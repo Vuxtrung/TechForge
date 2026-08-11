@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{fragments/header :: header-head}">
     <meta charset="UTF-8">
@@ -8,37 +7,26 @@
 </head>
 
 <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <main class="main-content">
+        <section class="hero">
+            <h1>Welcome to TechForge</h1>
+            <p>
+                Your technology platform for powerful
+                and customizable PCs.
+            </p>
+            <div class="hero-actions">
+                <a th:href="@{/products}" class="btn btn-primary">
+                    Explore Products
+                </a>
 
-<header th:replace="~{fragments/header :: header}">
-</header>
-
-
-<main class="main-content">
-
-    <section class="hero">
-        <h1>Welcome to TechForge</h1>
-
-        <p>
-            Your technology platform for powerful
-            and customizable PCs.
-        </p>
-
-        <div class="hero-actions">
-            <a th:href="@{/products}" class="btn btn-primary">
-                Explore Products
-            </a>
-
-            <a th:href="@{/custom-build}" class="btn btn-secondary">
-                Custom Build
-            </a>
-        </div>
-    </section>
-
-</main>
-
-
-<footer th:replace="~{fragments/footer :: footer}">
-</footer>
-
+                <a th:href="@{/custom-build}" class="btn btn-secondary">
+                    Custom Build
+                </a>
+            </div>
+        </section>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
+
 </html>

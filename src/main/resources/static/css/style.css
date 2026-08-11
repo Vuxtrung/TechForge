@@ -3,9 +3,15 @@
     background-color: #111827;
 }
 
-.logo {
+.header-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 20px;
     display: flex;
     align-items: center;
+    gap: 24px;
+    box-sizing: border-box;
 }
 
 .logo img {
@@ -24,8 +30,12 @@
 }
 
 /* Search */
-.site-header form {
+.search-form {
+    flex: 1 1 500px;
+    width: auto;
+    min-width: 0;
     max-width: 500px;
+    display: flex;
 }
 
 .site-header .form-control {
@@ -38,7 +48,6 @@
     border-radius: 3px;
 }
 
-/* Build PC */
 .sprite {
     background-image: url(../images/spritesheet1.png);
     background-repeat: no-repeat;
@@ -46,10 +55,34 @@
     background-size: 366px 284px !important;
 }
 
+.sprite-search-header {
+    width: 17px;
+    height: 17px;
+    background-position: -301px -122px;
+}
+
 .sprite-buildpc-header {
     width: 14px;
     height: 25px;
     background-position: -3px -49px;
+}
+
+.sprite-contact-header {
+    width: 23px;
+    height: 23px;
+    background-position: -103px -211px;
+}
+
+.sprite-cart-header {
+    width: 23px;
+    height: 21px;
+    background-position: -94px -49px;
+}
+
+.sprite-account-header {
+    width: 25px;
+    height: 26px;
+    background-position: -24px -3px;
 }
 
 .build-link {
@@ -62,6 +95,14 @@
     min-width: 50px;
     padding: 0;
     cursor: pointer;
+}
+
+.icon-box {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .build-link .sprite {
@@ -81,3 +122,151 @@
     color: #60a5fa;
     text-decoration: none;
 }
+
+/* ========================= Footer ========================= */
+.site-footer {
+    background-color: #111827;
+    color: #ffffff;
+    margin-top: 50px;
+}
+
+/* Footer columns */
+
+.footer-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 30px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    box-sizing: border-box;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-column h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.footer-column a {
+    color: #9ca3af;
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-column a:hover {
+    color: #ffffff;
+}
+
+
+/* Company information */
+
+.footer-company {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px;
+    border-top: 1px solid #374151;
+    box-sizing: border-box;
+}
+
+.footer-company h3 {
+    margin: 0 0 15px;
+    font-size: 20px;
+}
+
+.footer-company p {
+    margin: 7px 0;
+    color: #9ca3af;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.footer-company strong {
+    color: #ffffff;
+}
+
+.footer-company a {
+    color: #9ca3af;
+    text-decoration: none;
+}
+
+.footer-company a:hover {
+    color: #ffffff;
+}
+
+
+/* Copyright */
+.footer-bottom {
+    border-top: 1px solid #374151;
+    padding: 18px 30px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* ======================== Login Page ========================= */
+.login-page {
+    width: 100%;
+    padding: 50px 20px;
+    box-sizing: border-box;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.login-box,
+.register-box {
+    border: 1px solid #e5e7eb;
+    padding: 30px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.login-box h1 { margin: 0 0 30px; font-size: 22px; font-weight: 600; color: #111827; }
+
+.login-form { display: flex; flex-direction: column; gap: 18px; }
+
+.form-group { display: flex; flex-direction: column; gap: 7px; }
+
+.form-group label { font-size: 14px; font-weight: 600; color: #374151; }
+
+.form-group input { width: 100%; height: 42px; padding: 0 12px; border: 1px solid #d1d5db; border-radius: 3px; box-sizing: border-box; font-size: 14px; outline: none; }
+
+.form-group input:focus { border-color: #60a5fa; }
+
+.login-button { width: 100%; height: 42px; border: none; border-radius: 3px; background-color: #2563eb; color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+.login-button:hover { background-color: #1d4ed8; }
+
+.forgot-password { text-align: center; color: #2563eb; font-size: 14px; text-decoration: none; }
+
+.forgot-password:hover { text-decoration: underline; }
+
+.register-box h2 { margin: 0 0 15px; font-size: 20px; font-weight: 600; color: #111827; }
+
+.register-box p { margin: 0 0 25px; color: #6b7280; font-size: 14px; line-height: 1.6; }
+
+.register-button { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 20px; border-radius: 3px; background-color: #111827; color: white; font-size: 14px; font-weight: 600; text-decoration: none; }
+
+.register-button:hover { background-color: #1f2937; color: white; }
+
+@media (max-width: 700px) { .login-container { grid-template-columns: 1fr; max-width: 500px; } .login-page { padding: 30px 15px; } }

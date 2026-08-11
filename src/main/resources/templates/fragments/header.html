@@ -12,25 +12,44 @@
 
 <body>
     <header th:fragment="header" class="site-header">
-        <div class="container d-flex align-items-center gap-4 py-2">
+        <div class="header-container">
             <!-- Logo -->
             <a th:href="@{/}" class="logo flex-shrink-0">
                 <img th:src="@{/images/logo.png}">
             </a>
             <!-- Search -->
-            <form th:action="@{/products}" method="get" class="d-flex flex-grow-1">
-                <input type="search" name="keyword" class="form-control" placeholder="Search products..."
+            <form th:action="@{/products}" method="get" class="search-form">
+                <input type="search" name="keyword" class="form-control" placeholder="Tìm kiếm sản phẩm..."
                     aria-label="Search products">
-                <button type="submit" class="btn btn-primary ms-2"> Search </button>
+                <button type="submit" class="btn btn-primary ms-2"> <i
+                        class="sprite sprite-search-header icon-search"></i> </button>
             </form>
             <!-- Navigation -->
             <nav class="d-flex align-items-center gap-3 flex-shrink-0">
-                <a th:href="@{/custom-build}" class="build-link">
-                    <i class="sprite sprite-buildpc-header"></i>
-                    <span>Build</span>
-                </a> <a th:href="@{/about}" class="nav-link"> About </a>
-                <a th:href="@{/products}" class="nav-link"> Products </a>
-                <a th:href="@{/login}" class="nav-link"> Login </a>
+                <a th:href="@{/buildpc}" class="build-link">
+                    <span class="icon-box">
+                        <i class="sprite sprite-buildpc-header"></i>
+                    </span>
+                    <span>Xây dựng PC</span>
+                </a>
+                <a th:href="@{/contact}" class="build-link">
+                    <span class="icon-box">
+                        <i class="sprite sprite-contact-header"></i>
+                    </span>
+                    <span>Liên hệ</span>
+                </a>
+                <a th:href="@{/cart}" class="build-link">
+                    <span class="icon-box">
+                        <i class="sprite sprite-cart-header"></i>
+                    </span>
+                    <span>Giỏ hàng</span>
+                </a>
+                <a th:href="@{/login}" class="build-link">
+                    <span class="icon-box">
+                        <i class="sprite sprite-account-header"></i>
+                    </span>
+                    <span>Tài khoản</span>
+                </a>
             </nav>
-        </div>  
+        </div>
     </header>

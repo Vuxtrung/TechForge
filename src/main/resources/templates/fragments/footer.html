@@ -1,34 +1,168 @@
-<footer th:fragment="footer"
-        xmlns:th="http://www.thymeleaf.org"
-        class="site-footer">
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<footer th:fragment="footer" class="site-footer">
 
     <div class="footer-container">
 
-        <div class="footer-section">
-            <h3>TechForge</h3>
-            <p>
-                Your technology platform for powerful
-                and customizable PCs.
-            </p>
+        <!-- About TechForge -->
+        <div class="footer-column">
+
+            <h3>GIỚI THIỆU TECHFORGE</h3>
+
+            <a th:href="@{/about}">
+                Giới thiệu TechForge
+            </a>
+
+            <a th:href="@{/contact}">
+                Thông tin liên hệ
+            </a>
+
+            <a th:href="@{/news}">
+                Tin tức
+            </a>
+
+            <a th:href="@{/careers}">
+                Tuyển dụng
+            </a>
+
+            <a th:href="@{/stores}">
+                Hệ thống cửa hàng
+            </a>
+
         </div>
 
-        <div class="footer-section">
-            <h4>Quick Links</h4>
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/products}">Products</a>
-            <a th:href="@{/about}">About</a>
+
+        <!-- Customer Support -->
+        <div class="footer-column">
+
+            <h3>HỖ TRỢ KHÁCH HÀNG</h3>
+
+            <a th:href="@{/shopping-guide}">
+                Hướng dẫn mua hàng trực tuyến
+            </a>
+
+            <a th:href="@{/payment-guide}">
+                Hướng dẫn thanh toán
+            </a>
+
+            <a th:href="@{/warranty}">
+                Gửi yêu cầu bảo hành
+            </a>
+
+            <a th:href="@{/feedback}">
+                Góp ý, Khiếu nại
+            </a>
+
         </div>
 
-        <div class="footer-section">
-            <h4>Support</h4>
-            <a th:href="@{/contact}">Contact Us</a>
-            <a th:href="@{/faq}">FAQ</a>
+
+        <!-- Policies -->
+        <div class="footer-column">
+
+            <h3>CHÍNH SÁCH CHUNG</h3>
+
+            <a th:href="@{/policies/general}">
+                Chính sách, quy định chung
+            </a>
+
+            <a th:href="@{/policies/shipping}">
+                Chính sách vận chuyển
+            </a>
+
+            <a th:href="@{/policies/warranty}">
+                Chính sách bảo hành
+            </a>
+
+            <a th:href="@{/policies/services}">
+                Dịch vụ tính phí
+            </a>
+
+            <a th:href="@{/policies/return}">
+                Chính sách nhập lại sản phẩm
+            </a>
+
+            <a th:href="@{/policies/business}">
+                Chính sách cho doanh nghiệp
+            </a>
+
+            <a th:href="@{/policies/privacy}">
+                Chính sách bảo mật
+            </a>
+
+        </div>
+
+
+        <!-- Promotions -->
+        <div class="footer-column">
+
+            <h3>THÔNG TIN KHUYẾN MẠI</h3>
+
+            <a th:href="@{/promotions}">
+                Thông tin khuyến mại
+            </a>
+
+            <a th:href="@{/products/promotions}">
+                Sản phẩm khuyến mại
+            </a>
+
+            <a th:href="@{/products/bestsellers}">
+                Sản phẩm bán chạy
+            </a>
+
+            <a th:href="@{/products/new}">
+                Sản phẩm mới
+            </a>
+
         </div>
 
     </div>
 
+
+    <!-- Company Information -->
+    <div class="footer-company">
+
+        <h3>TECHFORGE</h3>
+
+        <p>
+            WEBSITE ĐƯỢC SỞ HỮU VÀ QUẢN LÝ BỞI TECHFORGE
+        </p>
+
+        <p>
+            <strong>TECHFORGE COMPUTER</strong>
+        </p>
+
+        <p>
+            Địa chỉ: Hà Nội, Việt Nam
+        </p>
+
+        <p>
+            Email:
+            <a href="mailto:support@techforge.vn">
+                support@techforge.vn
+            </a>
+        </p>
+
+        <p>
+            Website:
+            <a th:href="@{/}">
+                TechForge
+            </a>
+        </p>
+
+    </div>
+
+
+    <!-- Copyright -->
     <div class="footer-bottom">
-        <p>&copy; 2026 TechForge. All rights reserved.</p>
+
+        <p>
+            &copy; 2026 TechForge. All rights reserved.
+        </p>
+
     </div>
 
 </footer>
