@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="header-head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - TechForge' : 'TechForge'}"> TechForge </title>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <header th:fragment="header" class="site-header">
+        <div class="container d-flex align-items-center gap-4 py-2">
+            <!-- Logo -->
+            <a th:href="@{/}" class="logo flex-shrink-0">
+                <img th:src="@{/images/logo.png}">
+            </a>
+            <!-- Search -->
+            <form th:action="@{/products}" method="get" class="d-flex flex-grow-1">
+                <input type="search" name="keyword" class="form-control" placeholder="Search products..."
+                    aria-label="Search products">
+                <button type="submit" class="btn btn-primary ms-2"> Search </button>
+            </form>
+            <!-- Navigation -->
+            <nav class="d-flex align-items-center gap-3 flex-shrink-0">
+                <a th:href="@{/custom-build}" class="build-link">
+                    <i class="sprite sprite-buildpc-header"></i>
+                    <span>Build</span>
+                </a> <a th:href="@{/about}" class="nav-link"> About </a>
+                <a th:href="@{/products}" class="nav-link"> Products </a>
+                <a th:href="@{/login}" class="nav-link"> Login </a>
+            </nav>
+        </div>  
+    </header>
