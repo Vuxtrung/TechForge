@@ -1,6 +1,5 @@
 ﻿-- =========================================================
 -- TechForge Database
--- (Đã đồng bộ khớp với bản dump techforge_db)
 -- =========================================================
 
 DROP DATABASE IF EXISTS techforge;
