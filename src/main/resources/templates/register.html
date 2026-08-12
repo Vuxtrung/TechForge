@@ -176,7 +176,12 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-[url('placeholder')] bg-cover bg-center" data-alt="A macro shot of high-end PC hardware components, specifically a motherboard with sleek dark grey and black heat sinks. Subtle neon blue LEDs provide a sharp, technical illumination. The background is deeply shadowed, focusing entirely on the precision engineering of the tech. The overall aesthetic is aggressive, premium, and cybernetic, fitting a high-performance computing theme.">
+<body class="min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-[url('placeholder')] bg-cover bg-center relative" data-alt="A macro shot of high-end PC hardware components, specifically a motherboard with sleek dark grey and black heat sinks. Subtle neon blue LEDs provide a sharp, technical illumination. The background is deeply shadowed, focusing entirely on the precision engineering of the tech. The overall aesthetic is aggressive, premium, and cybernetic, fitting a high-performance computing theme.">
+<!-- Back to Home Button (Top Left) -->
+<a href="/" th:href="@{/}" class="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container/80 hover:bg-surface-container text-on-surface hover:text-primary-container border border-white/10 backdrop-blur-md shadow-lg transition-all duration-300 group text-decoration-none" title="Trở về Trang Chủ TechForge">
+    <span class="material-symbols-outlined text-[22px] group-hover:-translate-x-1 transition-transform duration-200">arrow_back</span>
+    <span class="font-label-mono text-label-mono uppercase tracking-wider text-xs font-semibold">Trang Chủ</span>
+</a>
 <!-- Background overlay for depth -->
 <div class="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
 <main class="relative z-10 w-full max-w-md glass-panel p-8 rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.8)]">

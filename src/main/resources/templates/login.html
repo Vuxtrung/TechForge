@@ -126,6 +126,11 @@
     </style>
 </head>
 <body class="bg-background text-on-surface min-h-screen flex items-center justify-center relative overflow-hidden">
+<!-- Back to Home Button (Top Left) -->
+<a href="/" th:href="@{/}" class="fixed top-6 left-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container/80 hover:bg-surface-container text-on-surface hover:text-primary-container border border-white/10 backdrop-blur-md shadow-lg transition-all duration-300 group text-decoration-none" title="Trở về Trang Chủ TechForge">
+    <span class="material-symbols-outlined text-[22px] group-hover:-translate-x-1 transition-transform duration-200">arrow_back</span>
+    <span class="font-label-mono text-label-mono uppercase tracking-wider text-xs font-semibold">Trang Chủ</span>
+</a>
 <!-- Background Texture/Image -->
 <div class="absolute inset-0 z-0">
 <div class="w-full h-full bg-cover bg-center opacity-30 mix-blend-luminosity" data-alt="A dark, moody, highly detailed macro photograph of premium computer hardware components, featuring a textured matte black circuit board with subtle, tracing metallic lines. The scene is illuminated by faint, ambient electric blue and deep green LEDs that create a moody, cyberpunk-inspired atmosphere. The depth of field is shallow, emphasizing the precision engineering and industrial design. The overall aesthetic is sleek, powerful, and high-tech." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCiTHFSvq0DLzXTmqpJ6_vV6g_TdZDn-Nep131eEAWALbt5AV8ON654Mo_GG1ea62Ob2y61SCU-lsPIVwhMBimF-Z0PyG1LT5r2FKtmQT1cZ4ZBEIC6IETmGiaYXlaFJuYPrvC-cVO1-qPywyTy2jGbOzcn9raJd5-9caAJp_0309R7k2LKZ2L4AJXaqolZkC07yt3z6ylBNhIq-zirZtUOQT9TukcnUiKEY3AHYUhaGo5rN3DgpmTl')"></div>
