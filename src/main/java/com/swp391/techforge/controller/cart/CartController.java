@@ -70,6 +70,7 @@ public class CartController {
                             @RequestParam(value = "price", defaultValue = "1000000") Double price,
                             @RequestParam(value = "imageUrl", defaultValue = "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400") String imageUrl,
                             @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
+                            @RequestHeader(value = "Referer", required = false) String referer,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
 
@@ -91,7 +92,12 @@ public class CartController {
         }
 
         session.setAttribute(CART_SESSION_KEY, cartItems);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm sản phẩm vào giỏ hàng thành công!");
+        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm \"" + productName + "\" vào giỏ hàng thành công!");
+
+        // Giữ khách hàng ở nguyên trang hiện tại (Trang chủ / Danh sách SP) để mua thêm món khác
+        if (referer != null && !referer.isEmpty()) {
+            return "redirect:" + referer;
+        }
 
         return "redirect:/cart";
     }
