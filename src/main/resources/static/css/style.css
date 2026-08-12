@@ -1,0 +1,106 @@
+/* =========================================================
+   TechForge E-Commerce & PC Builder - Global Custom Styles
+   ========================================================= */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+/* Utilities */
+.fs-7 { font-size: 0.85rem !important; }
+.fs-8 { font-size: 0.75rem !important; }
+.tracking-tight { letter-spacing: -0.5px; }
+.tracking-wider { letter-spacing: 1px; }
+.max-w-600 { max-width: 600px; }
+
+/* Header & Navigation */
+.site-header {
+    z-index: 1030;
+}
+
+.brand-logo {
+    font-family: 'Impact', sans-serif;
+}
+
+.hover-warning:hover {
+    color: #f59e0b !important;
+}
+
+.hover-white:hover {
+    color: #ffffff !important;
+}
+
+.hover-bg-light:hover {
+    background-color: #f1f5f9 !important;
+}
+
+.header-action-btn:hover {
+    color: #ef4444 !important;
+}
+
+/* Category Menu */
+.category-menu-card {
+    min-height: 340px;
+}
+
+.category-menu-list li a {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Hover Animations */
+.hover-shadow {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-shadow:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.hover-transform {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-transform:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Feature Shortcut Cards */
+.feature-shortcut-card {
+    cursor: pointer;
+}
+
+.shortcut-icon {
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Product Cards */
+.product-card {
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.product-img {
+    height: 180px;
+    object-fit: contain;
+    background-color: #ffffff;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Footer Links */
+.footer-links a {
+    transition: color 0.2s ease;
+}
