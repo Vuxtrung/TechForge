@@ -1,165 +1,107 @@
-/* ========================= Header ========================= */
+/* =========================================================
+   TechForge E-Commerce & PC Builder - Global Custom Styles
+   ========================================================= */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+/* Utilities */
+.fs-7 { font-size: 0.85rem !important; }
+.fs-8 { font-size: 0.75rem !important; }
+.tracking-tight { letter-spacing: -0.5px; }
+.tracking-wider { letter-spacing: 1px; }
+.max-w-600 { max-width: 600px; }
+
+/* Header & Navigation */
 .site-header {
-    background-color: #111827;
+    z-index: 1030;
 }
 
-.header-container {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    box-sizing: border-box;
+.brand-logo {
+    font-family: 'Impact', sans-serif;
 }
 
-.logo img {
-    height: 45px;
-    width: auto;
-    display: block;
+.hover-warning:hover {
+    color: #f59e0b !important;
 }
 
-.site-header .nav-link {
-    color: white;
-    white-space: nowrap;
+.hover-white:hover {
+    color: #ffffff !important;
 }
 
-.site-header .nav-link:hover {
-    color: #60a5fa;
+.hover-bg-light:hover {
+    background-color: #f1f5f9 !important;
 }
 
-/* Search */
-.search-form {
-    flex: 1 1 500px;
-    width: auto;
-    min-width: 0;
-    max-width: 500px;
-    display: flex;
+.header-action-btn:hover {
+    color: #ef4444 !important;
 }
 
-.site-header .form-control {
-    height: 39px;
-    border-radius: 3px;
+/* Category Menu */
+.category-menu-card {
+    min-height: 340px;
 }
 
-.site-header .btn {
-    height: 39px;
-    border-radius: 3px;
+.category-menu-list li a {
+    transition: all 0.2s ease-in-out;
 }
 
-.sprite {
-    background-image: url(../images/spritesheet1.png);
-    background-repeat: no-repeat;
-    display: block;
-    background-size: 366px 284px !important;
+/* Hover Animations */
+.hover-shadow {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sprite-search-header {
-    width: 17px;
-    height: 17px;
-    background-position: -301px -122px;
+.hover-shadow:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
-.sprite-buildpc-header {
-    width: 14px;
-    height: 25px;
-    background-position: -3px -49px;
+.hover-transform {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sprite-contact-header {
-    width: 23px;
-    height: 23px;
-    background-position: -103px -211px;
+.hover-transform:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08) !important;
 }
 
-.sprite-cart-header {
-    width: 23px;
-    height: 21px;
-    background-position: -94px -49px;
-}
-
-.sprite-account-header {
-    width: 25px;
-    height: 26px;
-    background-position: -24px -3px;
-}
-
-.build-link {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-decoration: none;
-    min-width: 50px;
-    padding: 0;
+/* Feature Shortcut Cards */
+.feature-shortcut-card {
     cursor: pointer;
 }
 
-.icon-box {
-    width: 25px;
-    height: 25px;
+.shortcut-icon {
+    width: 55px;
+    height: 55px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.build-link .sprite {
-    margin: 0 auto;
+/* Product Cards */
+.product-card {
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
 }
 
-.build-link span {
-    display: block;
-    color: white;
-    text-decoration: none;
-    font-size: 12px;
-    line-height: 1;
-    margin-top: 4px;
+.product-img {
+    height: 180px;
+    object-fit: contain;
+    background-color: #ffffff;
 }
 
-.build-link:hover {
-    color: #60a5fa;
-    text-decoration: none;
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* ========================= Footer ========================= */
-.site-footer {
-    background-color: #111827;
-    color: #ffffff;
-    margin-top: 50px;
-}
-
-/* Footer columns */
-
-.footer-container {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 30px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-    box-sizing: border-box;
-}
-
-.footer-column {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.footer-column h3 {
-    margin: 0 0 10px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #ffffff;
-}
-
-.footer-column a {
-    color: #9ca3af;
-    font-size: 14px;
-    text-decoration: none;
+/* Footer Links */
+.footer-links a {
     transition: color 0.2s ease;
 }
 
@@ -282,3 +224,4 @@
 .register-submit:hover { background-color: #1f2937; }
 
 @media (max-width: 700px) { .register-container { max-width: 500px; } .register-form-box { padding: 25px 20px; } }
+}

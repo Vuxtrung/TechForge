@@ -3,29 +3,385 @@
 
 <head th:replace="~{fragments/header :: header-head}">
     <meta charset="UTF-8">
-    <title>TechForge</title>
+    <title>TechForge - Cửa Hàng Máy Tính, PC Đồ Họa, PC Gaming & Điện Thoại Chuyên Nghiệp</title>
 </head>
 
 <body>
+    <!-- Header Fragment -->
     <div th:replace="~{fragments/header :: header}"></div>
-    <main class="main-content">
-        <section class="hero">
-            <h1>Welcome to TechForge</h1>
-            <p>
-                Your technology platform for powerful
-                and customizable PCs.
-            </p>
-            <div class="hero-actions">
-                <a th:href="@{/products}" class="btn btn-primary">
-                    Explore Products
-                </a>
 
-                <a th:href="@{/custom-build}" class="btn btn-secondary">
-                    Custom Build
-                </a>
+    <!-- Main Container -->
+    <main class="main-body">
+
+        <!-- SECTION 1: HERO & CATEGORY MENU -->
+        <section class="hero-section container-fluid px-lg-5 my-3">
+            <div class="row g-3">
+                <!-- Left Menu (Categories) -->
+                <div class="col-lg-3 d-none d-lg-block">
+                    <div class="category-menu-card bg-white rounded shadow-sm border p-2">
+                        <div class="menu-title bg-dark text-white p-2 rounded mb-2 fw-bold text-uppercase fs-6">
+                            <i class="bi bi-list me-2"></i> Danh Mục Sản Phẩm
+                        </div>
+                        <ul class="list-unstyled mb-0 category-menu-list">
+                            <li>
+                                <a th:href="@{/products(category='pc-gaming')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-controller me-2 text-danger"></i> PC Gaming & Esports</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/products(category='pc-do-hoa')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-cpu me-2 text-primary"></i> PC Đồ Họa & Workstation</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/products(category='linh-kien')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-gpu-card me-2 text-success"></i> Linh Kiện Máy Tính</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/products(category='laptop')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-laptop me-2 text-warning"></i> Laptop Gaming & Office</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/products(category='man-hinh')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-display me-2 text-info"></i> Màn Hình Máy Tính</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/products(category='dien-thoai')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-phone me-2 text-danger"></i> Điện Thoại Di Động</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a th:href="@{/products(category='phu-kien')}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                    <span><i class="bi bi-keyboard me-2 text-secondary"></i> Bàn Phím, Chuột & Gear</span>
+                                    <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Middle Banner Carousel -->
+                <div class="col-lg-6 col-md-8">
+                    <div id="heroCarousel" class="carousel slide rounded overflow-hidden shadow-sm border" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="bg-dark text-white p-5 d-flex flex-column justify-content-center align-items-start position-relative hero-slide-bg" style="min-height: 340px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+                                    <span class="badge bg-danger mb-2 px-3 py-2 fs-7 text-uppercase">Khuyến Mãi Khủng 2026</span>
+                                    <h2 class="fw-bold text-warning display-6 mb-2">BUILD PC TECHFORGE</h2>
+                                    <h4 class="fw-normal mb-3">TẶNG MÀN HÌNH GAMING 180HZ CHÍNH HÃNG</h4>
+                                    <p class="text-light fs-6 mb-4">Áp dụng cho cấu hình PC i5/Ryzen 5 + RTX 4060 trở lên</p>
+                                    <a th:href="@{/buildpc}" class="btn btn-warning btn-lg fw-bold text-dark px-4 shadow">
+                                        <i class="bi bi-tools me-2"></i> TỰ BUILD PC NGAY
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="bg-dark text-white p-5 d-flex flex-column justify-content-center align-items-start position-relative hero-slide-bg" style="min-height: 340px; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);">
+                                    <span class="badge bg-success mb-2 px-3 py-2 fs-7 text-uppercase">Thuật Toán Thông Minh</span>
+                                    <h2 class="fw-bold text-info display-6 mb-2">GỢI Ý PC THEO NGÂN SÁCH</h2>
+                                    <h4 class="fw-normal mb-3">Tối Ưu Cấu Hình Trong Tầm Giá (10Tr - 50Tr)</h4>
+                                    <p class="text-light fs-6 mb-4">Hệ thống tự động đề xuất 3 cấu hình chuẩn nhất cho bạn</p>
+                                    <a th:href="@{/pc-recommender}" class="btn btn-info btn-lg fw-bold text-dark px-4 shadow">
+                                        <i class="bi bi-lightbulb me-2"></i> XEM GỢI Ý NGAY
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="bg-dark text-white p-5 d-flex flex-column justify-content-center align-items-start position-relative hero-slide-bg" style="min-height: 340px; background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%);">
+                                    <span class="badge bg-warning text-dark mb-2 px-3 py-2 fs-7 text-uppercase">Chính Sách Uy Tín</span>
+                                    <h2 class="fw-bold text-white display-6 mb-2">BẢO HÀNH 1 ĐỔI 1</h2>
+                                    <h4 class="fw-normal mb-3">Tra Cứu Tiến Độ Qua IMEI / Serial / SĐT</h4>
+                                    <p class="text-light fs-6 mb-4">Cam kết hàng mới 100% chính hãng bảo hành siêu tốc</p>
+                                    <a th:href="@{/warranty-lookup}" class="btn btn-light btn-lg fw-bold text-danger px-4 shadow">
+                                        <i class="bi bi-shield-check me-2"></i> TRA CỨU BẢO HÀNH
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Banners -->
+                <div class="col-lg-3 col-md-4 d-flex flex-column justify-content-between gap-2">
+                    <div class="side-banner-card bg-primary text-white p-3 rounded shadow-sm border h-100 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                        <span class="badge bg-warning text-dark mb-1 w-fit">HOT SALE</span>
+                        <h6 class="fw-bold mb-1">PC Đồ Họa Render 3D</h6>
+                        <p class="fs-7 mb-2 opacity-90">i9 14900K | RTX 4090 | RAM 64GB DDR5</p>
+                        <a th:href="@{/products(category='pc-do-hoa')}" class="btn btn-sm btn-light text-primary fw-bold align-self-start">Xem Cấu Hình</a>
+                    </div>
+                    <div class="side-banner-card bg-danger text-white p-3 rounded shadow-sm border h-100 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);">
+                        <span class="badge bg-light text-danger mb-1 w-fit">BEST SELLER</span>
+                        <h6 class="fw-bold mb-1">PC Gaming Esports 10Tr</h6>
+                        <p class="fs-7 mb-2 opacity-90">i3 13100F | GTX 1650 | 16GB RAM</p>
+                        <a th:href="@{/products(category='pc-gaming')}" class="btn btn-sm btn-light text-danger fw-bold align-self-start">Xem Chi Tiết</a>
+                    </div>
+                </div>
             </div>
         </section>
+
+
+        <!-- SECTION 2: CORE FEATURE SHORTCUT CARDS (4 NÚT TÍNH NĂNG NỔI BẬT) -->
+        <section class="feature-shortcuts-section container-fluid px-lg-5 my-4">
+            <div class="row g-3">
+                <!-- Build PC -->
+                <div class="col-xl-3 col-md-6">
+                    <a th:href="@{/buildpc}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-danger hover-transform">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon bg-danger-subtle text-danger rounded-circle p-3 fs-3">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Tự Build PC TechForge</h6>
+                                <p class="text-muted fs-7 mb-0">Tự chọn linh kiện - Auto check tương thích 100%</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Budget PC Recommender -->
+                <div class="col-xl-3 col-md-6">
+                    <a th:href="@{/pc-recommender}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-primary hover-transform">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon bg-primary-subtle text-primary rounded-circle p-3 fs-3">
+                                <i class="bi bi-calculator"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Gợi Ý PC Theo Ngân Sách</h6>
+                                <p class="text-muted fs-7 mb-0">Nhập ngân sách - Đề xuất cấu hình tối ưu nhất</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Warranty Lookup -->
+                <div class="col-xl-3 col-md-6">
+                    <a th:href="@{/warranty-lookup}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-success hover-transform">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon bg-success-subtle text-success rounded-circle p-3 fs-3">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Tra Cứu Bảo Hành 1 Đổi 1</h6>
+                                <p class="text-muted fs-7 mb-0">Nhập IMEI / Serial / SĐT kiểm tra bảo hành</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Installment 0% -->
+                <div class="col-xl-3 col-md-6">
+                    <a th:href="@{/installment}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-warning hover-transform">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="shortcut-icon bg-warning-subtle text-warning-emphasis rounded-circle p-3 fs-3">
+                                <i class="bi bi-credit-card-2-front"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Trả Góp Lãi Suất 0%</h6>
+                                <p class="text-muted fs-7 mb-0">Duyệt hồ sơ nhanh qua Thẻ / Cty tài chính</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 3: FLASH SALE SECTION -->
+        <section class="flash-sale-section container-fluid px-lg-5 my-4">
+            <div class="bg-white rounded-3 shadow-sm border p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fs-4 text-danger fw-bold"><i class="bi bi-lightning-charge-fill"></i> FLASH SALE TECHFORGE</span>
+                        <span class="badge bg-danger fs-7">Giảm Đến 35%</span>
+                    </div>
+                    <a th:href="@{/products}" class="text-danger fw-bold text-decoration-none fs-7">Xem Tất Cả <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <!-- Product Grid Static Demo -->
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                    <!-- Demo Product 1 -->
+                    <div class="col">
+                        <div class="card h-100 product-card border rounded-3 p-2 hover-shadow">
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">-20%</span>
+                            <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400" class="card-img-top rounded p-2 product-img" alt="PC Gaming i5">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <div>
+                                    <span class="text-muted fs-8">PC Gaming</span>
+                                    <h6 class="card-title fw-bold fs-7 text-dark text-truncate-2 mt-1">TechForge Gaming Alpha i5 13400F | RTX 4060 | 16GB DDR5</h6>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-danger fw-bold fs-6">17.990.000đ</span>
+                                        <span class="text-muted text-decoration-line-through fs-8">22.500.000đ</span>
+                                    </div>
+                                    <a th:href="@{/products}" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold">
+                                        <i class="bi bi-cart-plus me-1"></i> Thêm Giỏ Hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo Product 2 -->
+                    <div class="col">
+                        <div class="card h-100 product-card border rounded-3 p-2 hover-shadow">
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">-15%</span>
+                            <img src="https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=400" class="card-img-top rounded p-2 product-img" alt="CPU Intel">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <div>
+                                    <span class="text-muted fs-8">Linh Kiện PC</span>
+                                    <h6 class="card-title fw-bold fs-7 text-dark text-truncate-2 mt-1">CPU Intel Core i7 14700K (LGA1700, 20 Nhân 28 Luồng)</h6>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-danger fw-bold fs-6">10.490.000đ</span>
+                                        <span class="text-muted text-decoration-line-through fs-8">12.300.000đ</span>
+                                    </div>
+                                    <a th:href="@{/products}" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold">
+                                        <i class="bi bi-cart-plus me-1"></i> Thêm Giỏ Hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo Product 3 -->
+                    <div class="col">
+                        <div class="card h-100 product-card border rounded-3 p-2 hover-shadow">
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">-18%</span>
+                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400" class="card-img-top rounded p-2 product-img" alt="VGA ASUS">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <div>
+                                    <span class="text-muted fs-8">VGA Card</span>
+                                    <h6 class="card-title fw-bold fs-7 text-dark text-truncate-2 mt-1">Card Màn Hình ASUS ROG Strix GeForce RTX 4070 Ti Super 16GB</h6>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-danger fw-bold fs-6">24.890.000đ</span>
+                                        <span class="text-muted text-decoration-line-through fs-8">29.990.000đ</span>
+                                    </div>
+                                    <a th:href="@{/products}" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold">
+                                        <i class="bi bi-cart-plus me-1"></i> Thêm Giỏ Hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo Product 4 -->
+                    <div class="col">
+                        <div class="card h-100 product-card border rounded-3 p-2 hover-shadow">
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">-25%</span>
+                            <img src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400" class="card-img-top rounded p-2 product-img" alt="Màn hình Gaming">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <div>
+                                    <span class="text-muted fs-8">Màn Hình</span>
+                                    <h6 class="card-title fw-bold fs-7 text-dark text-truncate-2 mt-1">Màn Hình Gaming ASUS TUF VG279Q3A 27 Inch IPS 180Hz 1ms</h6>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-danger fw-bold fs-6">3.990.000đ</span>
+                                        <span class="text-muted text-decoration-line-through fs-8">5.290.000đ</span>
+                                    </div>
+                                    <a th:href="@{/products}" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold">
+                                        <i class="bi bi-cart-plus me-1"></i> Thêm Giỏ Hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 4: TECHFORGE PC GAMING & ESPORTS SHOWCASE -->
+        <section class="pc-gaming-section container-fluid px-lg-5 my-4">
+            <div class="bg-white rounded-3 shadow-sm border p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fs-4 text-dark fw-bold"><i class="bi bi-controller text-danger"></i> PC GAMING & ESPORTS TECHFORGE</span>
+                    </div>
+                    <a th:href="@{/products(category='pc-gaming')}" class="text-primary fw-bold text-decoration-none fs-7">Xem Thêm PC Gaming <i class="bi bi-chevron-right"></i></a>
+                </div>
+
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                    <div class="col" th:each="i : ${#numbers.sequence(1, 4)}">
+                        <div class="card h-100 product-card border rounded-3 p-2 hover-shadow">
+                            <span class="badge bg-primary position-absolute top-0 start-0 m-2">HOT</span>
+                            <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400" class="card-img-top rounded p-2 product-img" alt="PC Gaming">
+                            <div class="card-body p-2 d-flex flex-column justify-content-between">
+                                <div>
+                                    <span class="text-muted fs-8">PC Gaming Nguyên Bộ</span>
+                                    <h6 class="card-title fw-bold fs-7 text-dark text-truncate-2 mt-1">TechForge Gaming Ultra R5 7600X | RTX 4070 | 32GB RAM</h6>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-danger fw-bold fs-6">28.990.000đ</span>
+                                    </div>
+                                    <a th:href="@{/products}" class="btn btn-dark btn-sm w-100 mt-2 fw-semibold">
+                                        <i class="bi bi-eye me-1"></i> Xem Cấu Hình
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 5: TECHFORGE COMMITMENT (CAM KẾT DỊCH VỤ) -->
+        <section class="commitment-section container-fluid px-lg-5 my-5">
+            <div class="bg-dark text-white rounded-3 shadow-sm p-4">
+                <div class="row g-4 text-center">
+                    <div class="col-md-3 col-6 border-end border-secondary">
+                        <i class="bi bi-truck fs-1 text-warning"></i>
+                        <h6 class="fw-bold mt-2 mb-1">GIAO HÀNG TOÀN QUỐC</h6>
+                        <p class="fs-8 text-light opacity-75 mb-0">Miễn phí vận chuyển đơn PC</p>
+                    </div>
+                    <div class="col-md-3 col-6 border-end border-secondary">
+                        <i class="bi bi-shield-check fs-1 text-success"></i>
+                        <h6 class="fw-bold mt-2 mb-1">BẢO HÀNH 1 ĐỔI 1</h6>
+                        <p class="fs-8 text-light opacity-75 mb-0">Cam kết linh kiện chính hãng 100%</p>
+                    </div>
+                    <div class="col-md-3 col-6 border-end border-secondary">
+                        <i class="bi bi-headset fs-1 text-info"></i>
+                        <h6 class="fw-bold mt-2 mb-1">HỖ TRỢ KỸ THUẬT 24/7</h6>
+                        <p class="fs-8 text-light opacity-75 mb-0">Tư vấn cấu hình chuyên nghiệp</p>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <i class="bi bi-credit-card fs-1 text-danger"></i>
+                        <h6 class="fw-bold mt-2 mb-1">TRẢ GÓP LÃI SUẤT 0%</h6>
+                        <p class="fs-8 text-light opacity-75 mb-0">Thủ tục nhanh chóng qua thẻ / Cty tài chính</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
+
+    <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 

@@ -1,171 +1,70 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <body>
+    <footer th:fragment="footer" class="site-footer bg-dark text-white pt-5">
+        <div class="footer-container container-fluid px-lg-5">
+            <div class="row g-4">
+                <!-- Col 1: About TechForge -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="brand-logo bg-danger text-white rounded p-2 fw-black fs-4 lh-1">TF</div>
+                        <span class="fs-4 fw-bold text-white">TECH<span class="text-danger">FORGE</span></span>
+                    </div>
+                    <p class="text-secondary fs-7 mb-3">
+                        TechForge là hệ thống bán lẻ máy tính, PC Gaming, PC Đồ Họa Workstation và Điện Thoại hàng đầu Việt Nam. Cam kết 100% hàng chính hãng, bảo hành 1 đổi 1 siêu tốc.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle"><i class="bi bi-tiktok"></i></a>
+                    </div>
+                </div>
 
-<footer th:fragment="footer" class="site-footer">
+                <!-- Col 2: Policy -->
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold text-white mb-3 text-uppercase fs-7">Chính Sách & Quy Định</h6>
+                    <ul class="list-unstyled footer-links fs-7">
+                        <li class="mb-2"><a th:href="@{/warranty-lookup}" class="text-secondary text-decoration-none hover-white">Chính Sách Bảo Hành 1 Đổi 1</a></li>
+                        <li class="mb-2"><a th:href="@{/installment}" class="text-secondary text-decoration-none hover-white">Chính Sách Trả Góp 0%</a></li>
+                        <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-white">Chính Sách Vận Chuyển</a></li>
+                        <li class="mb-2"><a href="#" class="text-secondary text-decoration-none hover-white">Chính Sách Đổi Trả Hàng</a></li>
+                    </ul>
+                </div>
 
-    <div class="footer-container">
+                <!-- Col 3: Showroom & Contact -->
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-white mb-3 text-uppercase fs-7">Hệ Thống Showroom TechForge</h6>
+                    <ul class="list-unstyled footer-links fs-7 text-secondary">
+                        <li class="mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <strong>Showroom 1:</strong> Trần Thái Tông, Cầu Giấy, Hà Nội</li>
+                        <li class="mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> <strong>Showroom 2:</strong> Lý Thường Kiệt, Q.10, TP. Hồ Chí Minh</li>
+                        <li class="mb-2"><i class="bi bi-telephone-fill text-warning me-1"></i> <strong>Hotline Kinh Doanh:</strong> 0828.333.363</li>
+                        <li class="mb-2"><i class="bi bi-headset text-info me-1"></i> <strong>Hotline Bảo Hành:</strong> 0988.882.838</li>
+                    </ul>
+                </div>
 
-        <!-- About TechForge -->
-        <div class="footer-column">
+                <!-- Col 4: Payment Partners -->
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-white mb-3 text-uppercase fs-7">Hỗ Trợ Thanh Toán & Trả Góp</h6>
+                    <p class="text-secondary fs-7 mb-2">Chấp nhận mọi hình thức thanh toán an toàn:</p>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span class="badge bg-secondary p-2 fs-8">VNPay</span>
+                        <span class="badge bg-secondary p-2 fs-8">MoMo</span>
+                        <span class="badge bg-secondary p-2 fs-8">Visa / Mastercard</span>
+                        <span class="badge bg-secondary p-2 fs-8">FE Credit</span>
+                    </div>
+                </div>
+            </div>
 
-            <h3>GIỚI THIỆU TECHFORGE</h3>
-
-            <a th:href="@{/about}">
-                Giới thiệu TechForge
-            </a>
-
-            <a th:href="@{/contact}">
-                Thông tin liên hệ
-            </a>
-
-            <a th:href="@{/news}">
-                Tin tức
-            </a>
-
-            <a th:href="@{/careers}">
-                Tuyển dụng
-            </a>
-
-            <a th:href="@{/stores}">
-                Hệ thống cửa hàng
-            </a>
-
+            <div class="border-top border-secondary mt-4 py-3 text-center fs-8 text-secondary">
+                <p class="mb-0">&copy; 2026 TechForge. All rights reserved. Designed for SWP391 TechForge Project.</p>
+            </div>
         </div>
+    </footer>
 
-
-        <!-- Customer Support -->
-        <div class="footer-column">
-
-            <h3>HỖ TRỢ KHÁCH HÀNG</h3>
-
-            <a th:href="@{/shopping-guide}">
-                Hướng dẫn mua hàng trực tuyến
-            </a>
-
-            <a th:href="@{/payment-guide}">
-                Hướng dẫn thanh toán
-            </a>
-
-            <a th:href="@{/warranty}">
-                Gửi yêu cầu bảo hành
-            </a>
-
-            <a th:href="@{/feedback}">
-                Góp ý, Khiếu nại
-            </a>
-
-        </div>
-
-
-        <!-- Policies -->
-        <div class="footer-column">
-
-            <h3>CHÍNH SÁCH CHUNG</h3>
-
-            <a th:href="@{/policies/general}">
-                Chính sách, quy định chung
-            </a>
-
-            <a th:href="@{/policies/shipping}">
-                Chính sách vận chuyển
-            </a>
-
-            <a th:href="@{/policies/warranty}">
-                Chính sách bảo hành
-            </a>
-
-            <a th:href="@{/policies/services}">
-                Dịch vụ tính phí
-            </a>
-
-            <a th:href="@{/policies/return}">
-                Chính sách nhập lại sản phẩm
-            </a>
-
-            <a th:href="@{/policies/business}">
-                Chính sách cho doanh nghiệp
-            </a>
-
-            <a th:href="@{/policies/privacy}">
-                Chính sách bảo mật
-            </a>
-
-        </div>
-
-
-        <!-- Promotions -->
-        <div class="footer-column">
-
-            <h3>THÔNG TIN KHUYẾN MẠI</h3>
-
-            <a th:href="@{/promotions}">
-                Thông tin khuyến mại
-            </a>
-
-            <a th:href="@{/products/promotions}">
-                Sản phẩm khuyến mại
-            </a>
-
-            <a th:href="@{/products/bestsellers}">
-                Sản phẩm bán chạy
-            </a>
-
-            <a th:href="@{/products/new}">
-                Sản phẩm mới
-            </a>
-
-        </div>
-
-    </div>
-
-
-    <!-- Company Information -->
-    <div class="footer-company">
-
-        <h3>TECHFORGE</h3>
-
-        <p>
-            WEBSITE ĐƯỢC SỞ HỮU VÀ QUẢN LÝ BỞI TECHFORGE
-        </p>
-
-        <p>
-            <strong>TECHFORGE COMPUTER</strong>
-        </p>
-
-        <p>
-            Địa chỉ: Hà Nội, Việt Nam
-        </p>
-
-        <p>
-            Email:
-            <a href="mailto:support@techforge.vn">
-                support@techforge.vn
-            </a>
-        </p>
-
-        <p>
-            Website:
-            <a th:href="@{/}">
-                TechForge
-            </a>
-        </p>
-
-    </div>
-
-
-    <!-- Copyright -->
-    <div class="footer-bottom">
-
-        <p>
-            &copy; 2026 TechForge. All rights reserved.
-        </p>
-
-    </div>
-
-</footer>
-
+    <!-- Bootstrap 5 JS Bundle -->
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/main.js}"></script>
 </body>
+
 </html>
