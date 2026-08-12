@@ -87,7 +87,7 @@
                     <!-- Cart Link -->
                     <a th:href="@{/cart}" class="header-action-btn position-relative text-white text-decoration-none d-flex flex-column align-items-center">
                         <i class="bi bi-cart3 fs-5"></i>
-                        <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle fs-8" th:text="${session.MY_CART_ITEMS != null ? session.MY_CART_ITEMS.size() : 0}">0</span>
+                        <span id="cartBadgeCount" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle fs-8" th:text="${session.MY_CART_ITEMS != null ? session.MY_CART_ITEMS.size() : 0}">0</span>
                         <span class="fs-8 mt-1">Giỏ hàng</span>
                     </a>
 
@@ -100,6 +100,62 @@
             </div>
         </div>
     </header>
+
+    <!-- JS Thêm vào giỏ hàng AJAX không load lại trang -->
+    <script>
+    function addToCartAjax(productId, productName, price, imageUrl) {
+        const formData = new FormData();
+        formData.append('productId', productId);
+        formData.append('productName', productName);
+        formData.append('price', price);
+        formData.append('imageUrl', imageUrl);
+        formData.append('quantity', 1);
+
+        fetch('/cart/api/add', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cập nhật số đếm trên Icon Giỏ hàng tức thì
+                const badge = document.getElementById('cartBadgeCount');
+                if (badge) badge.innerText = data.cartSize;
+
+                // Hiển thị Toast thông báo nổi
+                showToastNotification(data.message);
+            }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function showToastNotification(msg) {
+        let container = document.getElementById('ajaxToastContainer');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'ajaxToastContainer';
+            container.className = 'position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '1080';
+            document.body.appendChild(container);
+        }
+
+        container.innerHTML = `
+            <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body fs-7 fw-semibold">
+                        <i class="bi bi-cart-check-fill me-2 fs-6"></i>
+                        <span>${msg}</span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.toast').remove()"></button>
+                </div>
+            </div>
+        `;
+
+        setTimeout(() => {
+            if (container) container.innerHTML = '';
+        }, 3000);
+    }
+    </script>
 </body>
 
 </html>

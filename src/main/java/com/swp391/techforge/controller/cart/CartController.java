@@ -102,6 +102,41 @@ public class CartController {
         return "redirect:/cart";
     }
 
+    // 2b. API Thêm vào giỏ hàng qua AJAX (KHÔNG LOAD LẠI TRANG)
+    @PostMapping("/api/add")
+    @ResponseBody
+    public java.util.Map<String, Object> addToCartApi(@RequestParam("productId") Long productId,
+                                                      @RequestParam(value = "productName", defaultValue = "Sản phẩm TechForge") String productName,
+                                                      @RequestParam(value = "price", defaultValue = "1000000") Double price,
+                                                      @RequestParam(value = "imageUrl", defaultValue = "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400") String imageUrl,
+                                                      @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
+                                                      HttpSession session) {
+
+        List<CartItemDTO> cartItems = getCartFromSession(session);
+        boolean found = false;
+
+        for (CartItemDTO item : cartItems) {
+            if (item.getProductId().equals(productId)) {
+                item.setQuantity(item.getQuantity() + quantity);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            cartItems.add(new CartItemDTO(productId, productName, imageUrl, price, quantity));
+        }
+
+        session.setAttribute(CART_SESSION_KEY, cartItems);
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("success", true);
+        response.put("cartSize", cartItems.size());
+        response.put("message", "Đã thêm \"" + productName + "\" vào giỏ hàng!");
+
+        return response;
+    }
+
     // 3. Cập nhật số lượng sản phẩm (Update Quantity)
     @PostMapping("/update")
     public String updateQuantity(@RequestParam("productId") Long productId,
