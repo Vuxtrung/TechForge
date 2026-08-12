@@ -218,28 +218,11 @@
 }
 
 /* ======================== Login Page ========================= */
-.login-page {
-    width: 100%;
-    padding: 50px 20px;
-    box-sizing: border-box;
-}
+.login-page { width: 100%; padding: 50px 20px; box-sizing: border-box; }
 
-.login-container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-}
+.login-container { width: 100%; max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 
-.login-box,
-.register-box {
-    border: 1px solid #e5e7eb;
-    padding: 30px;
-    background-color: #ffffff;
-    box-sizing: border-box;
-}
+.login-box, .register-box { border: 1px solid #e5e7eb; padding: 30px; background-color: #ffffff; box-sizing: border-box; }
 
 .login-box h1 { margin: 0 0 30px; font-size: 22px; font-weight: 600; color: #111827; }
 
@@ -270,3 +253,32 @@
 .register-button:hover { background-color: #1f2937; color: white; }
 
 @media (max-width: 700px) { .login-container { grid-template-columns: 1fr; max-width: 500px; } .login-page { padding: 30px 15px; } }
+
+/* ======================== Register Page ========================= */
+.register-container { width: 100%; max-width: 650px; margin: 0 auto; }
+
+.register-form-box { border: 1px solid #e5e7eb; padding: 30px; background-color: #ffffff; box-sizing: border-box; }
+
+.register-form-box h1 { margin: 0 0 30px; font-size: 22px; font-weight: 600; color: #111827; }
+
+.register-form { display: flex; flex-direction: column; gap: 18px; }
+
+.register-form .form-group { display: flex; flex-direction: column; gap: 7px; }
+
+.register-form .form-group label { font-size: 14px; font-weight: 600; color: #374151; }
+
+.required { color: #dc2626; margin-left: 3px; }
+
+.register-form input, .register-form textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 3px; box-sizing: border-box; font-family: inherit; font-size: 14px; outline: none; }
+
+.register-form input { height: 42px; }
+
+.register-form textarea { resize: vertical; }
+
+.register-form input:focus, .register-form textarea:focus { border-color: #60a5fa; }
+
+.register-submit { width: 100%; margin-top: 5px; border: none; cursor: pointer; }
+
+.register-submit:hover { background-color: #1f2937; }
+
+@media (max-width: 700px) { .register-container { max-width: 500px; } .register-form-box { padding: 25px 20px; } }
