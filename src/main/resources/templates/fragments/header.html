@@ -74,7 +74,7 @@
                     <!-- Cart Link -->
                     <a th:href="@{/cart}" class="header-action-btn position-relative text-white text-decoration-none d-flex flex-column align-items-center">
                         <i class="bi bi-cart3 fs-5"></i>
-                        <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle fs-8">0</span>
+                        <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle fs-8" th:text="${session.MY_CART_ITEMS != null ? session.MY_CART_ITEMS.size() : 0}">0</span>
                         <span class="fs-8 mt-1">Giỏ hàng</span>
                     </a>
 
