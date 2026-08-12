@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TechForge - Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#859399",
+                        "on-tertiary-container": "#6b4700",
+                        "surface-tint": "#4cd6ff",
+                        "tertiary-fixed-dim": "#ffba49",
+                        "surface-variant": "#353534",
+                        "surface-container-high": "#2a2a2a",
+                        "primary-fixed-dim": "#4cd6ff",
+                        "primary": "#a4e6ff",
+                        "tertiary": "#ffd59c",
+                        "on-primary": "#003543",
+                        "inverse-surface": "#e5e2e1",
+                        "outline-variant": "#3c494e",
+                        "surface": "#131313",
+                        "on-tertiary-fixed-variant": "#624000",
+                        "secondary": "#d7ffc5",
+                        "surface-dim": "#131313",
+                        "inverse-primary": "#00677f",
+                        "primary-fixed": "#b7eaff",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#001f28",
+                        "secondary-fixed": "#79ff5b",
+                        "on-secondary-fixed": "#022100",
+                        "on-tertiary-fixed": "#291800",
+                        "inverse-on-surface": "#313030",
+                        "on-background": "#e5e2e1",
+                        "background": "#131313",
+                        "surface-container-highest": "#353534",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-container": "#00d1ff",
+                        "surface-container": "#201f1f",
+                        "on-surface-variant": "#bbc9cf",
+                        "on-tertiary": "#442b00",
+                        "on-secondary": "#053900",
+                        "tertiary-fixed": "#ffddb1",
+                        "tertiary-container": "#feb127",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#0f6d00",
+                        "error-container": "#93000a",
+                        "secondary-container": "#2ff801",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed-dim": "#2ae500",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed-variant": "#004e60",
+                        "on-primary-container": "#00566a",
+                        "on-secondary-fixed-variant": "#095300",
+                        "on-surface": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "margin-desktop": "64px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-mono": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "display-lg": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow {
+            box-shadow: 0 0 40px rgba(0, 209, 255, 0.15);
+        }
+        .input-glow:focus {
+            border-bottom-color: #00d1ff;
+            box-shadow: 0 4px 15px rgba(0, 209, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(0,209,255,0.15)]">
+<div class="flex justify-between items-center px-margin-desktop h-20 w-full mx-auto max-w-container-max">
+<a href="/" class="font-display-lg text-headline-md tracking-tighter text-primary">TechForge</a>
+<nav class="hidden md:flex space-x-8 items-center">
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="/buildpc">Build PC</a>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">PC <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">PC Gaming</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">PC Văn phòng</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Màn hình <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">Dell</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">ASUS</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">LG</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Linh kiện PC <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">CPU</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">VGA</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">Mainboard</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Phím chuột <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">Bàn phím cơ</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">Chuột Gaming</a>
+        </div>
+    </div>
+</nav>
+<div class="flex gap-4">
+<a href="/checkout" class="text-primary border-b-2 border-primary pb-1 active:scale-95 transition-transform flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+</a>
+<a href="/login" class="text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 transition-all duration-300 p-2 rounded-full active:scale-95 transition-transform flex items-center justify-center">
+<span class="material-symbols-outlined">person</span>
+</a>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-32 pb-32 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full flex flex-col lg:flex-row gap-gutter">
+<!-- Left Column: Cart & Details -->
+<div class="w-full lg:w-2/3 flex flex-col gap-12">
+<!-- Shopping Cart Section -->
+<section class="glass-panel p-8 rounded-xl">
+<h1 class="font-headline-md text-headline-md mb-8">Shopping Cart</h1>
+<div class="flex flex-col gap-6">
+<!-- Item 1 -->
+<div class="flex flex-col sm:flex-row gap-6 items-center p-4 border border-white/5 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="w-32 h-32 flex-shrink-0 bg-surface rounded overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-end custom gaming PC build inside a sleek glass case, illuminated by vibrant cyan and deep blue LED lighting. The internal components, including a massive graphics card and liquid cooling tubes, are highly detailed and visually striking. Set against a pitch-black background to emphasize the premium, high-tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKnBG_Otb2ALkYk1dvWDuftDfg3p8AC_mbvWt2PWMP2tr9FRhgnqL0SUDFdQGVPzQvbjrSWb_LIi1pMpsUkXLR49dh-66OAgPjM_2l17gP76w5haSEp79KekkzsPu3DI_9TTttpYTMPsXteDAY2SBYZxKYYzdka6zT2n0NkqZ0xFgpt_NRphEPza0B55Qf2_hrtG3_5XUgIpynkbpJUxy9Bw868JYNHxQvTiyuQAQW0eHP2dgYE8su"/>
+</div>
+<div class="flex-grow flex flex-col justify-between h-full">
+<div>
+<h3 class="font-body-lg text-body-lg font-bold text-on-surface">The Apex v4 Custom Build</h3>
+<p class="font-label-mono text-label-mono text-on-surface-variant mt-1">SKU: NP-APEX-V4-001</p>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-4 bg-surface-bright rounded border border-white/10 p-1">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"><span class="material-symbols-outlined">remove</span></button>
+<span class="font-label-mono text-label-mono">1</span>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"><span class="material-symbols-outlined">add</span></button>
+</div>
+<span class="font-headline-md text-[24px] font-bold text-primary-container">$4,299.00</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex flex-col sm:flex-row gap-6 items-center p-4 border border-white/5 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="w-32 h-32 flex-shrink-0 bg-surface rounded overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A macro shot of a premium computer processor resting on a reflective black surface. The intricate gold pins and the sleek metallic heat spreader are sharply in focus. Subtle edge lighting in electric blue highlights the precision engineering of the component, creating a dark, sophisticated atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYSu3M-75iGDFIfkS7LwYqnWckbRC6qx2uNS_9nBiTeFSvTpnVz5e-egNYsmM9uTceA5z487bDBLauW2SfU7rXbEe-1UO3QVKpIWhg6aaq3O753uN0W7nw80IUtmAr6d0dBZy4pBr8m0rudCS-CKxezK5kW1gQJx7x1Sxtqxdf4bJNBbxBNTNEocobdHUt-EfsDLqbWhU3G7xM1BgFjPzzE6dOfWDGHEBHVbG7ihp_gJTQXPDmV02q"/>
+</div>
+<div class="flex-grow flex flex-col justify-between h-full">
+<div>
+<h3 class="font-body-lg text-body-lg font-bold text-on-surface">Intel Core i9-14900K</h3>
+<p class="font-label-mono text-label-mono text-on-surface-variant mt-1">24 Cores / 32 Threads</p>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-4 bg-surface-bright rounded border border-white/10 p-1">
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"><span class="material-symbols-outlined">remove</span></button>
+<span class="font-label-mono text-label-mono">1</span>
+<button class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"><span class="material-symbols-outlined">add</span></button>
+</div>
+<span class="font-headline-md text-[24px] font-bold text-primary-container">$589.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Checkout Form Section -->
+<section class="glass-panel p-8 rounded-xl">
+<h2 class="font-headline-md text-headline-md mb-8">Secure Checkout</h2>
+<form class="flex flex-col gap-8">
+<!-- Shipping Info -->
+<div>
+<h3 class="font-body-lg text-body-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">local_shipping</span> Shipping Information
+                        </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">FULL NAME</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="John Doe" type="text"/>
+</div>
+<div class="flex flex-col">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">EMAIL ADDRESS</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="john@example.com" type="email"/>
+</div>
+<div class="flex flex-col md:col-span-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">STREET ADDRESS</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="123 Tech Lane, Suite 404" type="text"/>
+</div>
+<div class="flex flex-col">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">CITY</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="Cyber City" type="text"/>
+</div>
+<div class="flex flex-col">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">ZIP / POSTAL CODE</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="90210" type="text"/>
+</div>
+</div>
+</div>
+<!-- Payment Method -->
+<div class="pt-6 border-t border-white/10">
+<h3 class="font-body-lg text-body-lg font-bold text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">payment</span> Payment Method
+                        </h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<label class="cursor-pointer">
+<input checked="" class="peer sr-only" name="payment" type="radio"/>
+<div class="p-4 border border-white/20 rounded-lg bg-surface peer-checked:border-primary-container peer-checked:bg-primary-container/10 transition-all flex flex-col items-center justify-center gap-2 h-32 hover:border-white/40">
+<span class="material-symbols-outlined text-[32px] text-on-surface peer-checked:text-primary-container">credit_card</span>
+<span class="font-label-mono text-label-mono text-center">CREDIT CARD</span>
+</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="payment" type="radio"/>
+<div class="p-4 border border-white/20 rounded-lg bg-surface peer-checked:border-primary-container peer-checked:bg-primary-container/10 transition-all flex flex-col items-center justify-center gap-2 h-32 hover:border-white/40">
+<span class="material-symbols-outlined text-[32px] text-on-surface peer-checked:text-primary-container">account_balance_wallet</span>
+<span class="font-label-mono text-label-mono text-center">PAYPAL</span>
+</div>
+</label>
+<label class="cursor-pointer">
+<input class="peer sr-only" name="payment" type="radio"/>
+<div class="p-4 border border-white/20 rounded-lg bg-surface peer-checked:border-primary-container peer-checked:bg-primary-container/10 transition-all flex flex-col items-center justify-center gap-2 h-32 hover:border-white/40">
+<span class="material-symbols-outlined text-[32px] text-on-surface peer-checked:text-primary-container">local_shipping</span>
+<span class="font-label-mono text-label-mono text-center">COD</span>
+</div>
+</label>
+</div>
+<!-- CC Details (Visible only when CC is selected) -->
+<div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low p-6 rounded-lg border border-white/5">
+<div class="flex flex-col md:col-span-2">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">CARD NUMBER</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="0000 0000 0000 0000" type="text"/>
+</div>
+<div class="flex flex-col">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">EXPIRY (MM/YY)</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="12/25" type="text"/>
+</div>
+<div class="flex flex-col">
+<label class="font-label-mono text-label-mono text-on-surface-variant mb-2">CVC</label>
+<input class="bg-surface border-0 border-b border-white/20 text-on-surface font-body-md focus:ring-0 input-glow transition-all px-0 py-2 placeholder:font-label-mono placeholder:text-surface-bright" placeholder="123" type="text"/>
+</div>
+</div>
+</div>
+</form>
+</section>
+</div>
+<!-- Right Column: Order Summary -->
+<div class="w-full lg:w-1/3">
+<div class="glass-panel p-8 rounded-xl sticky top-28 neon-glow">
+<h2 class="font-headline-md text-[24px] mb-6 border-b border-white/10 pb-4">Order Summary</h2>
+<div class="flex flex-col gap-4 font-body-md text-body-md">
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Subtotal</span>
+<span class="font-label-mono text-on-surface">$4,888.00</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Estimated Shipping</span>
+<span class="font-label-mono text-on-surface">$50.00</span>
+</div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span>Taxes</span>
+<span class="font-label-mono text-on-surface">$391.04</span>
+</div>
+<div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+<span class="font-headline-md text-[20px] font-bold">Total</span>
+<span class="font-headline-md text-[28px] font-bold text-primary-container">$5,329.04</span>
+</div>
+</div>
+<button class="w-full mt-8 bg-primary-container text-black font-label-mono text-label-mono font-bold py-4 rounded hover:shadow-[0_0_20px_rgba(0,209,255,0.4)] transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+                    PLACE SECURE ORDER
+                </button>
+<p class="text-center font-label-mono text-[10px] text-outline mt-4 opacity-70">
+                    By placing this order, you agree to our Terms of Service and Privacy Policy. All transactions are encrypted and secure.
+                </p>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-16 px-margin-desktop border-t border-white/5">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="font-display-lg text-headline-md text-on-surface mb-4">TechForge</div>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 TechForge. ENGINEERED FOR POWER.</p>
+</div>
+<div class="flex flex-col gap-3">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors" href="#">Build Guide</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors" href="#">Warranty</a>
+</div>
+<div class="flex flex-col gap-3">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors" href="#">Shipping</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors" href="#">Privacy Policy</a>
+</div>
+<div class="flex flex-col gap-3">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary-fixed transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+</body></html>

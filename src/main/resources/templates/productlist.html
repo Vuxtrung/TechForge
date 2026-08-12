@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TechForge - Gaming PCs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed": "#79ff5b",
+                        "tertiary-fixed": "#ffddb1",
+                        "surface-variant": "#353534",
+                        "primary": "#a4e6ff",
+                        "on-tertiary-fixed-variant": "#624000",
+                        "tertiary-fixed-dim": "#ffba49",
+                        "outline-variant": "#3c494e",
+                        "on-surface-variant": "#bbc9cf",
+                        "on-tertiary": "#442b00",
+                        "on-secondary-fixed-variant": "#095300",
+                        "on-secondary": "#053900",
+                        "background": "#131313",
+                        "outline": "#859399",
+                        "on-tertiary-container": "#6b4700",
+                        "surface-bright": "#393939",
+                        "inverse-on-surface": "#313030",
+                        "tertiary": "#ffd59c",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#feb127",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#4cd6ff",
+                        "on-secondary-container": "#0f6d00",
+                        "on-background": "#e5e2e1",
+                        "on-secondary-fixed": "#022100",
+                        "on-primary-fixed": "#001f28",
+                        "primary-container": "#00d1ff",
+                        "on-primary": "#003543",
+                        "secondary-fixed-dim": "#2ae500",
+                        "on-primary-container": "#00566a",
+                        "on-error": "#690005",
+                        "on-primary-fixed-variant": "#004e60",
+                        "surface-container-highest": "#353534",
+                        "secondary": "#d7ffc5",
+                        "primary-fixed": "#b7eaff",
+                        "secondary-container": "#2ff801",
+                        "inverse-primary": "#00677f",
+                        "surface-container": "#201f1f",
+                        "surface-container-low": "#1c1b1b",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a2a2a",
+                        "surface": "#131313",
+                        "surface-tint": "#4cd6ff",
+                        "error-container": "#93000a",
+                        "surface-dim": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#291800"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "container-max": "1440px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-mono": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-primary:hover {
+            box-shadow: 0 0 40px rgba(0, 209, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col pt-[88px]">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(0,209,255,0.15)]">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 w-full mx-auto max-w-container-max">
+<!-- Brand -->
+<a href="/" class="font-display-lg text-headline-md tracking-tighter text-primary truncate">
+                TechForge
+            </a>
+<!-- Links (Desktop) -->
+<div class="hidden md:flex space-x-8 items-center">
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="/buildpc">Build PC</a>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">PC <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">PC Gaming</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">PC Văn phòng</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Màn hình <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">Dell</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">ASUS</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">LG</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Linh kiện PC <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">CPU</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">VGA</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">Mainboard</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Phím chuột <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">Bàn phím cơ</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">Chuột Gaming</a>
+        </div>
+    </div>
+</div>
+<!-- Actions -->
+<div class="flex space-x-4 items-center">
+<button class="text-on-surface hover:text-primary transition-colors active:scale-95 flex items-center justify-center p-2 rounded hover:bg-white/10 duration-300">
+<span class="material-symbols-outlined">search</span>
+</button>
+<a href="/checkout" class="text-on-surface hover:text-primary transition-colors active:scale-95 flex items-center justify-center p-2 rounded hover:bg-white/10 duration-300">
+<span class="material-symbols-outlined">shopping_cart</span>
+</a>
+<a href="/login" class="text-on-surface hover:text-primary transition-colors active:scale-95 flex items-center justify-center p-2 rounded hover:bg-white/10 duration-300">
+<span class="material-symbols-outlined">person</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col md:flex-row max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop gap-gutter py-8 md:py-16">
+<!-- Sidebar Filters -->
+<aside class="w-full md:w-64 flex-shrink-0 mb-8 md:mb-0">
+<div class="glass-panel p-6 rounded-xl sticky top-32">
+<h2 class="font-headline-md text-headline-md mb-6">Filters</h2>
+<!-- Category 1 -->
+<div class="mb-6 border-b border-outline-variant pb-4">
+<h3 class="font-label-mono text-label-mono text-primary mb-3">GPU</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="form-checkbox bg-surface-container border-outline rounded text-primary-container focus:ring-primary-container focus:ring-offset-surface" type="checkbox"/>
+<span class="text-on-surface-variant">RTX 4090</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="form-checkbox bg-surface-container border-outline rounded text-primary-container focus:ring-primary-container focus:ring-offset-surface" type="checkbox"/>
+<span class="text-on-surface-variant">RTX 4080</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="form-checkbox bg-surface-container border-outline rounded text-primary-container focus:ring-primary-container focus:ring-offset-surface" type="checkbox"/>
+<span class="text-on-surface-variant">RX 7900 XTX</span>
+</label>
+</div>
+</div>
+<!-- Category 2 -->
+<div class="mb-6 border-b border-outline-variant pb-4">
+<h3 class="font-label-mono text-label-mono text-primary mb-3">CPU</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="form-checkbox bg-surface-container border-outline rounded text-primary-container focus:ring-primary-container focus:ring-offset-surface" type="checkbox"/>
+<span class="text-on-surface-variant">Intel Core i9</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="form-checkbox bg-surface-container border-outline rounded text-primary-container focus:ring-primary-container focus:ring-offset-surface" type="checkbox"/>
+<span class="text-on-surface-variant">AMD Ryzen 9</span>
+</label>
+</div>
+</div>
+<!-- Price -->
+<div>
+<h3 class="font-label-mono text-label-mono text-primary mb-3">PRICE RANGE</h3>
+<input class="w-full accent-primary-container" max="10000" min="1000" type="range" value="5000"/>
+<div class="flex justify-between mt-2 font-label-mono text-label-mono text-on-surface-variant">
+<span>$1k</span>
+<span>$10k+</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Product Grid -->
+<section class="flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Product Card 1 -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col group glow-primary transition-all duration-300">
+<div class="relative h-64 bg-surface-container-highest">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" data-alt="A high-end custom gaming PC build featuring neon blue water cooling tubes, glowing RGB fans, and a sleek black minimalist chassis. The interior is brightly illuminated, showcasing premium components like a massive RTX 4090 GPU and intricate cable management. Set against a pitch-black background to emphasize the glowing electric blue lights. The overall style is high-tech, aggressive yet sophisticated, mimicking a futuristic cockpit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCunTePdaRMtCIQUX2gJHjLy_mclCy3QHz4RC-Poo4nSW6fLcI4BitzBUIw08O5PdbWy2wqtJTIoDDXVDYlkv_Bq5MrixVeRzezRtI1j4lK9xCv2u34SMq8144yHw1onfada0qSyT-Vjk15oHvNpiTHL2WLUbP5KCsIsP1wYctHW8l5b1XU5qh1GlUdcyJX7BLtzc1u7kt5OTus3848APkWV2VAsBGZEXVIN-7CSUQqjPVDaT5Y368T"/>
+<div class="absolute top-4 left-4 bg-[#053900] text-secondary px-2 py-1 rounded-full font-label-mono text-label-mono border border-secondary/30">
+                        IN STOCK
+                    </div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-2">The Apex v4</h3>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">RTX 4090</span>
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">i9-14900K</span>
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">64GB DDR5</span>
+</div>
+<div class="mt-auto flex justify-between items-end">
+<div class="font-headline-md text-headline-md text-primary">$4,299</div>
+<button onclick="window.location.href='/productdetail'" class="bg-primary-container text-on-primary px-4 py-2 rounded font-body-md text-body-md hover:shadow-[0_0_15px_rgba(0,209,255,0.4)] transition-shadow">View Details</button>
+</div>
+</div>
+</article>
+<!-- Product Card 2 -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col group glow-primary transition-all duration-300">
+<div class="relative h-64 bg-surface-container-highest">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" data-alt="A premium pre-built gaming PC in a mid-tower case with tempered glass panels. Inside, glowing cyan and white LED lights illuminate an AMD Radeon high-end graphics card and a bulky air cooler. The hardware photography is crisp, emphasizing the brushed metal textures and clean layout. Shot in a dark studio environment to highlight the striking neon accents and sophisticated minimalist industrial design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASBFnnqAvdvqZNn4alE_NAk7oq72LbtrAm-PKBUFmLmniG7A6LmNyk1v-n5QiRiKEfm0DifN-7pnr5ZtAMvhBNWQpD-pLJqtU5uill0wCza1jCof6ebd4o6Gyw55qOL_U6i9BAeJ0fk4Geljslv0uD0_Z8-CzEYW3gtAeSBwEIRVaNV89TlkA-c-RHHy19D4iYHeqP-iv5221ZffhRR6VaaQnmsf6dfaE9gsg59M4w9NpghameUmaY"/>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-2">Neon Core II</h3>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">RX 7900 XTX</span>
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">Ryzen 9 7950X</span>
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">32GB DDR5</span>
+</div>
+<div class="mt-auto flex justify-between items-end">
+<div class="font-headline-md text-headline-md text-primary">$3,499</div>
+<button onclick="window.location.href='/productdetail'" class="bg-primary-container text-on-primary px-4 py-2 rounded font-body-md text-body-md hover:shadow-[0_0_15px_rgba(0,209,255,0.4)] transition-shadow">View Details</button>
+</div>
+</div>
+</article>
+<!-- Product Card 3 -->
+<article class="glass-panel rounded-xl overflow-hidden flex flex-col group glow-primary transition-all duration-300">
+<div class="relative h-64 bg-surface-container-highest">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" data-alt="A compact, small form factor (SFF) custom gaming PC. The case is a sleek, dark charcoal gray with mesh panels. Through the mesh, subtle electric blue lighting from the internal components is visible. The shot focuses on the precision engineering of fitting powerful hardware like an RTX 4080 into a small space. The lighting is cinematic, casting soft glows against a deep black background, conveying raw power in a refined package." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDY0M1XxDc4DX1Zs1deAeKHZNvYjWO-wiz43uTZZ8i7s44uH22qf5yRexGf2leH8Y7ka3FvD-BC4gmB5ULMVAE6OMSJTQ4345lUMtqVgqJTUH9-dvgdfACKjnOuluEwVDOIEus7OSy01bTNh44Dz8Uye8v2dVScs0VKmrFkpvgaXZ2l4_8ZitGlQOT0AMrV5zYQl2su6Tk_Sg10WkGiZCA2sWojuscZj86Jss2yOEpdwH4WWsmPTKYN"/>
+<div class="absolute top-4 left-4 bg-[#690005] text-[#ffdad6] px-2 py-1 rounded-full font-label-mono text-label-mono border border-[#ffdad6]/30">
+                        LOW STOCK
+                    </div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-2">Micro Stealth</h3>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">RTX 4080</span>
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">i7-14700K</span>
+<span class="bg-surface-container px-2 py-1 rounded text-on-surface-variant font-label-mono text-label-mono border border-outline-variant">32GB DDR5</span>
+</div>
+<div class="mt-auto flex justify-between items-end">
+<div class="font-headline-md text-headline-md text-primary">$2,899</div>
+<button onclick="window.location.href='/productdetail'" class="bg-primary-container text-on-primary px-4 py-2 rounded font-body-md text-body-md hover:shadow-[0_0_15px_rgba(0,209,255,0.4)] transition-shadow">View Details</button>
+</div>
+</div>
+</article>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface-container-lowest border-t border-outline-variant mt-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-16 max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-2">
+<div class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-4">
+                    TechForge
+                </div>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 TechForge. Engineered for Excellence.</p>
+</div>
+<div class="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">PC Build Guide</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Driver Downloads</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Warranty Policy</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Technical Support</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Contact Us</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer" href="#">Affiliate Program</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

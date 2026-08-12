@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TechForge - PC Configurator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#353534",
+                        "surface-bright": "#393939",
+                        "primary-fixed": "#b7eaff",
+                        "secondary-fixed-dim": "#2ae500",
+                        "outline": "#859399",
+                        "primary-container": "#00d1ff",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-fixed-variant": "#624000",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#79ff5b",
+                        "surface-tint": "#4cd6ff",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#feb127",
+                        "on-primary-fixed": "#001f28",
+                        "on-secondary-fixed": "#022100",
+                        "background": "#131313",
+                        "error": "#ffb4ab",
+                        "surface-container": "#201f1f",
+                        "on-primary": "#003543",
+                        "primary-fixed-dim": "#4cd6ff",
+                        "on-background": "#e5e2e1",
+                        "outline-variant": "#3c494e",
+                        "on-secondary-container": "#0f6d00",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-fixed": "#ffddb1",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed-variant": "#004e60",
+                        "tertiary": "#ffd59c",
+                        "secondary-container": "#2ff801",
+                        "inverse-surface": "#e5e2e1",
+                        "primary": "#a4e6ff",
+                        "on-surface": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "inverse-on-surface": "#313030",
+                        "secondary": "#d7ffc5",
+                        "on-primary-container": "#00566a",
+                        "on-secondary": "#053900",
+                        "surface": "#131313",
+                        "tertiary-fixed-dim": "#ffba49",
+                        "on-tertiary": "#442b00",
+                        "on-tertiary-fixed": "#291800",
+                        "inverse-primary": "#00677f",
+                        "on-tertiary-container": "#6b4700",
+                        "on-secondary-fixed-variant": "#095300",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#bbc9cf"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "container-max": "1440px",
+                        "margin-mobile": "16px",
+                        "unit": "8px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-mono": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-mono": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "headline-md": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400" }],
+                        "display-lg": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary {
+            background-color: #00D1FF;
+            color: #000;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-xl border-b border-white/10 shadow-[0_0_40px_rgba(0,209,255,0.15)] flex justify-between items-center px-margin-desktop h-20 mx-auto">
+<a href="/" class="font-display-lg text-headline-md tracking-tighter text-primary truncate">TechForge</a>
+<div class="hidden md:flex space-x-8 items-center">
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="/buildpc">Build PC</a>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">PC <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">PC Gaming</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">PC Văn phòng</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Màn hình <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">Dell</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">ASUS</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">LG</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-primary border-b-2 border-primary pb-1 flex items-center gap-1" href="#">Linh kiện PC <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">CPU</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">VGA</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">Mainboard</a>
+        </div>
+    </div>
+    
+    <div class="relative group">
+        <a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/10 duration-300 px-2 py-1 rounded flex items-center gap-1" href="#">Phím chuột <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+        <div class="absolute left-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 overflow-hidden">
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors">Bàn phím cơ</a>
+            <a href="/productlist" class="block px-4 py-3 text-sm text-on-surface-variant hover:bg-white/5 hover:text-primary transition-colors border-t border-white/5">Chuột Gaming</a>
+        </div>
+    </div>
+</div>
+<div class="flex space-x-6">
+<a href="/checkout" class="text-primary hover:bg-white/10 transition-all duration-300 rounded-full p-2 active:scale-95 transition-transform flex items-center justify-center"><span class="material-symbols-outlined">shopping_cart</span></a>
+<a href="/login" class="text-primary hover:bg-white/10 transition-all duration-300 rounded-full p-2 active:scale-95 transition-transform flex items-center justify-center"><span class="material-symbols-outlined">person</span></a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow pt-[120px] pb-[160px] px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Component Checklist -->
+<div class="md:col-span-7 flex flex-col space-y-6">
+<h1 class="font-headline-md text-headline-md mb-4">Build Your Core</h1>
+<div class="glass-panel p-6 rounded-xl flex justify-between items-center">
+<div>
+<h3 class="font-bold text-lg mb-1">CPU</h3>
+<p class="font-label-mono text-label-mono text-on-surface-variant">NOT SELECTED</p>
+</div>
+<button class="btn-primary px-6 py-2 rounded-lg font-bold" onclick="document.getElementById('cpu-modal').classList.remove('hidden')">SELECT</button>
+</div>
+<div class="glass-panel p-6 rounded-xl flex justify-between items-center">
+<div>
+<h3 class="font-bold text-lg mb-1">Motherboard</h3>
+<p class="font-label-mono text-label-mono text-on-surface-variant">REQUIRES CPU SELECTION</p>
+</div>
+<button class="btn-secondary px-6 py-2 rounded-lg font-bold opacity-50 cursor-not-allowed">SELECT</button>
+</div>
+<div class="glass-panel p-6 rounded-xl flex justify-between items-center">
+<div>
+<h3 class="font-bold text-lg mb-1">GPU</h3>
+<p class="font-label-mono text-label-mono text-on-surface-variant">NOT SELECTED</p>
+</div>
+<button class="btn-primary px-6 py-2 rounded-lg font-bold">SELECT</button>
+</div>
+<!-- More components would follow here -->
+</div>
+<!-- Right Column: Configuration Summary -->
+<div class="md:col-span-5 relative">
+<div class="sticky top-[120px] glass-panel rounded-xl overflow-hidden flex flex-col h-[calc(100vh-200px)]">
+<!-- 3D Visualization Placeholder -->
+<div class="flex-grow relative bg-surface-container-low flex items-center justify-center p-4">
+<img class="object-contain w-full h-full max-h-[400px]" data-alt="A highly detailed, cinematic render of a high-end, futuristic PC gaming case. The case is a sleek, black monolith with sharp industrial angles, accented by intense, electric blue LED lighting emanating from the interior components. The side panel is tempered glass, revealing a complex, meticulously wire-managed motherboard layout. The background is a stark, absolute black void, emphasizing the raw power and premium aesthetic of the hardware." src="https://www.gstatic.com/labs-code/stitch/stitch-placeholder-300x300.svg"/>
+</div>
+<div class="p-6 border-t border-white/10 flex flex-col space-y-6">
+<div class="flex justify-between items-end">
+<span class="font-label-mono text-label-mono text-on-surface-variant uppercase">Estimated Total</span>
+<span class="font-headline-md text-headline-md text-primary-container">$0.00</span>
+</div>
+<div class="flex justify-between items-center bg-surface-container p-4 rounded-lg">
+<span class="font-body-sm text-on-surface-variant flex items-center gap-2"><span class="material-symbols-outlined text-sm">bolt</span> Est. Wattage</span>
+<span class="font-label-mono text-label-mono">150W / 850W</span>
+</div>
+<button class="btn-primary w-full py-4 rounded-lg font-bold text-lg uppercase tracking-wider disabled:opacity-50">Add Full Build to Cart</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-16 px-margin-desktop border-t border-white/5">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="font-display-lg text-headline-md text-on-surface mb-4">TechForge</div>
+<p class="font-body-md text-body-md text-primary">© 2024 TechForge. ENGINEERED FOR POWER.</p>
+</div>
+<div class="col-span-1 md:col-span-3 flex flex-wrap gap-8 justify-end">
+<a class="text-on-surface-variant hover:text-secondary-fixed transition-colors font-body-md text-body-md" href="#">Build Guide</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed transition-colors font-body-md text-body-md" href="#">Warranty</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed transition-colors font-body-md text-body-md" href="#">Shipping</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed transition-colors font-body-md text-body-md" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary-fixed transition-colors font-body-md text-body-md" href="#">Terms of Service</a>
+</div>
+</div>
+</footer>
+<!-- CPU Selection Modal Overlay -->
+<div class="hidden fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-margin-mobile md:p-margin-desktop" id="cpu-modal">
+<div class="glass-panel w-full max-w-4xl rounded-2xl overflow-hidden flex flex-col h-[80vh]">
+<div class="flex justify-between items-center p-6 border-b border-white/10">
+<h2 class="font-headline-md text-headline-md">Select Processor (CPU)</h2>
+<button class="text-on-surface hover:text-primary transition-colors" onclick="document.getElementById('cpu-modal').classList.add('hidden')"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="flex-grow overflow-y-auto p-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- CPU Card 1 -->
+<div class="bg-surface-container-low rounded-xl p-4 border border-transparent hover:border-primary/50 transition-colors cursor-pointer group flex flex-col">
+<div class="h-32 mb-4 bg-surface-container flex items-center justify-center rounded-lg relative overflow-hidden">
+<img class="object-cover w-full h-full opacity-70 group-hover:opacity-100 transition-opacity" data-alt="A close up, macro shot of a high end, modern desktop CPU processor chip resting on a dark metallic surface. The chip features a complex arrangement of gold contact pads on its underside, reflecting a subtle electric blue rim light. The top heat spreader is a clean, brushed silver metal. The aesthetic is extremely technical, precise, and premium, typical of top-tier PC hardware marketing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSlqaU7fwhVyT46R3loRgP8Iw0U6Asxpkb9UO_pwRse5RICSYObD_No4-tWR5y1OHqZ_Cgr1SuPffZdav98KoWyI-E1pJEzgO3FiZy-oVApx5VfOyBxIak1GdpA26buYWGebObFyX7XLNqH067c-xz5EbASoJcV4BV-Eva-euzBZiR6IMJ_1zUGNb3rdrLDVW-DgB9PZqhym9DVk3kidNyVjs-xVRMQOoiqhe02Nt-iySFL3AXUmmD"/>
+</div>
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-lg">Intel Core i9-14900K</h4>
+<span class="bg-secondary-fixed-dim/20 text-[#39FF14] text-[10px] font-bold px-2 py-1 rounded-full border border-secondary-fixed-dim/30">COMPATIBLE</span>
+</div>
+<div class="text-on-surface-variant text-sm mb-4 flex-grow">24 Cores / 32 Threads, 6.0 GHz Turbo</div>
+<div class="flex justify-between items-center mt-auto">
+<span class="font-bold text-xl">$589.99</span>
+<button class="btn-secondary px-4 py-1 rounded-md text-sm">ADD</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

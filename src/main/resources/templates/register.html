@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TechForge - Sign Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error": "#690005",
+                      "secondary-container": "#2ff801",
+                      "surface-container-lowest": "#0e0e0e",
+                      "tertiary": "#ffd59c",
+                      "secondary-fixed": "#79ff5b",
+                      "error": "#ffb4ab",
+                      "secondary-fixed-dim": "#2ae500",
+                      "on-surface-variant": "#bbc9cf",
+                      "on-primary-container": "#00566a",
+                      "outline": "#859399",
+                      "surface-dim": "#131313",
+                      "on-primary-fixed": "#001f28",
+                      "on-surface": "#e5e2e1",
+                      "primary-container": "#00d1ff",
+                      "surface-container": "#201f1f",
+                      "surface-bright": "#393939",
+                      "primary-fixed": "#b7eaff",
+                      "on-tertiary-container": "#6b4700",
+                      "primary": "#a4e6ff",
+                      "on-background": "#e5e2e1",
+                      "error-container": "#93000a",
+                      "background": "#131313",
+                      "surface-variant": "#353534",
+                      "on-error-container": "#ffdad6",
+                      "on-secondary-container": "#0f6d00",
+                      "on-tertiary": "#442b00",
+                      "on-secondary": "#053900",
+                      "on-primary-fixed-variant": "#004e60",
+                      "on-primary": "#003543",
+                      "on-tertiary-fixed-variant": "#624000",
+                      "surface-container-low": "#1c1b1b",
+                      "secondary": "#d7ffc5",
+                      "surface-tint": "#4cd6ff",
+                      "tertiary-fixed": "#ffddb1",
+                      "tertiary-fixed-dim": "#ffba49",
+                      "surface-container-highest": "#353534",
+                      "inverse-surface": "#e5e2e1",
+                      "inverse-primary": "#00677f",
+                      "on-secondary-fixed": "#022100",
+                      "on-tertiary-fixed": "#291800",
+                      "outline-variant": "#3c494e",
+                      "surface": "#131313",
+                      "inverse-on-surface": "#313030",
+                      "on-secondary-fixed-variant": "#095300",
+                      "primary-fixed-dim": "#4cd6ff",
+                      "tertiary-container": "#feb127",
+                      "surface-container-high": "#2a2a2a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "unit": "8px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "64px",
+                      "gutter": "24px",
+                      "container-max": "1440px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "label-mono": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-mono": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "72px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0A0A0A;
+            color: #e5e2e1;
+        }
+        .glass-panel {
+            background-color: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-glow:hover {
+            box-shadow: 0 0 40px rgba(0, 209, 255, 0.15);
+        }
+        .input-glow:focus-within {
+            border-bottom-color: #00D1FF;
+        }
+        
+        /* Checkbox switch styling */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #00D1FF;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #00D1FF;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop bg-[url('placeholder')] bg-cover bg-center" data-alt="A macro shot of high-end PC hardware components, specifically a motherboard with sleek dark grey and black heat sinks. Subtle neon blue LEDs provide a sharp, technical illumination. The background is deeply shadowed, focusing entirely on the precision engineering of the tech. The overall aesthetic is aggressive, premium, and cybernetic, fitting a high-performance computing theme.">
+<!-- Background overlay for depth -->
+<div class="absolute inset-0 bg-black/60 backdrop-blur-sm z-0"></div>
+<main class="relative z-10 w-full max-w-md glass-panel p-8 rounded-xl shadow-[0_0_80px_rgba(0,0,0,0.8)]">
+<div class="text-center mb-10">
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary tracking-tighter mb-2">TechForge</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">ENGINEERED FOR POWER.</p>
+</div>
+<form class="space-y-6">
+<div class="space-y-1 group input-glow border-b border-surface-variant transition-colors duration-300 pb-2">
+<label class="block font-label-mono text-label-mono text-on-surface-variant uppercase tracking-widest" for="fullName">Full Name</label>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant p-0" id="fullName" placeholder="J. Doe" type="text"/>
+</div>
+<div class="space-y-1 group input-glow border-b border-surface-variant transition-colors duration-300 pb-2">
+<label class="block font-label-mono text-label-mono text-on-surface-variant uppercase tracking-widest" for="email">Email</label>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant p-0" id="email" placeholder="operator@neon.com" type="email"/>
+</div>
+<div class="space-y-1 group input-glow border-b border-surface-variant transition-colors duration-300 pb-2">
+<label class="block font-label-mono text-label-mono text-on-surface-variant uppercase tracking-widest" for="password">Password</label>
+<div class="relative flex items-center">
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant p-0 pr-8" id="password" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-0 text-on-surface-variant text-sm cursor-pointer hover:text-primary transition-colors">visibility</span>
+</div>
+</div>
+<div class="space-y-1 group input-glow border-b border-surface-variant transition-colors duration-300 pb-2">
+<label class="block font-label-mono text-label-mono text-on-surface-variant uppercase tracking-widest" for="confirmPassword">Confirm Password</label>
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant p-0" id="confirmPassword" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex items-center justify-between pt-4">
+<span class="font-body-md text-body-md text-on-surface-variant">Subscribe to Hardware Updates</span>
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-surface-variant transition-all duration-300 z-10 top-0 left-0" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-5 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300" for="toggle"></label>
+</div>
+</div>
+<button class="w-full bg-primary text-black font-headline-md text-[20px] font-bold py-4 rounded-lg neon-glow transition-all duration-300 hover:bg-primary-container active:scale-[0.98] mt-8 flex justify-center items-center gap-2" type="button">
+                SIGN UP
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_forward</span>
+</button>
+</form>
+<div class="mt-8 text-center border-t border-white/5 pt-6">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Already an operator? 
+                <a class="text-primary hover:text-primary-container hover:underline transition-colors ml-1 font-bold" href="/login">Back to Login</a>
+</p>
+</div>
+</main>
+</body></html>
