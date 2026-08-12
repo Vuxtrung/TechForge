@@ -14,16 +14,34 @@
             <section class="login-box">
                 <h1>Thông tin khách hàng đăng nhập hệ thống</h1>
                 <form th:action="@{/login}" method="post" class="login-form">
+
+                    <div th:if="${loginError}" class="alert alert-danger" th:text="${loginError}">
+                    </div>
+
                     <div class="form-group">
-                        <label for="email"> Email đăng nhập </label>
+                        <label for="email">
+                            Email đăng nhập
+                        </label>
+
                         <input type="email" id="email" name="email" placeholder="Nhập email của bạn" required>
                     </div>
+
                     <div class="form-group">
-                        <label for="password"> Mật khẩu </label>
+                        <label for="password">
+                            Mật khẩu
+                        </label>
+
                         <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
                     </div>
-                    <button type="submit" class="login-button"> Đăng nhập </button>
-                    <a th:href="@{/forgot-password}" class="forgot-password"> Quên mật khẩu? </a>
+
+                    <button type="submit" class="login-button">
+                        Đăng nhập
+                    </button>
+
+                    <a th:href="@{/forgot-password}" class="forgot-password">
+                        Quên mật khẩu?
+                    </a>
+
                 </form>
             </section>
             <section class="register-box">
