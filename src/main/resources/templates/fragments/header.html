@@ -99,69 +99,69 @@
                 </nav>
             </div>
         </div>
-    </header>
 
-    <!-- JS Thêm vào giỏ hàng AJAX không load lại trang -->
-    <script>
-    function addToCartAjax(productId, productName, price, imageUrl) {
-        const params = new URLSearchParams();
-        params.append('productId', productId);
-        params.append('productName', productName);
-        params.append('price', price);
-        params.append('imageUrl', imageUrl);
-        params.append('quantity', 1);
+        <!-- JS Thêm vào giỏ hàng AJAX không load lại trang -->
+        <script>
+        function addToCartAjax(productId, productName, price, imageUrl) {
+            const params = new URLSearchParams();
+            params.append('productId', productId);
+            params.append('productName', productName);
+            params.append('price', price);
+            params.append('imageUrl', imageUrl);
+            params.append('quantity', 1);
 
-        fetch('/cart/api/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: params
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Cập nhật số đếm trên Icon Giỏ hàng tức thì
-                const badge = document.getElementById('cartBadgeCount');
-                if (badge) badge.innerText = data.cartSize;
+            fetch('/cart/api/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Cập nhật số đếm trên Icon Giỏ hàng tức thì
+                    const badge = document.getElementById('cartBadgeCount');
+                    if (badge) badge.innerText = data.cartSize;
 
-                // Hiển thị Toast thông báo nổi
-                showToastNotification(data.message);
-            }
-        })
-        .catch(err => {
-            console.error('Error adding to cart:', err);
-            alert('Đã thêm sản phẩm vào giỏ hàng!');
-        });
-    }
-
-    function showToastNotification(msg) {
-        let container = document.getElementById('ajaxToastContainer');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'ajaxToastContainer';
-            container.className = 'position-fixed top-0 end-0 p-3';
-            container.style.zIndex = '1080';
-            document.body.appendChild(container);
+                    // Hiển thị Toast thông báo nổi
+                    showToastNotification(data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Error adding to cart:', err);
+                alert('Đã thêm sản phẩm vào giỏ hàng!');
+            });
         }
 
-        container.innerHTML = `
-            <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body fs-7 fw-semibold">
-                        <i class="bi bi-cart-check-fill me-2 fs-6"></i>
-                        <span>${msg}</span>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.toast').remove()"></button>
-                </div>
-            </div>
-        `;
+        function showToastNotification(msg) {
+            let container = document.getElementById('ajaxToastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'ajaxToastContainer';
+                container.className = 'position-fixed top-0 end-0 p-3';
+                container.style.zIndex = '1080';
+                document.body.appendChild(container);
+            }
 
-        setTimeout(() => {
-            if (container) container.innerHTML = '';
-        }, 3500);
-    }
-    </script>
+            container.innerHTML = `
+                <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body fs-7 fw-semibold">
+                            <i class="bi bi-cart-check-fill me-2 fs-6"></i>
+                            <span>${msg}</span>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.toast').remove()"></button>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => {
+                if (container) container.innerHTML = '';
+            }, 3500);
+        }
+        </script>
+    </header>
 </body>
 
 </html>
