@@ -14,4 +14,10 @@ public class HomeController {
     public String redirectHome() {
         return "redirect:/";
     }
+
+    @GetMapping("/buildpc")
+    public String buildpc(org.springframework.ui.Model model) {
+        model.addAttribute("pageTitle", "Tự Build PC");
+        return "buildpc";
+    }
 }
