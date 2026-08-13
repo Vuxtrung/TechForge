@@ -2,7 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
   <head th:replace="~{fragments/header :: header-head}">
     <meta charset="UTF-8" />
-    <title>Quản Lý Danh Mục</title>
+    <title>Quản Lý Sản Phẩm</title>
   </head>
 
   <body>
@@ -16,13 +16,13 @@
             class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2"
           >
             <span class="fs-4 text-dark fw-bold">
-              <i class="bi bi-tags text-danger"></i> Quản Lý Danh Mục Sản Phẩm
+              <i class="bi bi-box-seam text-danger"></i> Quản Lý Sản Phẩm
             </span>
             <a
-              th:href="@{/admin/categories/new}"
+              th:href="@{/admin/products/new}"
               class="btn btn-danger fw-semibold"
             >
-              <i class="bi bi-plus-lg me-1"></i> Thêm Danh Mục
+              <i class="bi bi-plus-lg me-1"></i> Thêm Sản Phẩm
             </a>
           </div>
 
@@ -56,7 +56,7 @@
 
           <!-- Search / Filter / Sort form -->
           <form
-            th:action="@{/admin/categories}"
+            th:action="@{/admin/products}"
             method="get"
             class="row g-2 align-items-end mb-3"
           >
@@ -69,44 +69,40 @@
                 name="keyword"
                 th:value="${keyword}"
                 class="form-control"
-                placeholder="Nhập tên danh mục..."
+                placeholder="Nhập tên sản phẩm..."
               />
             </div>
 
             <div class="col-md-2">
-              <label class="form-label fs-8 text-muted mb-1">Loại</label>
-              <select name="type" class="form-select">
-                <option value="" th:selected="${type == null || type == ''}">
+              <label class="form-label fs-8 text-muted mb-1">Danh mục</label>
+              <select name="categoryId" class="form-select">
+                <option value="" th:selected="${categoryId == null}">
                   Tất cả
                 </option>
                 <option
-                  value="PC_PRODUCT"
-                  th:selected="${type == 'PC_PRODUCT'}"
+                  th:each="c : ${categories}"
+                  th:value="${c.categoryId}"
+                  th:text="${c.name}"
+                  th:selected="${categoryId != null and categoryId == c.categoryId}"
                 >
-                  Sản phẩm PC
-                </option>
-                <option
-                  value="PC_COMPONENT"
-                  th:selected="${type == 'PC_COMPONENT'}"
-                >
-                  Linh kiện Build PC
+                  Danh mục
                 </option>
               </select>
             </div>
 
             <div class="col-md-2">
               <label class="form-label fs-8 text-muted mb-1">Trạng thái</label>
-              <select name="active" class="form-select">
+              <select name="status" class="form-select">
                 <option
                   value=""
-                  th:selected="${active == null || active == ''}"
+                  th:selected="${status == null || status == ''}"
                 >
                   Tất cả
                 </option>
-                <option value="true" th:selected="${active == 'true'}">
-                  Đang hiện
+                <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">
+                  Đang bán
                 </option>
-                <option value="false" th:selected="${active == 'false'}">
+                <option value="HIDDEN" th:selected="${status == 'HIDDEN'}">
                   Đã ẩn
                 </option>
               </select>
@@ -122,16 +118,22 @@
                   Tên Z-A
                 </option>
                 <option
+                  value="basePrice,asc"
+                  th:selected="${sort == 'basePrice,asc'}"
+                >
+                  Giá thấp đến cao
+                </option>
+                <option
+                  value="basePrice,desc"
+                  th:selected="${sort == 'basePrice,desc'}"
+                >
+                  Giá cao đến thấp
+                </option>
+                <option
                   value="createdAt,desc"
                   th:selected="${sort == 'createdAt,desc'}"
                 >
                   Mới nhất
-                </option>
-                <option
-                  value="createdAt,asc"
-                  th:selected="${sort == 'createdAt,asc'}"
-                >
-                  Cũ nhất
                 </option>
               </select>
             </div>
@@ -141,7 +143,7 @@
                 <i class="bi bi-funnel me-1"></i> Lọc
               </button>
               <a
-                th:href="@{/admin/categories}"
+                th:href="@{/admin/products}"
                 class="btn btn-outline-secondary"
                 title="Xóa bộ lọc"
               >
@@ -150,105 +152,98 @@
             </div>
           </form>
 
-          <!-- Category table -->
+          <!-- Product table -->
           <div class="table-responsive">
             <table class="table table-hover align-middle">
               <thead class="table-dark">
                 <tr>
                   <th scope="col" style="width: 60px">#</th>
-                  <th scope="col">Tên Danh Mục</th>
-                  <th scope="col">Loại</th>
-                  <th scope="col">Danh Mục Cha</th>
-                  <th scope="col" class="text-center">Số Sản Phẩm</th>
+                  <th scope="col">Tên Sản Phẩm</th>
+                  <th scope="col">Danh Mục</th>
+                  <th scope="col">Thương Hiệu</th>
+                  <th scope="col" class="text-end">Giá Bán</th>
+                  <th scope="col" class="text-center">Tồn Kho</th>
                   <th scope="col" class="text-center">Trạng Thái</th>
                   <th scope="col" class="text-end">Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
-                <tr th:if="${categoryPage.empty}">
-                  <td colspan="7" class="text-center text-muted py-4">
-                    Không tìm thấy danh mục nào phù hợp.
+                <tr th:if="${productPage.empty}">
+                  <td colspan="8" class="text-center text-muted py-4">
+                    Không tìm thấy sản phẩm nào phù hợp.
                   </td>
                 </tr>
-                <tr th:each="cat, iter : ${categoryPage.content}">
+                <tr th:each="p, iter : ${productPage.content}">
                   <td
-                    th:text="${categoryPage.number * categoryPage.size + iter.index + 1}"
+                    th:text="${productPage.number * productPage.size + iter.index + 1}"
                   >
                     1
                   </td>
                   <td>
-                    <span class="fw-semibold text-dark" th:text="${cat.name}"
-                      >Tên danh mục</span
+                    <span class="fw-semibold text-dark" th:text="${p.name}"
+                      >Tên sản phẩm</span
                     >
                     <div
                       class="fs-8 text-muted text-truncate-2"
-                      th:text="${cat.description}"
+                      th:text="${p.description}"
                     >
                       Mô tả
                     </div>
                   </td>
-                  <td>
-                    <span
-                      class="badge bg-secondary"
-                      th:if="${cat.type.name() == 'PC_PRODUCT'}"
-                      >Sản phẩm PC</span
-                    >
-                    <span
-                      class="badge bg-info text-dark"
-                      th:if="${cat.type.name() == 'PC_COMPONENT'}"
-                      >Linh kiện</span
-                    >
+                  <td th:text="${p.category != null ? p.category.name : '—'}">
+                    —
                   </td>
-                  <td>
-                    <span
-                      th:text="${cat.parent != null ? cat.parent.name : '—'}"
-                      >—</span
-                    >
+                  <td th:text="${p.brand ?: '—'}">—</td>
+                  <td
+                    class="text-end"
+                    th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 0, 'POINT')} + ' đ'"
+                  >
+                    0 đ
                   </td>
-                  <td class="text-center" th:text="${cat.productCount}">0</td>
+                  <td class="text-center" th:text="${p.stockQuantity}">0</td>
                   <td class="text-center">
-                    <span class="badge bg-success" th:if="${cat.active}"
-                      >Đang hiện</span
+                    <span class="badge bg-success" th:if="${p.status.name() == 'ACTIVE'}"
+                      >Đang bán</span
                     >
-                    <span class="badge bg-secondary" th:unless="${cat.active}"
+                    <span class="badge bg-secondary" th:if="${p.status.name() == 'HIDDEN'}"
                       >Đã ẩn</span
                     >
                   </td>
                   <td class="text-end">
                     <a
-                      th:href="@{/admin/categories/{id}/edit(id=${cat.categoryId})}"
+                      th:href="@{/admin/products/{id}/edit(id=${p.productId})}"
                       class="btn btn-outline-primary btn-sm"
                       title="Sửa"
                     >
                       <i class="bi bi-pencil-square"></i>
                     </a>
                     <form
-                      th:action="@{/admin/categories/{id}/toggle(id=${cat.categoryId})}"
+                      th:action="@{/admin/products/{id}/toggle(id=${p.productId})}"
                       method="post"
                       class="d-inline"
                     >
                       <button
                         type="submit"
-                        class="btn btn-outline-warning btn-sm js-toggle-category"
-                        th:title="${cat.active ? 'Ẩn danh mục' : 'Hiện danh mục'}"
-                        th:data-name="${cat.name}"
+                        class="btn btn-outline-warning btn-sm js-toggle-product"
+                        th:title="${p.status.name() == 'ACTIVE' ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'}"
+                        th:data-name="${p.name}"
                       >
                         <i
                           class="bi"
-                          th:classappend="${cat.active ? 'bi-eye-slash' : 'bi-eye'}"
+                          th:classappend="${p.status.name() == 'ACTIVE' ? 'bi-eye-slash' : 'bi-eye'}"
                         ></i>
                       </button>
                     </form>
                     <form
-                      th:action="@{/admin/categories/{id}/delete(id=${cat.categoryId})}"
+                      th:action="@{/admin/products/{id}/delete(id=${p.productId})}"
                       method="post"
                       class="d-inline"
                     >
                       <button
                         type="submit"
-                        class="btn btn-outline-danger btn-sm js-delete-category"
+                        class="btn btn-outline-danger btn-sm js-delete-product"
                         title="Xóa"
-                        th:data-name="${cat.name}"
+                        th:data-name="${p.name}"
                       >
                         <i class="bi bi-trash"></i>
                       </button>
@@ -261,40 +256,40 @@
 
           <!-- Pagination -->
           <nav
-            th:if="${categoryPage.totalPages > 1}"
-            aria-label="Category pagination"
+            th:if="${productPage.totalPages > 1}"
+            aria-label="Product pagination"
           >
             <ul class="pagination justify-content-center mb-0">
               <li
                 class="page-item"
-                th:classappend="${categoryPage.first} ? 'disabled'"
+                th:classappend="${productPage.first} ? 'disabled'"
               >
                 <a
                   class="page-link"
-                  th:href="@{/admin/categories(page=${categoryPage.number - 1}, keyword=${keyword}, type=${type}, active=${active}, sort=${sort})}"
+                  th:href="@{/admin/products(page=${productPage.number - 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status}, sort=${sort})}"
                 >
                   <i class="bi bi-chevron-left"></i>
                 </a>
               </li>
               <li
                 class="page-item"
-                th:each="i : ${#numbers.sequence(0, categoryPage.totalPages - 1)}"
-                th:classappend="${i == categoryPage.number} ? 'active'"
+                th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                th:classappend="${i == productPage.number} ? 'active'"
               >
                 <a
                   class="page-link"
-                  th:href="@{/admin/categories(page=${i}, keyword=${keyword}, type=${type}, active=${active}, sort=${sort})}"
+                  th:href="@{/admin/products(page=${i}, keyword=${keyword}, categoryId=${categoryId}, status=${status}, sort=${sort})}"
                   th:text="${i + 1}"
                   >1</a
                 >
               </li>
               <li
                 class="page-item"
-                th:classappend="${categoryPage.last} ? 'disabled'"
+                th:classappend="${productPage.last} ? 'disabled'"
               >
                 <a
                   class="page-link"
-                  th:href="@{/admin/categories(page=${categoryPage.number + 1}, keyword=${keyword}, type=${type}, active=${active}, sort=${sort})}"
+                  th:href="@{/admin/products(page=${productPage.number + 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status}, sort=${sort})}"
                 >
                   <i class="bi bi-chevron-right"></i>
                 </a>
@@ -308,18 +303,18 @@
     <div th:replace="~{fragments/footer :: footer}"></div>
 
     <script th:inline="none">
-      document.querySelectorAll('.js-toggle-category').forEach(function (btn) {
+      document.querySelectorAll('.js-toggle-product').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           var name = btn.getAttribute('data-name');
-          if (!confirm('Xác nhận đổi trạng thái danh mục "' + name + '"? Nếu ẩn, các danh mục con bên trong cũng sẽ bị ẩn theo.')) {
+          if (!confirm('Xác nhận đổi trạng thái sản phẩm "' + name + '"?')) {
             e.preventDefault();
           }
         });
       });
-      document.querySelectorAll('.js-delete-category').forEach(function (btn) {
+      document.querySelectorAll('.js-delete-product').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           var name = btn.getAttribute('data-name');
-          if (!confirm('Xác nhận XÓA VĨNH VIỄN danh mục "' + name + '"? Hành động này không thể hoàn tác.')) {
+          if (!confirm('Xác nhận XÓA VĨNH VIỄN sản phẩm "' + name + '"? Hành động này không thể hoàn tác.')) {
             e.preventDefault();
           }
         });
