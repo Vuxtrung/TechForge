@@ -104,4 +104,15 @@ public class CategoryController {
         redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái danh mục.");
         return "redirect:/admin/categories";
     }
+
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa danh mục.");
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        }
+        return "redirect:/admin/categories";
+    }
 }
