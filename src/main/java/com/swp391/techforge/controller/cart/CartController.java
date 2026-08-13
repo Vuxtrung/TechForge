@@ -28,13 +28,6 @@ public class CartController {
     public String viewCart(HttpSession session, Model model) {
         List<CartItemDTO> cartItems = getCartFromSession(session);
 
-        // Nếu giỏ hàng trống, tạo dữ liệu mẫu để thầy review giao diện được luôn
-        if (cartItems.isEmpty()) {
-            cartItems.add(new CartItemDTO(1L, "TechForge Gaming Alpha i5 13400F | RTX 4060", "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400", 17990000.0, 1));
-            cartItems.add(new CartItemDTO(2L, "Màn Hình Gaming ASUS TUF VG279Q3A 27 Inch 180Hz", "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=400", 3990000.0, 1));
-            session.setAttribute(CART_SESSION_KEY, cartItems);
-        }
-
         // Tính tổng tiền tạm tính
         double subtotal = 0.0;
         for (CartItemDTO item : cartItems) {
@@ -129,9 +122,15 @@ public class CartController {
 
         session.setAttribute(CART_SESSION_KEY, cartItems);
 
+        // Tính tổng số lượng tất cả các sản phẩm trong giỏ
+        int totalItemCount = 0;
+        for (CartItemDTO item : cartItems) {
+            totalItemCount += item.getQuantity();
+        }
+
         java.util.Map<String, Object> response = new java.util.HashMap<>();
         response.put("success", true);
-        response.put("cartSize", cartItems.size());
+        response.put("cartSize", totalItemCount);
         response.put("message", "Đã thêm \"" + productName + "\" vào giỏ hàng!");
 
         return response;
