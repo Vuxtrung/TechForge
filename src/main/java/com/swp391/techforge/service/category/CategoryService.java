@@ -85,6 +85,24 @@ public class CategoryService {
         }
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục."));
+
+        List<Category> children = categoryRepository.findAllByParent_CategoryId(id);
+        if (!children.isEmpty()) {
+            throw new IllegalArgumentException("Không thể xóa danh mục đang có danh mục con bên trong.");
+        }
+
+        long productCount = categoryRepository.countProductsByCategoryId(id);
+        if (productCount > 0) {
+            throw new IllegalArgumentException("Không thể xóa danh mục đang có sản phẩm.");
+        }
+
+        categoryRepository.delete(category);
+    }
+
     private void cascadeDeactivate(Long parentId) {
         List<Category> children = categoryRepository.findAllByParent_CategoryId(parentId);
         for (Category child : children) {

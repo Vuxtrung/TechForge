@@ -1,150 +1,246 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
-<head th:fragment="header-head">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle != null ? pageTitle + ' - TechForge' : 'TechForge - Máy Tính, PC Gaming & Điện Thoại'}">TechForge</title>
+  <head th:fragment="header-head">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title
+      th:text="${pageTitle != null ? pageTitle + ' - TechForge' : 'TechForge - Máy Tính, PC Gaming & Điện Thoại'}"
+    >
+      TechForge
+    </title>
 
     <!-- Bootstrap 5 & Bootstrap Icons -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
+    <link
+      rel="stylesheet"
+      th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+  </head>
 
-<body>
+  <body>
     <header th:fragment="header" class="site-header sticky-top shadow-sm">
-        <!-- Toast Thông Báo Thêm Giỏ Hàng Thành Công -->
-        <div th:if="${successMessage}" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
-            <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body fs-7 fw-semibold">
-                        <i class="bi bi-cart-check-fill me-2 fs-6"></i>
-                        <span th:text="${successMessage}">Đã thêm sản phẩm vào giỏ hàng!</span>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
+      <!-- Toast Thông Báo Thêm Giỏ Hàng Thành Công -->
+      <div
+        th:if="${successMessage}"
+        class="position-fixed top-0 end-0 p-3"
+        style="z-index: 1080"
+      >
+        <div
+          id="flashSuccessToast"
+          class="toast show align-items-center text-white bg-success border-0 shadow-lg"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          <div class="d-flex">
+            <div class="toast-body fs-7 fw-semibold">
+              <i class="bi bi-cart-check-fill me-2 fs-6"></i>
+              <span th:text="${successMessage}"
+                >Đã thêm sản phẩm vào giỏ hàng!</span
+              >
             </div>
+            <button
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              onclick="
+                document
+                  .getElementById('flashSuccessToast')
+                  .closest('.position-fixed')
+                  .remove()
+              "
+              aria-label="Close"
+            ></button>
+          </div>
         </div>
+      </div>
+      <script th:if="${successMessage}" th:inline="none">
+        setTimeout(function () {
+          var el = document.getElementById("flashSuccessToast");
+          if (el && el.closest(".position-fixed")) {
+            el.closest(".position-fixed").remove();
+          }
+        }, 3000);
+      </script>
 
-        <!-- Top Announcement Bar -->
-        <div class="top-bar bg-black text-white py-1 px-lg-5 fs-8">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-none d-md-flex align-items-center gap-3 opacity-90">
-                    <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Showroom HN: Trần Thái Tông | TP.HCM: Lý Thường Kiệt</span>
-                    <span><i class="bi bi-telephone-fill text-warning me-1"></i> Hotline: 0828.333.363 - 0988.882.838</span>
-                </div>
-                <div class="d-flex align-items-center gap-3 ms-auto opacity-90">
-                    <a th:href="@{/warranty-lookup}" class="text-white text-decoration-none hover-warning">
-                        <i class="bi bi-shield-check me-1 text-success"></i> Tra Cứu Bảo Hành
-                    </a>
-                    <a th:href="@{/installment}" class="text-white text-decoration-none hover-warning">
-                        <i class="bi bi-percent me-1 text-info"></i> Trả Góp 0%
-                    </a>
-                    <a th:href="@{/contact}" class="text-white text-decoration-none hover-warning">
-                        <i class="bi bi-envelope me-1"></i> Liên Hệ
-                    </a>
-                </div>
+      <!-- Top Announcement Bar -->
+      <div class="top-bar bg-black text-white py-1 px-lg-5 fs-8">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-none d-md-flex align-items-center gap-3 opacity-90">
+            <span
+              ><i class="bi bi-geo-alt-fill text-danger me-1"></i> Showroom HN:
+              Trần Thái Tông | TP.HCM: Lý Thường Kiệt</span
+            >
+            <span
+              ><i class="bi bi-telephone-fill text-warning me-1"></i> Hotline:
+              0828.333.363 - 0988.882.838</span
+            >
+          </div>
+          <div class="d-flex align-items-center gap-3 ms-auto opacity-90">
+            <a
+              th:href="@{/warranty-lookup}"
+              class="text-white text-decoration-none hover-warning"
+            >
+              <i class="bi bi-shield-check me-1 text-success"></i> Tra Cứu Bảo
+              Hành
+            </a>
+            <a
+              th:href="@{/installment}"
+              class="text-white text-decoration-none hover-warning"
+            >
+              <i class="bi bi-percent me-1 text-info"></i> Trả Góp 0%
+            </a>
+            <a
+              th:href="@{/contact}"
+              class="text-white text-decoration-none hover-warning"
+            >
+              <i class="bi bi-envelope me-1"></i> Liên Hệ
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Header -->
+      <div class="header-container bg-dark text-white py-2 px-lg-5">
+        <div
+          class="d-flex align-items-center justify-content-between w-100 gap-3"
+        >
+          <!-- Brand Logo -->
+          <a
+            th:href="@{/}"
+            class="text-decoration-none d-flex align-items-center gap-2"
+          >
+            <div
+              class="brand-logo bg-danger text-white rounded p-2 fw-black fs-4 lh-1 shadow-sm"
+            >
+              TF
             </div>
-        </div>
-
-        <!-- Main Header -->
-        <div class="header-container bg-dark text-white py-2 px-lg-5">
-            <div class="d-flex align-items-center justify-content-between w-100 gap-3">
-                <!-- Brand Logo -->
-                <a th:href="@{/}" class="text-decoration-none d-flex align-items-center gap-2">
-                    <div class="brand-logo bg-danger text-white rounded p-2 fw-black fs-4 lh-1 shadow-sm">TF</div>
-                    <div class="brand-name">
-                        <span class="fs-4 fw-extrabold text-white tracking-tight">TECH<span class="text-danger">FORGE</span></span>
-                        <span class="d-block fs-8 text-muted text-uppercase tracking-wider">PC & Tech Gaming Store</span>
-                    </div>
-                </a>
-
-                <!-- Search Bar -->
-                <form th:action="@{/products}" method="get" class="search-form mx-auto flex-grow-1 max-w-600">
-                    <div class="input-group">
-                        <input type="search" name="keyword" class="form-control border-0 py-2 fs-7" placeholder="Tìm kiếm PC Gaming, CPU, VGA, Laptop, Điện thoại..." aria-label="Search products">
-                        <button type="submit" class="btn btn-danger px-4">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Navigation Action Links -->
-                <nav class="d-flex align-items-center gap-3">
-                    <!-- Build PC Tool Button -->
-                    <a th:href="@{/buildpc}" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50">
-                        <i class="bi bi-tools fs-6 text-danger"></i>
-                        <span class="d-none d-md-inline fs-7">Tự Build PC</span>
-                    </a>
-
-                    <!-- Budget PC Recommender -->
-                    <a th:href="@{/pc-recommender}" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50">
-                        <i class="bi bi-calculator fs-6 text-warning"></i>
-                        <span class="d-none d-md-inline fs-7">Gợi Ý PC</span>
-                    </a>
-
-                    <!-- Cart Link -->
-                    <a th:href="@{/cart}" class="header-action-btn position-relative text-white text-decoration-none d-flex flex-column align-items-center">
-                        <i class="bi bi-cart3 fs-5"></i>
-                        <span id="cartBadgeCount" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle fs-8" th:text="${session.MY_CART_ITEMS != null ? session.MY_CART_ITEMS.size() : 0}">0</span>
-                        <span class="fs-8 mt-1">Giỏ hàng</span>
-                    </a>
-
-                    <!-- Account Link -->
-                    <a th:href="@{/login}" class="header-action-btn text-white text-decoration-none d-flex flex-column align-items-center">
-                        <i class="bi bi-person-circle fs-5"></i>
-                        <span class="fs-8 mt-1">Tài khoản</span>
-                    </a>
-                </nav>
+            <div class="brand-name">
+              <span class="fs-4 fw-extrabold text-white tracking-tight"
+                >TECH<span class="text-danger">FORGE</span></span
+              >
+              <span
+                class="d-block fs-8 text-muted text-uppercase tracking-wider"
+                >PC & Tech Gaming Store</span
+              >
             </div>
-        </div>
+          </a>
 
-        <!-- JS Thêm vào giỏ hàng AJAX không load lại trang -->
-        <script>
+          <!-- Search Bar -->
+          <form
+            th:action="@{/products}"
+            method="get"
+            class="search-form mx-auto flex-grow-1 max-w-600"
+          >
+            <div class="input-group">
+              <input
+                type="search"
+                name="keyword"
+                class="form-control border-0 py-2 fs-7"
+                placeholder="Tìm kiếm PC Gaming, CPU, VGA, Laptop, Điện thoại..."
+                aria-label="Search products"
+              />
+              <button type="submit" class="btn btn-danger px-4">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </form>
+
+          <!-- Navigation Action Links -->
+          <nav class="d-flex align-items-center gap-3">
+            <!-- Build PC Tool Button -->
+            <a
+              th:href="@{/buildpc}"
+              class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50"
+            >
+              <i class="bi bi-tools fs-6 text-danger"></i>
+              <span class="d-none d-md-inline fs-7">Tự Build PC</span>
+            </a>
+
+            <!-- Budget PC Recommender -->
+            <a
+              th:href="@{/pc-recommender}"
+              class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50"
+            >
+              <i class="bi bi-calculator fs-6 text-warning"></i>
+              <span class="d-none d-md-inline fs-7">Gợi Ý PC</span>
+            </a>
+
+            <!-- Cart Link -->
+            <a
+              th:href="@{/cart}"
+              class="header-action-btn position-relative text-white text-decoration-none d-flex flex-column align-items-center"
+            >
+              <i class="bi bi-cart3 fs-5"></i>
+              <span
+                id="cartBadgeCount"
+                class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle fs-8"
+                th:text="${session.MY_CART_ITEMS != null ? session.MY_CART_ITEMS.size() : 0}"
+                >0</span
+              >
+              <span class="fs-8 mt-1">Giỏ hàng</span>
+            </a>
+
+            <!-- Account Link -->
+            <a
+              th:href="@{/login}"
+              class="header-action-btn text-white text-decoration-none d-flex flex-column align-items-center"
+            >
+              <i class="bi bi-person-circle fs-5"></i>
+              <span class="fs-8 mt-1">Tài khoản</span>
+            </a>
+          </nav>
+        </div>
+      </div>
+
+      <!-- JS Thêm vào giỏ hàng AJAX không load lại trang -->
+      <script>
         function addToCartAjax(productId, productName, price, imageUrl) {
-            const params = new URLSearchParams();
-            params.append('productId', productId);
-            params.append('productName', productName);
-            params.append('price', price);
-            params.append('imageUrl', imageUrl);
-            params.append('quantity', 1);
+          const params = new URLSearchParams();
+          params.append("productId", productId);
+          params.append("productName", productName);
+          params.append("price", price);
+          params.append("imageUrl", imageUrl);
+          params.append("quantity", 1);
 
-            fetch('/cart/api/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: params
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Cập nhật số đếm trên Icon Giỏ hàng tức thì
-                    const badge = document.getElementById('cartBadgeCount');
-                    if (badge) badge.innerText = data.cartSize;
+          fetch("/cart/api/add", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: params,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                // Cập nhật số đếm trên Icon Giỏ hàng tức thì
+                const badge = document.getElementById("cartBadgeCount");
+                if (badge) badge.innerText = data.cartSize;
 
-                    // Hiển thị Toast thông báo nổi
-                    showToastNotification(data.message);
-                }
+                // Hiển thị Toast thông báo nổi
+                showToastNotification(data.message);
+              }
             })
-            .catch(err => {
-                console.error('Error adding to cart:', err);
-                alert('Đã thêm sản phẩm vào giỏ hàng!');
+            .catch((err) => {
+              console.error("Error adding to cart:", err);
+              alert("Đã thêm sản phẩm vào giỏ hàng!");
             });
         }
 
         function showToastNotification(msg) {
-            let container = document.getElementById('ajaxToastContainer');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'ajaxToastContainer';
-                container.className = 'position-fixed top-0 end-0 p-3';
-                container.style.zIndex = '1080';
-                document.body.appendChild(container);
-            }
+          let container = document.getElementById("ajaxToastContainer");
+          if (!container) {
+            container = document.createElement("div");
+            container.id = "ajaxToastContainer";
+            container.className = "position-fixed top-0 end-0 p-3";
+            container.style.zIndex = "1080";
+            document.body.appendChild(container);
+          }
 
-            container.innerHTML = `
+          container.innerHTML = `
                 <div class="toast show align-items-center text-white bg-success border-0 shadow-lg" role="alert">
                     <div class="d-flex">
                         <div class="toast-body fs-7 fw-semibold">
@@ -156,12 +252,11 @@
                 </div>
             `;
 
-            setTimeout(() => {
-                if (container) container.innerHTML = '';
-            }, 3500);
+          setTimeout(() => {
+            if (container) container.innerHTML = "";
+          }, 3500);
         }
-        </script>
+      </script>
     </header>
-</body>
-
+  </body>
 </html>
