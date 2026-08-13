@@ -11,39 +11,40 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/login",
-                    "/register",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
-                    "/webjars/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
 
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .defaultSuccessUrl("/", true)
-                .failureUrl("/login?error=true")
-                .permitAll()
-            )
+                        .requestMatchers("/account/**").authenticated()
 
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .permitAll()
-            )
+                        .anyRequest().permitAll()
+                )
 
-            .csrf(csrf -> csrf.disable());
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/account", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .permitAll()
+                )
+
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }
