@@ -29,7 +29,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .withUsername(user.getEmail())
                 .password(user.getPasswordHash())
                 .roles(user.getRole().getRoleName())
-                .disabled(user.getStatus() != com.swp391.techforge.entity.UserStatus.ACTIVE)
+                .disabled(
+                        user.getStatus()
+                                != com.swp391.techforge.entity.UserStatus.ACTIVE
+                )
                 .build();
     }
 }
