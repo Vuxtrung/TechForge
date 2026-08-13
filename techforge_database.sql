@@ -1,7 +1,3 @@
-﻿-- =========================================================
--- TechForge Database
--- =========================================================
-
 DROP DATABASE IF EXISTS techforge;
 CREATE DATABASE techforge
     CHARACTER SET utf8mb4
