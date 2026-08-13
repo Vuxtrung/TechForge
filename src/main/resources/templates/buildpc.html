@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title>Tự Build PC - TechForge</title>
+</head>
+
+<body class="bg-light text-dark min-vh-100 d-flex flex-column">
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    <!-- Main Content -->
+    <main class="flex-grow-1 container-xl py-4 d-flex flex-column flex-md-row gap-4">
+        <!-- Left Column: Component Categories -->
+        <aside class="flex-shrink-0" style="width: 100%; max-width: 280px;">
+            <div class="bg-white rounded border shadow-sm overflow-hidden">
+                <div class="bg-dark text-white px-3 py-2 d-flex align-items-center justify-content-between fw-bold text-uppercase fs-6">
+                    <span>Linh Kiện</span>
+                    <i class="bi bi-pc-display fs-6"></i>
+                </div>
+                <div class="d-flex flex-column">
+                    <!-- Active Item -->
+                    <div class="bg-light border-start border-4 border-danger px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center text-danger" style="width: 40px; height: 40px;">
+                                <i class="bi bi-cpu fs-5"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold fs-7 text-dark">CPU</span>
+                                <span class="text-muted fs-8 text-truncate-2" style="max-width: 120px;">Intel Core i9-14900K</span>
+                            </div>
+                        </div>
+                        <a class="text-danger fw-bold fs-8 text-decoration-none text-uppercase" href="#">Sửa</a>
+                    </div>
+                    <!-- Inactive Items -->
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-motherboard fs-5"></i>
+                            </div>
+                            <span class="fw-bold fs-7 text-dark">Bo Mạch Chủ</span>
+                        </div>
+                        <a class="text-secondary fw-bold fs-8 text-decoration-none text-uppercase hover-warning" href="#">Thêm</a>
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-memory fs-5"></i>
+                            </div>
+                            <span class="fw-bold fs-7 text-dark">RAM</span>
+                        </div>
+                        <a class="text-secondary fw-bold fs-8 text-decoration-none text-uppercase hover-warning" href="#">Thêm</a>
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-gpu-card fs-5"></i>
+                            </div>
+                            <span class="fw-bold fs-7 text-dark">Card Màn Hình</span>
+                        </div>
+                        <a class="text-secondary fw-bold fs-8 text-decoration-none text-uppercase hover-warning" href="#">Thêm</a>
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-plug fs-5"></i>
+                            </div>
+                            <span class="fw-bold fs-7 text-dark">Nguồn (PSU)</span>
+                        </div>
+                        <a class="text-secondary fw-bold fs-8 text-decoration-none text-uppercase hover-warning" href="#">Thêm</a>
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-hdd fs-5"></i>
+                            </div>
+                            <span class="fw-bold fs-7 text-dark">Ổ Cứng</span>
+                        </div>
+                        <a class="text-secondary fw-bold fs-8 text-decoration-none text-uppercase hover-warning" href="#">Thêm</a>
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-fan fs-5"></i>
+                            </div>
+                            <span class="fw-bold fs-7 text-dark">Tản Nhiệt</span>
+                        </div>
+                        <a class="text-secondary fw-bold fs-8 text-decoration-none text-uppercase hover-warning" href="#">Thêm</a>
+                    </div>
+                    <div class="px-3 py-2 d-flex align-items-center justify-content-between border-start border-4 border-transparent cursor-pointer hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-secondary" style="width: 40px; height: 40px;">
+                                <i class="bi bi-pc fs-5"></i>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold fs-7 text-dark">Vỏ Máy</span>
+                                <span class="text-muted fs-8 text-truncate-2" style="max-width: 120px;">NZXT H9 Flow White</span>
+                            </div>
+                        </div>
+                        <a class="text-danger fw-bold fs-8 text-decoration-none text-uppercase" href="#">Sửa</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- Center Column: Product Grid -->
+        <section class="flex-grow-1 d-flex flex-column gap-3">
+            <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border">
+                <h2 class="fw-bold fs-5 text-dark mb-0">Chọn CPU</h2>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm border text-muted">
+                        <option>Sắp xếp: Phổ biến</option>
+                        <option>Giá: Thấp đến Cao</option>
+                        <option>Giá: Cao xuống Thấp</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                <!-- Product Card 1 -->
+                <div class="col">
+                    <div class="card h-100 border rounded shadow-sm hover-shadow position-relative">
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-2 z-1">-20%</span>
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center p-3" style="height: 180px;">
+                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGCi9G_tbKdBP5TujnEaOqklc0Z12ZLkiWYHwL1wE5j6OXX8EKMYIr3UKkM5pP6il0xYd1DjyNb04m03Mdey25gDkGBMBNjk7ZeDkcveirAvNRpO0XOEY9YOXg6dcMSeGGj-VUv8sK9Q7BVeyHebaQld0x8cvzwYbij4GN8fKriSP7pmgKmJsAXWEJ2v1G3_C1iTaueE5Ep2GzCCheEm7v9nFe_bAdA2OQjJQTQo5GeMM3tFms_KeMMg" class="img-fluid" style="max-height: 100%; object-fit: contain;" alt="CPU">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <h3 class="fw-bold fs-6 text-dark mb-2 text-truncate-2" style="height: 40px;">Intel Core i9-14900K 24-Core, 32-Thread Processor</h3>
+                            <ul class="text-muted fs-8 mb-3 ps-3 flex-grow-1">
+                                <li>LGA 1700 Socket</li>
+                                <li>Up to 6.0 GHz</li>
+                                <li>125W Base Power</li>
+                            </ul>
+                            <div class="d-flex align-items-end justify-content-between mt-auto">
+                                <div class="d-flex flex-column">
+                                    <span class="text-muted text-decoration-line-through fs-8">$699.00</span>
+                                    <span class="fw-bold fs-5 text-danger">$559.00</span>
+                                </div>
+                                <button class="btn btn-warning btn-sm fw-bold">CHỌN</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 2 -->
+                <div class="col">
+                    <div class="card h-100 border border-danger shadow position-relative">
+                        <span class="badge bg-danger-subtle text-danger position-absolute top-0 end-0 m-2 z-1 border border-danger d-flex align-items-center gap-1">
+                            <i class="bi bi-check-circle-fill"></i> Đã chọn
+                        </span>
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center p-3" style="height: 180px;">
+                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUImS7_BA_3iTOB1AwFZS24m_ND9oV9f_hrLVxbiJDEGAgtjR7F9fVpIPhCS0-oUBiVJDmKTjiyr8Q3Uqy03xs1lF59qWywnxu657D0Nt5RxM9s8cHh2tUHmPtMUthIgSuT0e63gwwblxOB_hODjzuhe8UE9V4QthsKIauEmpnDadz1MlrSvw_LqKrABZhsZ6Hyu7z8089WBZ6EHhTjKJdvyoPOjazKB1o47irSShe37Zqn2Ad34MQzw" class="img-fluid" style="max-height: 100%; object-fit: contain;" alt="CPU">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <h3 class="fw-bold fs-6 text-dark mb-2 text-truncate-2" style="height: 40px;">AMD Ryzen 9 7950X3D 16-Core, 32-Thread Processor</h3>
+                            <ul class="text-muted fs-8 mb-3 ps-3 flex-grow-1">
+                                <li>AM5 Socket</li>
+                                <li>Up to 5.7 GHz</li>
+                                <li>120W Base Power</li>
+                            </ul>
+                            <div class="d-flex align-items-end justify-content-between mt-auto">
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold fs-5 text-dark">$599.00</span>
+                                </div>
+                                <button class="btn btn-danger btn-sm fw-bold">ĐÃ CHỌN</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Product Card 3 -->
+                <div class="col">
+                    <div class="card h-100 border rounded shadow-sm hover-shadow position-relative">
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center p-3" style="height: 180px;">
+                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMnxcoONpHcDa9MzwozJUgF2ayfxDwRaLJ4_lk5CdzQ3XQSGKrXZ2sBB8-BMu8wYkhflhZtUYg4bkCC0ER9VLuPk0yYYRCxHJN5AHubWKplZ_fGsAFtIfKrP-aI-iI7ADl9zIbaqU7tI7u_ZNwumFNrnPZrp6JTaY8YCB_Fwl2QmCrteYhl89uSn6P5ZCrD1hWK75P55-cVvq-e2UDndpDP157e5qyaRPR92LTUj7uJmpr0htwfEFW6w" class="img-fluid" style="max-height: 100%; object-fit: contain;" alt="CPU">
+                        </div>
+                        <div class="card-body d-flex flex-column p-3">
+                            <h3 class="fw-bold fs-6 text-dark mb-2 text-truncate-2" style="height: 40px;">Intel Core i7-14700K 20-Core, 28-Thread Processor</h3>
+                            <ul class="text-muted fs-8 mb-3 ps-3 flex-grow-1">
+                                <li>LGA 1700 Socket</li>
+                                <li>Up to 5.6 GHz</li>
+                                <li>125W Base Power</li>
+                            </ul>
+                            <div class="d-flex align-items-end justify-content-between mt-auto">
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold fs-5 text-dark">$399.00</span>
+                                </div>
+                                <button class="btn btn-warning btn-sm fw-bold">CHỌN</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Right Column: Build Summary -->
+        <aside class="flex-shrink-0" style="width: 100%; max-width: 320px;">
+            <div class="bg-dark rounded shadow p-3 position-sticky mt-3" style="top: 80px;">
+                <h2 class="fw-bold fs-5 text-white mb-3 border-bottom border-secondary pb-2">Tổng Quan Cấu Hình</h2>
+                
+                <div class="mb-4 d-flex flex-column gap-2">
+                    <!-- Added Item -->
+                    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary pb-2">
+                        <div class="d-flex flex-column pe-2">
+                            <span class="fw-bold fs-8 text-secondary text-uppercase">CPU</span>
+                            <span class="text-light fs-8 text-truncate" style="max-width: 180px;">AMD Ryzen 9 7950X3D</span>
+                        </div>
+                        <span class="fw-bold fs-7 text-white">$599.00</span>
+                    </div>
+                    <!-- Added Item -->
+                    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary pb-2">
+                        <div class="d-flex flex-column pe-2">
+                            <span class="fw-bold fs-8 text-secondary text-uppercase">Case</span>
+                            <span class="text-light fs-8 text-truncate" style="max-width: 180px;">NZXT H9 Flow White</span>
+                        </div>
+                        <span class="fw-bold fs-7 text-white">$159.99</span>
+                    </div>
+                    <!-- Added Item -->
+                    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary pb-2">
+                        <div class="d-flex flex-column pe-2">
+                            <span class="fw-bold fs-8 text-secondary text-uppercase">PSU</span>
+                            <span class="text-light fs-8 text-truncate" style="max-width: 180px;">Corsair RM1000x 1000W</span>
+                        </div>
+                        <span class="fw-bold fs-7 text-white">$189.99</span>
+                    </div>
+                </div>
+
+                <div class="bg-black bg-opacity-25 rounded p-2 mb-4 border border-secondary border-opacity-50">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary fs-8">Công suất dự kiến:</span>
+                        <span class="fw-bold fs-7 text-white">450W</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary fs-8">Độ tương thích:</span>
+                        <span class="badge bg-success-subtle text-success border border-success d-flex align-items-center gap-1 fs-8">
+                            <i class="bi bi-check"></i> Tương thích tốt
+                        </span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-end mb-4">
+                    <span class="fw-bold fs-6 text-secondary">Tổng tiền</span>
+                    <span class="fw-bold fs-3 text-warning lh-1">$2,499.00</span>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <button class="btn btn-danger w-100 fw-bold py-2 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                        <i class="bi bi-cart-check"></i> THÊM VÀO GIỎ HÀNG
+                    </button>
+                    <button class="btn btn-outline-warning w-100 fw-bold py-2 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-headset"></i> NHẬN TƯ VẤN CHUYÊN GIA
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </main>
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>
