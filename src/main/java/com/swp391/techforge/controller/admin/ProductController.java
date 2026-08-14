@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -66,13 +67,14 @@ public class ProductController {
     @PostMapping
     public String create(@Valid @ModelAttribute("product") Product product,
                           BindingResult result, Model model,
+                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                           RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
         try {
-            productService.create(product);
+            productService.create(product, imageFile);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.findAllActive());
@@ -86,13 +88,14 @@ public class ProductController {
     public String update(@PathVariable Long id,
                           @Valid @ModelAttribute("product") Product product,
                           BindingResult result, Model model,
+                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                           RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
         try {
-            productService.update(id, product);
+            productService.update(id, product, imageFile);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.findAllActive());

@@ -30,7 +30,7 @@
                         </div>
 
                         <form th:action="${product.productId == null ? '/admin/products' : '/admin/products/' + product.productId}"
-                              th:object="${product}" method="post" novalidate>
+                              th:object="${product}" method="post" enctype="multipart/form-data" novalidate>
 
                             <!-- Name -->
                             <div class="mb-3">
@@ -97,14 +97,51 @@
                                 </div>
                             </div>
 
+                            <!-- Image -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Ảnh Sản Phẩm</label>
+                                <div class="mb-2" th:if="${product.primaryImageUrl}">
+                                    <img th:src="${product.primaryImageUrl}" alt="Ảnh hiện tại"
+                                         style="max-height:150px;" class="rounded border">
+                                </div>
+                                <input type="file" id="imageFile" name="imageFile" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <div class="form-text">Chọn ảnh mới để tải lên (JPG, PNG, WEBP - tối đa 5MB).</div>
+                                <div id="imageFileError" class="text-danger fs-8 mt-1" style="display:none;"></div>
+                            </div>
+
                             <div class="d-flex gap-2 justify-content-end border-top pt-3">
                                 <a th:href="@{/admin/products}" class="btn btn-outline-secondary px-4">Hủy</a>
-                                <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                                <button type="submit" id="submitBtn" class="btn btn-danger px-4 fw-semibold">
                                     <i class="bi bi-check-lg me-1"></i>
                                     <span th:text="${product.productId == null ? 'Thêm Sản Phẩm' : 'Lưu Thay Đổi'}">Lưu</span>
                                 </button>
                             </div>
                         </form>
+
+                        <script>
+                            (function () {
+                                var MAX_SIZE = 5 * 1024 * 1024; // 5MB
+                                var fileInput = document.getElementById('imageFile');
+                                var errorBox = document.getElementById('imageFileError');
+                                var submitBtn = document.getElementById('submitBtn');
+
+                                fileInput.addEventListener('change', function () {
+                                    errorBox.style.display = 'none';
+                                    errorBox.textContent = '';
+                                    submitBtn.disabled = false;
+
+                                    var file = fileInput.files[0];
+                                    if (!file) return;
+
+                                    if (file.size > MAX_SIZE) {
+                                        errorBox.textContent = 'Ảnh vượt quá 5MB, vui lòng chọn ảnh khác.';
+                                        errorBox.style.display = 'block';
+                                        fileInput.value = '';
+                                        submitBtn.disabled = false;
+                                    }
+                                });
+                            })();
+                        </script>
 
                     </div>
                 </div>
