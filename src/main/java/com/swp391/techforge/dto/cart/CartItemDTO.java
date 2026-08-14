@@ -1,9 +1,6 @@
 package com.swp391.techforge.dto.cart;
 
-/**
- * Class DTO lưu thông tin 1 món hàng trong giỏ hàng.
- * Người thực hiện: Cáp Duy Thái (F_09 - Add to Cart / View Cart)
- */
+
 public class CartItemDTO {
     private Long productId;
     private String productName;
@@ -22,13 +19,11 @@ public class CartItemDTO {
         this.quantity = quantity;
     }
 
-    // Hàm tính tổng tiền từng dòng món hàng (Giá * Số lượng)
     public Double getTotalPrice() {
         if (price == null || quantity == null) return 0.0;
         return price * quantity;
     }
 
-    // các Getter và Setter cơ bản
     public Long getProductId() {
         return productId;
     }
