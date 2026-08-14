@@ -25,7 +25,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         .requestMatchers("/account/**").authenticated()
-
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
                 )
 
