@@ -17,13 +17,11 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb fs-7">
                 <li class="breadcrumb-item">
-                    <a th:href="@{/}"
-                       class="text-decoration-none text-muted">
+                    <a th:href="@{/}" class="text-decoration-none text-muted">
                         Trang chủ
                     </a>
                 </li>
-                <li class="breadcrumb-item active text-danger fw-semibold"
-                    aria-current="page">
+                <li class="breadcrumb-item active text-danger fw-semibold" aria-current="page">
                     Đăng nhập
                 </li>
             </ol>
@@ -61,42 +59,49 @@
                     </div>
 
                     <!-- Error -->
-                    <div th:if="${param.error}"
-                         class="alert alert-danger alert-dismissible fade show fs-7 shadow-sm"
-                         role="alert">
+                    <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show fs-7 shadow-sm"
+                        role="alert">
 
                         <i class="bi bi-exclamation-circle-fill me-2"></i>
-                        Email hoặc mật khẩu không chính xác.
 
-                        <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="alert">
+                        <span th:if="${param.error[0] == 'not_found'}">
+                            Email không tồn tại.
+                        </span>
+
+                        <span th:if="${param.error[0] == 'bad_credentials'}">
+                            Mật khẩu không chính xác.
+                        </span>
+
+                        <span th:if="${param.error[0] == 'locked'}">
+                            Tài khoản của bạn đã bị khóa.
+                        </span>
+
+                        <span th:if="${param.error[0] == 'unknown'}">
+                            Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.
+                        </span>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="alert">
                         </button>
                     </div>
 
                     <!-- Logout success -->
-                    <div th:if="${param.logout}"
-                         class="alert alert-success alert-dismissible fade show fs-7 shadow-sm"
-                         role="alert">
+                    <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show fs-7 shadow-sm"
+                        role="alert">
 
                         <i class="bi bi-check-circle-fill me-2"></i>
                         Bạn đã đăng xuất thành công.
 
-                        <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert">
                         </button>
                     </div>
 
                     <!-- Login form -->
-                    <form th:action="@{/login}"
-                          method="post">
+                    <form th:action="@{/login}" method="post">
 
                         <!-- Email -->
                         <div class="mb-3">
 
-                            <label for="email"
-                                   class="form-label fw-semibold fs-7 text-dark">
+                            <label for="email" class="form-label fw-semibold fs-7 text-dark">
                                 Email đăng nhập
                             </label>
 
@@ -106,13 +111,8 @@
                                     <i class="bi bi-envelope text-danger"></i>
                                 </span>
 
-                                <input type="email"
-                                       id="email"
-                                       name="username"
-                                       class="form-control fs-7"
-                                       placeholder="Nhập email của bạn"
-                                       autocomplete="email"
-                                       required>
+                                <input type="email" id="email" name="username" class="form-control fs-7"
+                                    placeholder="Nhập email của bạn" autocomplete="email" required>
 
                             </div>
 
@@ -121,8 +121,7 @@
                         <!-- Password -->
                         <div class="mb-2">
 
-                            <label for="password"
-                                   class="form-label fw-semibold fs-7 text-dark">
+                            <label for="password" class="form-label fw-semibold fs-7 text-dark">
                                 Mật khẩu
                             </label>
 
@@ -132,13 +131,8 @@
                                     <i class="bi bi-lock-fill text-danger"></i>
                                 </span>
 
-                                <input type="password"
-                                       id="password"
-                                       name="password"
-                                       class="form-control fs-7"
-                                       placeholder="Nhập mật khẩu"
-                                       autocomplete="current-password"
-                                       required>
+                                <input type="password" id="password" name="password" class="form-control fs-7"
+                                    placeholder="Nhập mật khẩu" autocomplete="current-password" required>
 
                             </div>
 
@@ -147,8 +141,7 @@
                         <!-- Forgot password -->
                         <div class="text-end mb-4">
 
-                            <a th:href="@{/forgot-password}"
-                               class="text-danger text-decoration-none fs-7">
+                            <a th:href="@{/forgot-password}" class="text-danger text-decoration-none fs-7">
 
                                 <i class="bi bi-question-circle me-1"></i>
                                 Quên mật khẩu?
@@ -158,8 +151,7 @@
                         </div>
 
                         <!-- Login button -->
-                        <button type="submit"
-                                class="btn btn-danger w-100 fw-bold py-2 shadow-sm">
+                        <button type="submit" class="btn btn-danger w-100 fw-bold py-2 shadow-sm">
 
                             <i class="bi bi-box-arrow-in-right me-2"></i>
                             ĐĂNG NHẬP
@@ -260,8 +252,7 @@
 
                     <!-- Register button -->
                     <div class="mt-auto">
-                        <a th:href="@{/register}"
-                           class="btn btn-outline-danger w-100 fw-bold py-2">
+                        <a th:href="@{/register}" class="btn btn-outline-danger w-100 fw-bold py-2">
                             <i class="bi bi-person-plus-fill me-2"></i>
                             ĐĂNG KÝ TÀI KHOẢN
                         </a>
@@ -313,4 +304,5 @@
     <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
+
 </html>
