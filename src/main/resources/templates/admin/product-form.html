@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title th:text="${product.productId == null ? 'Thêm Sản Phẩm' : 'Sửa Sản Phẩm'}">Sản Phẩm</title>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body">
+        <section class="container-fluid px-lg-5 my-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="bg-white rounded-3 shadow-sm border p-4">
+
+                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                            <span class="fs-4 text-dark fw-bold">
+                                <i class="bi bi-box-seam text-danger"></i>
+                                <span th:text="${product.productId == null ? 'Thêm Sản Phẩm Mới' : 'Cập Nhật Sản Phẩm'}">Sản Phẩm</span>
+                            </span>
+                            <a th:href="@{/admin/products}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
+                            </a>
+                        </div>
+
+                        <div th:if="${errorMessage}" class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-1"></i> <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <form th:action="${product.productId == null ? '/admin/products' : '/admin/products/' + product.productId}"
+                              th:object="${product}" method="post" novalidate>
+
+                            <!-- Name -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Tên Sản Phẩm <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{name}" class="form-control"
+                                       th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                                       placeholder="VD: PC Gaming AMD Ryzen 5 - RTX 4060" required maxlength="200">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Category -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Danh Mục <span class="text-danger">*</span></label>
+                                    <select th:field="*{categoryId}" class="form-select" required>
+                                        <option value="">-- Chọn danh mục --</option>
+                                        <option th:each="c : ${categories}"
+                                                th:value="${c.categoryId}"
+                                                th:text="${c.name}">Danh mục</option>
+                                    </select>
+                                </div>
+
+                                <!-- Brand -->
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Thương Hiệu</label>
+                                    <input type="text" th:field="*{brand}" class="form-control"
+                                           placeholder="VD: Asus, MSI, Intel..." maxlength="100">
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Mô Tả</label>
+                                <textarea th:field="*{description}" class="form-control" rows="4"
+                                          placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+                            </div>
+
+                            <div class="row">
+                                <!-- Price -->
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Giá Bán (VNĐ) <span class="text-danger">*</span></label>
+                                    <input type="number" th:field="*{basePrice}" class="form-control"
+                                           th:classappend="${#fields.hasErrors('basePrice')} ? 'is-invalid'"
+                                           step="1000" min="0" placeholder="VD: 15000000" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('basePrice')}" th:errors="*{basePrice}"></div>
+                                </div>
+
+                                <!-- Stock -->
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Số Lượng Tồn Kho <span class="text-danger">*</span></label>
+                                    <input type="number" th:field="*{stockQuantity}" class="form-control"
+                                           th:classappend="${#fields.hasErrors('stockQuantity')} ? 'is-invalid'"
+                                           min="0" placeholder="0" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}"></div>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Trạng Thái <span class="text-danger">*</span></label>
+                                    <select th:field="*{status}" class="form-select" required>
+                                        <option value="ACTIVE">Đang bán</option>
+                                        <option value="HIDDEN">Đã ẩn</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 justify-content-end border-top pt-3">
+                                <a th:href="@{/admin/products}" class="btn btn-outline-secondary px-4">Hủy</a>
+                                <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    <span th:text="${product.productId == null ? 'Thêm Sản Phẩm' : 'Lưu Thay Đổi'}">Lưu</span>
+                                </button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>
