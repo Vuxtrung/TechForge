@@ -34,6 +34,7 @@ CREATE TABLE users (
     email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
+    address VARCHAR(500),
     avatar_url VARCHAR(255),
     status ENUM('ACTIVE','LOCKED') NOT NULL DEFAULT 'ACTIVE',
     loyalty_points INT NOT NULL DEFAULT 0,
@@ -87,26 +88,7 @@ CREATE TABLE vouchers (
 
 
 -- =========================================================
--- 5. USER ADDRESSES
--- =========================================================
-
-CREATE TABLE user_addresses (
-    address_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    recipient_name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    address_line VARCHAR(255) NOT NULL,
-    city VARCHAR(100),
-    is_default TINYINT(1) DEFAULT 0,
-
-    CONSTRAINT user_addresses_ibfk_1
-        FOREIGN KEY (user_id)
-        REFERENCES users(user_id)
-) ENGINE = InnoDB;
-
-
--- =========================================================
--- 6. PRODUCTS
+-- 5. PRODUCTS
 -- =========================================================
 
 CREATE TABLE products (
@@ -129,7 +111,7 @@ CREATE TABLE products (
 
 
 -- =========================================================
--- 7. PRODUCT VARIANTS
+-- 6. PRODUCT VARIANTS
 -- =========================================================
 
 CREATE TABLE product_variants (
@@ -146,7 +128,7 @@ CREATE TABLE product_variants (
 
 
 -- =========================================================
--- 8. PRODUCT IMAGES
+-- 7. PRODUCT IMAGES
 -- =========================================================
 
 CREATE TABLE product_images (
@@ -162,7 +144,7 @@ CREATE TABLE product_images (
 
 
 -- =========================================================
--- 9. PRODUCT SPECIFICATIONS
+-- 8. PRODUCT SPECIFICATIONS
 -- =========================================================
 
 CREATE TABLE product_specifications (
@@ -178,7 +160,7 @@ CREATE TABLE product_specifications (
 
 
 -- =========================================================
--- 10. PC BUILDS
+-- 9. PC BUILDS
 -- =========================================================
 
 CREATE TABLE pc_builds (
@@ -198,7 +180,7 @@ CREATE TABLE pc_builds (
 
 
 -- =========================================================
--- 11. CARTS
+-- 10. CARTS
 -- =========================================================
 
 CREATE TABLE carts (
@@ -215,17 +197,22 @@ CREATE TABLE carts (
 
 
 -- =========================================================
--- 12. ORDERS
+-- 11. ORDERS
 -- =========================================================
 
 CREATE TABLE orders (
     order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    address_id BIGINT,
     pickup_showroom VARCHAR(100),
     order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('PENDING','CONFIRMED','SHIPPING','DELIVERED','CANCEL_REQUESTED','CANCELLED')
-        NOT NULL DEFAULT 'PENDING',
+    status ENUM(
+        'PENDING',
+        'CONFIRMED',
+        'SHIPPING',
+        'DELIVERED',
+        'CANCEL_REQUESTED',
+        'CANCELLED'
+    ) NOT NULL DEFAULT 'PENDING',
     total_amount DECIMAL(15,2) NOT NULL,
     voucher_id BIGINT,
     cancel_reason VARCHAR(255),
@@ -236,16 +223,12 @@ CREATE TABLE orders (
 
     CONSTRAINT orders_ibfk_1
         FOREIGN KEY (user_id)
-        REFERENCES users(user_id),
-
-    CONSTRAINT orders_ibfk_2
-        FOREIGN KEY (address_id)
-        REFERENCES user_addresses(address_id)
+        REFERENCES users(user_id)
 ) ENGINE = InnoDB;
 
 
 -- =========================================================
--- 13. ORDER ITEMS
+-- 12. ORDER ITEMS
 -- (product_id đổi thành NULLABLE để khớp với bản dump)
 -- =========================================================
 
@@ -270,7 +253,7 @@ CREATE TABLE order_items (
 
 
 -- =========================================================
--- 14. CART ITEMS
+-- 13. CART ITEMS
 -- =========================================================
 
 CREATE TABLE cart_items (
@@ -300,7 +283,7 @@ CREATE TABLE cart_items (
 
 
 -- =========================================================
--- 15. PC BUILD ITEMS
+-- 14. PC BUILD ITEMS
 -- =========================================================
 
 CREATE TABLE pc_build_items (
@@ -321,7 +304,7 @@ CREATE TABLE pc_build_items (
 
 
 -- =========================================================
--- 16. PAYMENTS
+-- 15. PAYMENTS
 -- =========================================================
 
 CREATE TABLE payments (
@@ -340,7 +323,7 @@ CREATE TABLE payments (
 
 
 -- =========================================================
--- 17. WARRANTY TICKETS
+-- 16. WARRANTY TICKETS
 -- =========================================================
 
 CREATE TABLE warranty_tickets (
@@ -371,7 +354,7 @@ CREATE TABLE warranty_tickets (
 
 
 -- =========================================================
--- 18. VOUCHER USAGES
+-- 17. VOUCHER USAGES
 -- =========================================================
 
 CREATE TABLE voucher_usages (
@@ -396,7 +379,7 @@ CREATE TABLE voucher_usages (
 
 
 -- =========================================================
--- 19. PASSWORD RESET OTP
+-- 18. PASSWORD RESET OTP
 -- =========================================================
 
 CREATE TABLE password_reset_otp (
@@ -414,7 +397,7 @@ CREATE TABLE password_reset_otp (
 
 
 -- =========================================================
--- 20. INSTALLMENT PLANS
+-- 19. INSTALLMENT PLANS
 -- =========================================================
 
 CREATE TABLE installment_plans (
@@ -431,7 +414,7 @@ CREATE TABLE installment_plans (
 
 
 -- =========================================================
--- 21. REVIEWS
+-- 20. REVIEWS
 -- =========================================================
 
 CREATE TABLE reviews (
@@ -458,7 +441,7 @@ CREATE TABLE reviews (
 
 
 -- =========================================================
--- 22. COMPATIBILITY RULES (bảng mới, bổ sung để khớp bản dump)
+-- 21. COMPATIBILITY RULES (bảng mới, bổ sung để khớp bản dump)
 -- =========================================================
 
 CREATE TABLE compatibility_rules (

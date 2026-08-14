@@ -3,9 +3,7 @@ package com.swp391.techforge.service.authentication;
 import com.swp391.techforge.dto.authentication.RegisterRequest;
 import com.swp391.techforge.entity.Role;
 import com.swp391.techforge.entity.User;
-import com.swp391.techforge.entity.UserAddress;
 import com.swp391.techforge.repository.authentication.RoleRepository;
-import com.swp391.techforge.repository.authentication.UserAddressRepository;
 import com.swp391.techforge.repository.authentication.UserRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,18 +15,15 @@ public class RegisterService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final UserAddressRepository userAddressRepository;
     private final PasswordEncoder passwordEncoder;
 
     public RegisterService(
             UserRepository userRepository,
             RoleRepository roleRepository,
-            UserAddressRepository userAddressRepository,
             PasswordEncoder passwordEncoder) {
 
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.userAddressRepository = userAddressRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -47,8 +42,7 @@ public class RegisterService {
 
         // 3. Lấy role CUSTOMER
         Role customerRole = roleRepository.findByRoleName("CUSTOMER")
-                .orElseThrow(() ->
-                        new IllegalStateException("Không tìm thấy role CUSTOMER"));
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy role CUSTOMER"));
 
         // 4. Tạo User
         User user = new User();
@@ -57,25 +51,13 @@ public class RegisterService {
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPasswordHash(
-                passwordEncoder.encode(request.getPassword())
-        );
+                passwordEncoder.encode(request.getPassword()));
         user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
 
         // User.java đã có default
         // ACTIVE và loyaltyPoints = 0
 
-        User savedUser = userRepository.save(user);
-
-        // 5. Tạo địa chỉ
-        UserAddress address = new UserAddress();
-
-        address.setUser(savedUser);
-        address.setRecipientName(request.getFullName());
-        address.setPhone(request.getPhone());
-        address.setAddressLine(request.getAddressLine());
-        address.setCity(request.getCity());
-        address.setIsDefault(true);
-
-        userAddressRepository.save(address);
+        userRepository.save(user);
     }
 }
