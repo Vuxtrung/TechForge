@@ -10,11 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Controller quản lý Giỏ hàng (F_09: Add to Cart / View Cart)
- * PIC: Cáp Duy Thái
- * Code đơn giản, lưu giỏ hàng trong HttpSession dễ giải thích khi review code.
- */
+
 @Controller
 @RequestMapping("/cart")
 public class CartController {
