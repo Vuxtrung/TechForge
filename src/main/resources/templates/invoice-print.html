@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Hóa Đơn Bán Hàng #' + ${order.orderId}">Hóa Đơn Bán Hàng - TechForge</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <style>
+        body { font-family: Arial, sans-serif; background: #fff; color: #000; }
+        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; }
+        @media print {
+            .no-print { display: none !important; }
+            .invoice-box { border: none; padding: 0; }
+        }
+    </style>
+</head>
+
+<body onload="window.print()">
+    <div class="container my-4">
+        <div class="no-print mb-3 text-end">
+            <button onclick="window.print()" class="btn btn-danger btn-sm fw-bold">In Hóa Đơn Ngay</button>
+            <button onclick="window.close()" class="btn btn-secondary btn-sm">Đóng Cửa Sổ</button>
+        </div>
+
+        <div class="invoice-box shadow-sm rounded">
+            <!-- HEADER HÓA ĐƠN -->
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <div>
+                    <h3 class="fw-bold text-danger mb-1">TECHFORGE STORE</h3>
+                    <div class="fs-7 text-muted">Showroom: 18 Trần Thái Tông, Cầu Giấy, Hà Nội</div>
+                    <div class="fs-7 text-muted">Hotline: 0828.333.363 - Website: techforge.com</div>
+                </div>
+                <div class="text-end">
+                    <h4 class="fw-bold mb-0">HÓA ĐƠN BÁN HÀNG</h4>
+                    <div class="fs-6 text-danger fw-bold" th:text="'Mã: #' + ${order.orderId}">#1001</div>
+                    <div class="fs-7 text-muted" th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">16/08/2026</div>
+                </div>
+            </div>
+
+            <!-- THÔNG TÍN KHÁCH HÀNG -->
+            <div class="row mb-4 fs-7">
+                <div class="col-6">
+                    <strong class="d-block mb-1 text-uppercase text-secondary">Thông tin khách hàng:</strong>
+                    <div><strong>Họ tên:</strong> <span th:text="${order.recipientName}">Nguyễn Văn A</span></div>
+                    <div><strong>Điện thoại:</strong> <span th:text="${order.phone}">0988888888</span></div>
+                    <div><strong>Email:</strong> <span th:text="${order.email}">khachhang@gmail.com</span></div>
+                </div>
+                <div class="col-6 text-end">
+                    <strong class="d-block mb-1 text-uppercase text-secondary">Địa chỉ nhận hàng:</strong>
+                    <div th:text="${order.shippingAddress}">18 Trần Thái Tông, Cầu Giấy, Hà Nội</div>
+                    <div><strong>Phương thức thanh toán:</strong> <span th:text="${order.payment != null ? order.payment.method : 'COD'}">COD</span></div>
+                </div>
+            </div>
+
+            <!-- BẢNG CHI TIẾT SẢN PHẨM -->
+            <table class="table table-bordered align-middle fs-7 mb-4">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center" style="width: 5%;">STT</th>
+                        <th>Tên Sản Phẩm / Tên Cấu Hình</th>
+                        <th class="text-center" style="width: 15%;">Đơn Giá</th>
+                        <th class="text-center" style="width: 10%;">SL</th>
+                        <th class="text-end" style="width: 20%;">Thành Tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item, stat : ${order.orderItems}">
+                        <td class="text-center" th:text="${stat.count}">1</td>
+                        <td th:text="${item.productName}">Màn hình Asus</td>
+                        <td class="text-center" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
+                        <td class="text-center fw-bold" th:text="${item.quantity}">1</td>
+                        <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- TỔNG TIỀN THANH TOÁN -->
+            <div class="row fs-7 mb-4">
+                <div class="col-6">
+                    <div class="border p-2 rounded text-muted">
+                        <em>Cảm ơn Quý khách đã mua sắm tại TechForge! Sản phẩm được bảo hành chính hãng theo tem &amp; số series.</em>
+                    </div>
+                </div>
+                <div class="col-6 text-end">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Phí vận chuyển:</span>
+                        <strong th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + 'đ'">30.000đ</strong>
+                    </div>
+                    <div class="d-flex justify-content-between fs-6 pt-2 border-top">
+                        <strong class="text-dark">TỔNG THÀNH TIỀN:</strong>
+                        <strong class="text-danger fs-5" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">18.020.000đ</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHỮ KÝ -->
+            <div class="row text-center fs-7 mt-5 pt-3">
+                <div class="col-6">
+                    <strong>Người mua hàng</strong>
+                    <div class="text-muted fs-8">(Ký và ghi rõ họ tên)</div>
+                </div>
+                <div class="col-6">
+                    <strong>Đại diện TechForge Store</strong>
+                    <div class="text-muted fs-8">(Ký, đóng dấu)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
