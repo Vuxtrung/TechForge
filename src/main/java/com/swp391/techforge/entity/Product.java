@@ -69,9 +69,14 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductSpecification> specifications = new ArrayList<>();
+
     @Transient
     public String getPrimaryImageUrl() {
-        if (images == null) return null;
+        if (images == null) {
+            return null;
+        }
         return images.stream()
                 .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
                 .map(ProductImage::getImageUrl)
