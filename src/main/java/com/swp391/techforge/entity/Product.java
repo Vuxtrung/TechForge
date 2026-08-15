@@ -11,6 +11,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -63,6 +65,24 @@ public class Product {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductSpecification> specifications = new ArrayList<>();
+
+    @Transient
+    public String getPrimaryImageUrl() {
+        if (images == null) {
+            return null;
+        }
+        return images.stream()
+                .filter(img -> Boolean.TRUE.equals(img.getIsPrimary()))
+                .map(ProductImage::getImageUrl)
+                .findFirst()
+                .orElse(images.isEmpty() ? null : images.get(0).getImageUrl());
+    }
 
     @PrePersist
     protected void onCreate() {
