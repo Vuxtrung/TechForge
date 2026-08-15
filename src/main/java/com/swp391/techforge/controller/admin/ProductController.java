@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -66,15 +67,17 @@ public class ProductController {
 
     @PostMapping
     public String create(@Valid @ModelAttribute("product") Product product,
-                          BindingResult result, Model model,
-                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                          RedirectAttributes redirectAttributes) {
+            BindingResult result, Model model,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "specKey", required = false) List<String> specKeys,
+            @RequestParam(value = "specValue", required = false) List<String> specValues,
+            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
         try {
-            productService.create(product, imageFile);
+            productService.create(product, imageFile, specKeys, specValues);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.findAllActive());
@@ -86,16 +89,18 @@ public class ProductController {
 
     @PostMapping("/{id}")
     public String update(@PathVariable Long id,
-                          @Valid @ModelAttribute("product") Product product,
-                          BindingResult result, Model model,
-                          @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                          RedirectAttributes redirectAttributes) {
+            @Valid @ModelAttribute("product") Product product,
+            BindingResult result, Model model,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "specKey", required = false) List<String> specKeys,
+            @RequestParam(value = "specValue", required = false) List<String> specValues,
+            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
         try {
-            productService.update(id, product, imageFile);
+            productService.update(id, product, imageFile, specKeys, specValues);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.findAllActive());
