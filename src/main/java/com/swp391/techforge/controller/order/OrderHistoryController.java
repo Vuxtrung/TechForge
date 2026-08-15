@@ -24,8 +24,11 @@ public class OrderHistoryController {
 
     private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+
+    public OrderHistoryController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @GetMapping
     public String viewOrderHistory(@RequestParam(value = "status", required = false) String statusStr,

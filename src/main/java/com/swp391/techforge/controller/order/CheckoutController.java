@@ -24,14 +24,15 @@ public class CheckoutController {
 
     private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
+    private final VNPayService vnPayService;
+    private final PaymentRepository paymentRepository;
 
-    @Autowired
-    private VNPayService vnPayService;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
+    public CheckoutController(OrderService orderService, VNPayService vnPayService, PaymentRepository paymentRepository) {
+        this.orderService = orderService;
+        this.vnPayService = vnPayService;
+        this.paymentRepository = paymentRepository;
+    }
 
     @GetMapping
     public String viewCheckoutPage(HttpSession session, Model model) {

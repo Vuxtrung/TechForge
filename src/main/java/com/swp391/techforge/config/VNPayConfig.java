@@ -1,15 +1,15 @@
 package com.swp391.techforge.config;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class VNPayConfig {
+
+    private VNPayConfig() {
+    }
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static String vnp_ReturnUrl = "http://localhost:8080/checkout/vnpay-return";
     public static String vnp_TmnCode = "CGXZ8J08";

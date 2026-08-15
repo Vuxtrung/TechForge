@@ -17,20 +17,23 @@ import java.util.Optional;
 @Service
 public class OrderService {
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final PaymentRepository paymentRepository;
+    private final VoucherRepository voucherRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
-
-    @Autowired
-    private VoucherRepository voucherRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
+    public OrderService(OrderRepository orderRepository,
+                        OrderItemRepository orderItemRepository,
+                        PaymentRepository paymentRepository,
+                        VoucherRepository voucherRepository,
+                        ProductRepository productRepository) {
+        this.orderRepository = orderRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.paymentRepository = paymentRepository;
+        this.voucherRepository = voucherRepository;
+        this.productRepository = productRepository;
+    }
 
     public Voucher validateVoucher(String code, BigDecimal subtotal) {
         if (code == null || code.trim().isEmpty()) return null;
