@@ -61,25 +61,13 @@
                     <!-- Error -->
                     <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show fs-7 shadow-sm"
                         role="alert">
-
                         <i class="bi bi-exclamation-circle-fill me-2"></i>
-
-                        <span th:if="${param.error[0] == 'not_found'}">
-                            Email không tồn tại.
-                        </span>
-
                         <span th:if="${param.error[0] == 'bad_credentials'}">
-                            Mật khẩu không chính xác.
+                            Email hoặc mật khẩu không chính xác.
                         </span>
-
                         <span th:if="${param.error[0] == 'locked'}">
                             Tài khoản của bạn đã bị khóa.
                         </span>
-
-                        <span th:if="${param.error[0] == 'unknown'}">
-                            Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.
-                        </span>
-
                         <button type="button" class="btn-close" data-bs-dismiss="alert">
                         </button>
                     </div>
