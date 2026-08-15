@@ -18,12 +18,19 @@ public class CloudinaryService {
     }
 
     /**
-     * Upload 1 file ảnh lên Cloudinary, trả về secure_url.
+     * Upload ảnh vào folder mặc định "techforge/products" (giữ nguyên hành vi cũ).
      */
     public String uploadImage(MultipartFile file) throws IOException {
+        return uploadImage(file, "techforge/products");
+    }
+
+    /**
+     * Upload ảnh vào folder chỉ định, trả về secure_url.
+     */
+    public String uploadImage(MultipartFile file, String folder) throws IOException {
         Map<?, ?> result = cloudinary.uploader().upload(
                 file.getBytes(),
-                ObjectUtils.asMap("folder", "techforge/products")
+                ObjectUtils.asMap("folder", folder)
         );
         return (String) result.get("secure_url");
     }

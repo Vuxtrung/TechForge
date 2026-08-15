@@ -17,14 +17,12 @@
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb fs-7">
                 <li class="breadcrumb-item">
-                    <a th:href="@{/}"
-                       class="text-decoration-none text-muted">
+                    <a th:href="@{/}" class="text-decoration-none text-muted">
                         Trang chủ
                     </a>
                 </li>
 
-                <li class="breadcrumb-item active text-danger fw-semibold"
-                    aria-current="page">
+                <li class="breadcrumb-item active text-danger fw-semibold" aria-current="page">
                     Tài khoản
                 </li>
             </ol>
@@ -36,9 +34,7 @@
             <!-- LEFT: ACCOUNT MENU -->
             <!-- ========================= -->
             <div class="col-lg-3">
-
                 <div class="bg-white rounded-3 shadow-sm border p-3">
-
                     <!-- User summary -->
                     <div class="d-flex align-items-center gap-3 pb-3 mb-3 border-bottom">
 
@@ -46,27 +42,21 @@
                         <div class="flex-shrink-0">
                             <div class="rounded-circle bg-danger-subtle text-danger
                                         d-flex align-items-center justify-content-center"
-                                 style="width: 65px; height: 65px;">
-
+                                style="width: 65px; height: 65px;">
                                 <i class="bi bi-person-fill fs-2"></i>
-
                             </div>
                         </div>
 
                         <!-- User information -->
                         <div class="overflow-hidden">
-
                             <div class="text-muted fs-8">
                                 Tài khoản
                             </div>
 
-                            <h6 class="fw-bold text-dark mb-0 text-truncate"
-                                th:text="${user.fullName}">
+                            <h6 class="fw-bold text-dark mb-0 text-truncate" th:text="${user.fullName}">
                                 Nguyễn Văn A
                             </h6>
-
                         </div>
-
                     </div>
 
 
@@ -74,54 +64,36 @@
                     <div class="list-group list-group-flush">
 
                         <!-- Thông tin tài khoản -->
-                        <a th:href="@{/account(view='info')}"
-                           class="list-group-item list-group-item-action
+                        <a th:href="@{/account(view='info')}" class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
-
                             <i class="bi bi-person-circle text-danger me-2"></i>
-
                             <span class="fs-7 fw-semibold">
                                 Thông tin tài khoản
                             </span>
-
                         </a>
 
 
                         <!-- Quản lý đơn hàng -->
-                        <a th:href="@{/account(view='orders')}"
-                           class="list-group-item list-group-item-action
+                        <a th:href="@{/account(view='orders')}" class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
-
                             <i class="bi bi-box-seam text-primary me-2"></i>
-
                             <span class="fs-7 fw-semibold">
                                 Quản lý đơn hàng
                             </span>
-
                         </a>
 
-
                         <!-- Thay đổi mật khẩu -->
-                        <a th:href="@{/account(view='password')}"
-                           class="list-group-item list-group-item-action
+                        <a th:href="@{/account(view='password')}" class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
-
                             <i class="bi bi-shield-lock text-warning me-2"></i>
-
                             <span class="fs-7 fw-semibold">
                                 Thay đổi mật khẩu
                             </span>
-
                         </a>
 
-
                         <!-- Đăng xuất -->
-                        <form th:action="@{/logout}"
-                              method="post"
-                              class="m-0">
-
-                            <button type="submit"
-                                    class="list-group-item list-group-item-action
+                        <form th:action="@{/logout}" method="post" class="m-0">
+                            <button type="submit" class="list-group-item list-group-item-action
                                            border-0 rounded-2 px-2 py-3
                                            text-danger w-100 text-start">
 
@@ -130,15 +102,10 @@
                                 <span class="fs-7 fw-semibold">
                                     Đăng xuất
                                 </span>
-
                             </button>
-
                         </form>
-
                     </div>
-
                 </div>
-
             </div>
 
 
@@ -146,108 +113,46 @@
             <!-- RIGHT: CONTENT -->
             <!-- ========================= -->
             <div class="col-lg-9">
-
                 <div class="bg-white rounded-3 shadow-sm border p-4 h-100">
 
+                    <!-- Error Messages -->
+                    <div th:if="${successMessage}" class="alert alert-success d-flex align-items-center py-2"
+                        role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <span th:text="${successMessage}"></span>
+                    </div>
+                    <div th:if="${errorMessage}" class="alert alert-danger d-flex align-items-center py-2" role="alert">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
                     <!-- Chưa chọn chức năng -->
-                    <div th:if="${view == null}"
-                         class="d-flex flex-column align-items-center
-                                justify-content-center text-center"
-                         style="min-height: 400px;">
-
-                        <i class="bi bi-person-circle text-muted"
-                           style="font-size: 4rem;"></i>
-
+                    <div th:if="${view == null}" class="d-flex flex-column align-items-center
+                    justify-content-center text-center" style="min-height: 400px;">
+                        <i class="bi bi-person-circle text-muted" style="font-size: 4rem;"></i>
                         <h5 class="fw-bold text-dark mt-3 mb-2">
                             Bạn đang ở trang tài khoản
                         </h5>
-
                         <p class="text-muted fs-7 mb-0">
                             Vui lòng chọn các mục bên trái để xem thông tin.
                         </p>
-
                     </div>
 
-
-                    <!-- ========================= -->
-                    <!-- ACCOUNT INFO -->
-                    <!-- ========================= -->
-                    <div th:if="${view == 'info'}">
-
-                        <div class="d-flex align-items-center
-                                    border-bottom pb-3 mb-4">
-
-                            <i class="bi bi-person-circle text-danger fs-4 me-2"></i>
-
-                            <h5 class="fw-bold text-dark mb-0">
-                                Thông tin tài khoản
-                            </h5>
-
+                    <!-- Nội dung tab, include động theo view -->
+                    <div th:switch="${view}">
+                        <div th:case="'info'">
+                            <div th:replace="~{account/info :: content}"></div>
                         </div>
-
-                        <p class="text-muted fs-7">
-                            Nội dung thông tin tài khoản sẽ được xây dựng
-                            ở fragment riêng.
-                        </p>
-
-                    </div>
-
-
-                    <!-- ========================= -->
-                    <!-- ORDERS -->
-                    <!-- ========================= -->
-                    <div th:if="${view == 'orders'}">
-
-                        <div class="d-flex align-items-center
-                                    border-bottom pb-3 mb-4">
-
-                            <i class="bi bi-box-seam text-primary fs-4 me-2"></i>
-
-                            <h5 class="fw-bold text-dark mb-0">
-                                Quản lý đơn hàng
-                            </h5>
-
+                        <div th:case="'orders'">
+                            <div th:replace="~{account/orders :: content}"></div>
                         </div>
-
-                        <p class="text-muted fs-7">
-                            Danh sách đơn hàng sẽ được xây dựng
-                            ở fragment riêng.
-                        </p>
-
-                    </div>
-
-
-                    <!-- ========================= -->
-                    <!-- CHANGE PASSWORD -->
-                    <!-- ========================= -->
-                    <div th:if="${view == 'password'}">
-
-                        <div class="d-flex align-items-center
-                                    border-bottom pb-3 mb-4">
-
-                            <i class="bi bi-shield-lock text-warning fs-4 me-2"></i>
-
-                            <h5 class="fw-bold text-dark mb-0">
-                                Thay đổi mật khẩu
-                            </h5>
-
+                        <div th:case="'password'">
+                            <div th:replace="~{account/password :: content}"></div>
                         </div>
-
-                        <p class="text-muted fs-7">
-                            Chức năng thay đổi mật khẩu sẽ được xây dựng
-                            ở fragment riêng.
-                        </p>
-
                     </div>
-
                 </div>
-
             </div>
-
-        </div>
-
     </main>
-
 
     <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>

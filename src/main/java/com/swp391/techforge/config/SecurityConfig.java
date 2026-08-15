@@ -19,7 +19,6 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
 		http
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
@@ -67,12 +66,8 @@ public class SecurityConfig {
 
 			if (exception instanceof DisabledException) {
 				error = "locked";
-			} else if (exception instanceof UsernameNotFoundException) {
-				error = "not_found";
-			} else if (exception instanceof BadCredentialsException) {
-				error = "bad_credentials";
 			} else {
-				error = "unknown";
+				error = "bad_credentials";
 			}
 
 			response.sendRedirect("/login?error=" + error);
@@ -88,7 +83,6 @@ public class SecurityConfig {
 
 		provider.setUserDetailsService(userDetailsService);
 		provider.setPasswordEncoder(passwordEncoder);
-		provider.setHideUserNotFoundExceptions(false);
 
 		return provider;
 	}

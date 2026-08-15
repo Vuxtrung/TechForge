@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="content">
+        <div class="d-flex align-items-center border-bottom pb-3 mb-4">
+            <i class="bi bi-person-circle text-danger fs-4 me-2"></i>
+            <h5 class="fw-bold text-dark mb-0">Thông tin tài khoản</h5>
+        </div>
+
+        <form id="accountInfoForm" th:action="@{/account/info}" method="post" enctype="multipart/form-data" novalidate>
+
+            <!-- ===== AVATAR ===== -->
+            <div class="d-flex align-items-center gap-4 mb-4">
+                <div class="position-relative" style="width: 96px; height: 96px;">
+                    <img id="avatarPreview" th:src="${user.avatarUrl != null ? user.avatarUrl : null}"
+                        th:if="${user.avatarUrl != null}" class="rounded-circle border object-fit-cover w-100 h-100"
+                        alt="Avatar">
+
+                    <div id="avatarPlaceholder" th:if="${user.avatarUrl == null}" class="rounded-circle bg-danger-subtle text-danger
+                            d-flex align-items-center justify-content-center
+                            w-100 h-100">
+                        <i class="bi bi-person-fill fs-1"></i>
+                    </div>
+
+                    <button type="button" onclick="document.getElementById('avatarInput').click()" class="btn btn-sm btn-danger rounded-circle position-absolute
+                               d-flex align-items-center justify-content-center p-0"
+                        style="width: 32px; height: 32px; bottom: 0; right: 0;" title="Đổi ảnh đại diện">
+                        <i class="bi bi-camera-fill" style="font-size: .8rem;"></i>
+                    </button>
+
+                    <input type="file" id="avatarInput" name="avatarFile" accept="image/png, image/jpeg, image/webp"
+                        hidden>
+                </div>
+
+                <div>
+                    <div class="fw-semibold text-dark" th:text="${user.fullName}">Nguyễn Văn A</div>
+                    <div class="text-muted fs-8">JPG, PNG hoặc WEBP. Tối đa 2MB.</div>
+                    <div id="avatarError" class="text-danger fs-8 mt-1 d-none"></div>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fs-7 fw-semibold">Họ và tên <span class="text-danger">*</span></label>
+                    <input type="text" name="fullName" id="fullName" class="form-control" th:value="${user.fullName}"
+                        maxlength="100" required>
+                    <div class="invalid-feedback">Vui lòng nhập họ tên.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fs-7 fw-semibold">Email</label>
+                    <input type="email" class="form-control" th:value="${user.email}" disabled>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fs-7 fw-semibold">Số điện thoại</label>
+                    <input type="tel" name="phone" id="phone" class="form-control" th:value="${user.phone}"
+                        placeholder="VD: 0912345678" maxlength="20">
+                    <div class="invalid-feedback">Số điện thoại không hợp lệ.</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fs-7 fw-semibold">Điểm tích lũy</label>
+                    <div class="form-control bg-light text-dark d-flex align-items-center gap-2">
+                        <i class="bi bi-gem text-warning"></i>
+                        <span th:text="${#numbers.formatInteger(user.loyaltyPoints, 0, 'COMMA')} + ' điểm'">0
+                            điểm</span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fs-7 fw-semibold">Địa chỉ</label>
+                    <textarea name="address" id="address" class="form-control" rows="2" maxlength="500"
+                        th:text="${user.address}"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fs-7 fw-semibold">Ngày tạo tài khoản</label>
+                    <input type="text" class="form-control"
+                        th:value="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}" disabled>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-check-lg me-1"></i> Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script th:src="@{/js/account-info.js}"></script>
+
+</body>
+
+</html>
