@@ -2,7 +2,9 @@ package com.swp391.techforge.service.product;
 
 import com.swp391.techforge.entity.Category;
 import com.swp391.techforge.entity.Product;
+import com.swp391.techforge.entity.ProductImage;
 import com.swp391.techforge.repository.category.CategoryRepository;
+import com.swp391.techforge.repository.product.ProductImageRepository;
 import com.swp391.techforge.repository.product.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,16 +12,38 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import com.swp391.techforge.entity.ProductSpecification;
+import com.swp391.techforge.repository.product.ProductSpecificationRepository;
+import java.util.List;
+
+import java.io.IOException;
+import java.util.Set;
 
 @Service
 public class ProductService {
 
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
+            "image/jpeg", "image/png", "image/webp"
+    );
+    private static final long MAX_IMAGE_SIZE = 5L * 1024 * 1024; // 5MB
+
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductImageRepository productImageRepository;
+    private final CloudinaryService cloudinaryService;
+    private final ProductSpecificationRepository productSpecificationRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository,
+            CategoryRepository categoryRepository,
+            ProductImageRepository productImageRepository,
+            ProductSpecificationRepository productSpecificationRepository,
+            CloudinaryService cloudinaryService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.productImageRepository = productImageRepository;
+        this.productSpecificationRepository = productSpecificationRepository;
+        this.cloudinaryService = cloudinaryService;
     }
 
     @Transactional(readOnly = true)
@@ -40,14 +64,22 @@ public class ProductService {
     }
 
     @Transactional
-    public Product create(Product product) {
+    public Product create(Product product, MultipartFile imageFile,
+            List<String> specKeys, List<String> specValues) {
         validateName(product.getName(), null);
         product.setCategory(resolveCategory(product.getCategoryId()));
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            uploadAndAttachImage(saved, imageFile, true);
+        }
+        saveSpecifications(saved, specKeys, specValues);
+        return saved;
     }
 
     @Transactional
-    public Product update(Long id, Product incoming) {
+    public Product update(Long id, Product incoming, MultipartFile imageFile,
+            List<String> specKeys, List<String> specValues) {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
 
@@ -61,8 +93,58 @@ public class ProductService {
         existing.setStatus(incoming.getStatus());
         existing.setCategory(resolveCategory(incoming.getCategoryId()));
 
-        return productRepository.save(existing);
+        if (imageFile != null && !imageFile.isEmpty()) {
+            boolean hasPrimary = existing.getImages().stream()
+                    .anyMatch(img -> Boolean.TRUE.equals(img.getIsPrimary()));
+            uploadAndAttachImage(existing, imageFile, !hasPrimary);
+        }
+
+        Product saved = productRepository.save(existing);
+        saveSpecifications(saved, specKeys, specValues);
+        return saved;
     }
+
+    private void uploadAndAttachImage(Product product, MultipartFile imageFile, boolean isPrimary) {
+        validateImage(imageFile);
+        try {
+            String url = cloudinaryService.uploadImage(imageFile);
+            ProductImage image = new ProductImage(product, url, isPrimary);
+            productImageRepository.save(image);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Tải ảnh lên thất bại: " + e.getMessage());
+        }
+    }
+
+    private void validateImage(MultipartFile imageFile) {
+        String contentType = imageFile.getContentType();
+        if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException(
+                    "Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG hoặc WEBP.");
+        }
+        if (imageFile.getSize() > MAX_IMAGE_SIZE) {
+            throw new IllegalArgumentException(
+                    "Dung lượng ảnh vượt quá giới hạn cho phép (5MB).");
+        }
+    }
+
+    private void saveSpecifications(Product product, List<String> specKeys, List<String> specValues) {
+    productSpecificationRepository.deleteAllByProduct_ProductId(product.getProductId());
+    if (specKeys == null || specValues == null) {
+        return;
+    }
+    for (int i = 0; i < specKeys.size(); i++) {
+        String key = specKeys.get(i) == null ? "" : specKeys.get(i).trim();
+        String value = specValues.get(i) == null ? "" : specValues.get(i).trim();
+        if (key.isEmpty() || value.isEmpty()) {
+            continue;
+        }
+        ProductSpecification spec = new ProductSpecification();
+        spec.setProduct(product);
+        spec.setSpecKey(key);
+        spec.setSpecValue(value);
+        productSpecificationRepository.save(spec);
+    }
+}
 
     @Transactional
     public void toggleStatus(Long id) {
@@ -79,6 +161,7 @@ public class ProductService {
     public void delete(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
+        productSpecificationRepository.deleteAllByProduct_ProductId(id);
         productRepository.delete(product);
     }
 

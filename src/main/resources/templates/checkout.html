@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title>Thanh Toán Đơn Hàng - TechForge</title>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body container-fluid px-lg-5 my-4">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb fs-7">
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none text-muted">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/cart}" class="text-decoration-none text-muted">Giỏ hàng</a></li>
+                <li class="breadcrumb-item active text-danger fw-semibold" aria-current="page">Thanh toán đơn hàng</li>
+            </ol>
+        </nav>
+
+        <h4 class="fw-bold text-dark mb-4"><i class="bi bi-credit-card-2-front text-danger me-2"></i> XÁC NHẬN VÀ THANH TOÁN ĐƠN HÀNG</h4>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <form th:action="@{/checkout/process}" method="post" th:object="${checkoutRequest}">
+            <div class="row g-4">
+                <!-- CỘT TRÁI: FORM NHẬP CHI TIẾT GIAO HÀNG (10 INPUT FIELDS) -->
+                <div class="col-lg-7">
+                    <div class="bg-white rounded-3 shadow-sm border p-4 mb-4">
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">
+                            <i class="bi bi-person-lines-fill text-danger me-1"></i> 1. THÔNG TIN NGƯỜI NHẬN HÀNG
+                        </h6>
+
+                        <div class="row g-3">
+                            <!-- Field 1: Họ tên người nhận -->
+                            <div class="col-md-6">
+                                <label for="recipientName" class="form-label fs-7 fw-semibold">Họ và Tên người nhận <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="recipientName" name="recipientName" placeholder="VD: Nguyễn Văn A" required>
+                            </div>
+
+                            <!-- Field 2: Số điện thoại -->
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fs-7 fw-semibold">Số điện thoại liên hệ <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control form-control-sm" id="phone" name="phone" placeholder="VD: 0988888888" required>
+                            </div>
+
+                            <!-- Field 3: Email nhận hóa đơn -->
+                            <div class="col-12">
+                                <label for="email" class="form-label fs-7 fw-semibold">Email nhận xác nhận đơn hàng <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="VD: khachhang@techforge.com" required>
+                            </div>
+
+                            <!-- Field 4: Tỉnh / Thành phố -->
+                            <div class="col-md-4">
+                                <label for="province" class="form-label fs-7 fw-semibold">Tỉnh / Thành phố <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="province" name="province" placeholder="VD: Hà Nội" required>
+                            </div>
+
+                            <!-- Field 5: Quận / Huyện -->
+                            <div class="col-md-4">
+                                <label for="district" class="form-label fs-7 fw-semibold">Quận / Huyện <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="district" name="district" placeholder="VD: Cầu Giấy" required>
+                            </div>
+
+                            <!-- Field 6: Phường / Xã -->
+                            <div class="col-md-4">
+                                <label for="ward" class="form-label fs-7 fw-semibold">Phường / Xã <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="ward" name="ward" placeholder="VD: Dịch Vọng Hậu" required>
+                            </div>
+
+                            <!-- Field 7: Địa chỉ chi tiết (Số nhà, tên đường) -->
+                            <div class="col-12">
+                                <label for="addressLine" class="form-label fs-7 fw-semibold">Địa chỉ chi tiết (Số nhà, Tòa nhà, Tên đường) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-sm" id="addressLine" name="addressLine" placeholder="VD: Số 18 Phố Trần Thái Tông" required>
+                            </div>
+
+                            <!-- Field 8: Ghi chú đơn hàng -->
+                            <div class="col-12">
+                                <label for="orderNote" class="form-label fs-7 fw-semibold">Ghi chú giao hàng (Không bắt buộc)</label>
+                                <textarea class="form-control form-control-sm" id="orderNote" name="orderNote" rows="2" placeholder="Ghi chú thêm cho shipper (Ví dụ: Giao giờ hành chính, gọi trước khi giao...)"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LỰA CHỌN VẬN CHUYỂN VÀ THANH TOÁN -->
+                    <div class="bg-white rounded-3 shadow-sm border p-4">
+                        <!-- Field 9: Phương thức Vận chuyển -->
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">
+                            <i class="bi bi-truck text-danger me-1"></i> 2. PHƯƠNG THỨC VẬN CHUYỂN
+                        </h6>
+
+                        <div class="form-check p-3 border rounded mb-2 bg-light">
+                            <input class="form-check-input" type="radio" name="shippingMethod" id="shipStandard" value="STANDARD" checked onchange="updateTotalDisplay()">
+                            <label class="form-check-label d-flex justify-content-between w-100 fs-7 cursor-pointer" for="shipStandard">
+                                <span><strong class="text-dark">Giao Hàng Tiêu Chuẩn</strong> (2 - 3 ngày làm việc)</span>
+                                <span class="fw-bold text-danger">30.000đ</span>
+                            </label>
+                        </div>
+
+                        <div class="form-check p-3 border rounded mb-4 bg-light">
+                            <input class="form-check-input" type="radio" name="shippingMethod" id="shipExpress" value="EXPRESS" onchange="updateTotalDisplay()">
+                            <label class="form-check-label d-flex justify-content-between w-100 fs-7 cursor-pointer" for="shipExpress">
+                                <span><strong class="text-dark">Giao Hàng Hỏa Tốc (24H)</strong> (Hà Nội &amp; TP.HCM)</span>
+                                <span class="fw-bold text-danger">50.000đ</span>
+                            </label>
+                        </div>
+
+                        <!-- Field 10: Phương thức Thanh toán (COD vs VNPay Online) -->
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">
+                            <i class="bi bi-wallet2 text-danger me-1"></i> 3. PHƯƠNG THỨC THANH TOÁN
+                        </h6>
+
+                        <div class="form-check p-3 border rounded mb-2 bg-light">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="payCOD" value="COD" checked>
+                            <label class="form-check-label d-flex align-items-center gap-2 fs-7 cursor-pointer" for="payCOD">
+                                <i class="bi bi-cash-stack text-success fs-5"></i>
+                                <div>
+                                    <strong class="text-dark">Thanh toán khi nhận hàng (COD)</strong>
+                                    <div class="fs-8 text-muted">Thanh toán bằng tiền mặt trực tiếp cho nhân viên giao hàng khi nhận máy</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-check p-3 border rounded bg-light">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="payVNPAY" value="VNPAY">
+                            <label class="form-check-label d-flex align-items-center gap-2 fs-7 cursor-pointer" for="payVNPAY">
+                                <i class="bi bi-qr-code-scan text-primary fs-5"></i>
+                                <div>
+                                    <strong class="text-dark">Thanh toán Online qua Cổng VNPay (Thẻ ATM / QR / Mobile Banking)</strong>
+                                    <div class="fs-8 text-muted">Chuyển hướng tới cổng VNPay sandbox để quét mã QR ngân hàng an toàn 100%</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI: TÓM TẮT SẢN PHẨM & TỔNG TIỀN THANH TOÁN -->
+                <div class="col-lg-5">
+                    <div class="bg-white rounded-3 shadow-sm border p-4 sticky-top" style="top: 90px;">
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">TÓM TẮT SẢN PHẨM MUA</h6>
+
+                        <!-- Danh sách sản phẩm -->
+                        <div class="pe-1 mb-3" style="max-height: 280px; overflow-y: auto;">
+                            <div th:each="item : ${cartItems}" class="d-flex align-items-center gap-3 border-bottom pb-2 mb-2">
+                                <img th:src="${item.imageUrl}" style="width: 50px; height: 50px; object-fit: contain;" class="rounded border p-1" alt="Product">
+                                <div class="flex-grow-1">
+                                    <h6 class="fs-8 fw-bold text-dark mb-0 text-truncate-2" th:text="${item.productName}">Tên sản phẩm</h6>
+                                    <div class="fs-8 text-muted">
+                                        <span th:text="${item.quantity}">1</span> x <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
+                                    </div>
+                                </div>
+                                <span class="fw-bold fs-7 text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
+                            </div>
+                        </div>
+
+                        <!-- Ô nhập Mã Giảm Giá trong Checkout -->
+                        <div class="mb-3">
+                            <label for="voucherCode" class="form-label fs-7 fw-semibold">Mã giảm giá (Nếu có)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control text-uppercase" id="voucherCode" name="voucherCode" placeholder="Mã giảm giá (VD: TECHFORGE10)">
+                                <button type="button" class="btn btn-outline-danger fw-bold" onclick="alert('Đã cập nhật mã giảm giá vào đơn hàng!')">Áp dụng</button>
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-3">
+                            <div class="d-flex justify-content-between mb-2 fs-7">
+                                <span class="text-muted">Tạm tính hàng hóa:</span>
+                                <span class="fw-semibold" th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-2 fs-7">
+                                <span class="text-muted">Phí vận chuyển:</span>
+                                <span class="fw-bold text-primary" id="shippingFeeDisplay">30.000đ</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between my-3 pt-2 border-top">
+                                <span class="fw-bold fs-6 text-dark">TỔNG CỘNG THANH TOÁN:</span>
+                                <span class="text-danger fw-extrabold fs-4" id="grandTotalDisplay" th:text="${#numbers.formatDecimal(subtotal + 30000, 0, 'COMMA', 0, 'POINT')} + 'đ'">18.020.000đ</span>
+                            </div>
+
+                            <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm py-2 fs-6">
+                                <i class="bi bi-shield-check me-2"></i> XÁC NHẬN ĐẶT HÀNG NGAY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        /* Dynamic Shipping Fee & Grand Total Calculation */
+        var subtotal = /*[[${subtotal}]]*/ 0;
+        function updateTotalDisplay() {
+            var expressRadio = document.getElementById('shipExpress');
+            var shipFee = expressRadio.checked ? 50000 : 30000;
+            var grandTotal = subtotal + shipFee;
+
+            document.getElementById('shippingFeeDisplay').innerText = shipFee.toLocaleString('vi-VN') + 'đ';
+            document.getElementById('grandTotalDisplay').innerText = grandTotal.toLocaleString('vi-VN') + 'đ';
+        }
+    </script>
+</body>
+
+</html>

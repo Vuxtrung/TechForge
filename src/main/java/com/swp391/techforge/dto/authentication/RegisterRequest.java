@@ -30,9 +30,6 @@ public class RegisterRequest {
     private String confirmPassword;
 
     @NotBlank(message = "Địa chỉ không được để trống")
-    @Size(max = 255, message = "Địa chỉ không được vượt quá 255 ký tự")
-    private String addressLine;
-
-    @Size(max = 100, message = "Thành phố không được vượt quá 100 ký tự")
-    private String city;
+    @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
+    private String address;
 }
