@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title>Sản phẩm - TechForge</title>
+</head>
+
+<body>
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body">
+        <div class="container-fluid px-lg-5 my-3">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb fs-8 mb-0">
+                    <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sản phẩm</li>
+                </ol>
+            </nav>
+
+            <div class="row g-3">
+                <!-- SIDEBAR FILTER -->
+                <div class="col-lg-3">
+                    <form th:action="@{/products}" method="get" id="filterForm">
+                        <!-- Giữ lại keyword đang tìm khi submit filter khác -->
+                        <input type="hidden" name="keyword" th:value="${filter.keyword}">
+
+                        <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
+                            <h6 class="fw-bold mb-2">Danh mục</h6>
+                            <div class="d-flex flex-column gap-1">
+                                <a th:href="@{/products(keyword=${filter.keyword})}"
+                                   class="text-decoration-none fs-8 py-1"
+                                   th:classappend="${filter.categoryId == null} ? 'fw-bold text-danger' : 'text-dark'">
+                                    Tất cả
+                                </a>
+                                <div th:each="cat : ${filterOptions.categories}" class="category-tree-item">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <a th:href="@{/products(keyword=${filter.keyword}, categoryId=${cat.categoryId})}"
+                                           class="text-decoration-none fs-8 py-1 flex-grow-1"
+                                           th:classappend="${filter.categoryId != null and filter.categoryId == cat.categoryId} ? 'fw-bold text-danger' : 'text-dark'"
+                                           th:text="${cat.name}">
+                                            Tên danh mục
+                                        </a>
+                                        <button th:if="${not #lists.isEmpty(cat.children)}"
+                                                type="button"
+                                                class="btn btn-sm btn-link p-0 text-muted category-tree-toggle"
+                                                data-bs-toggle="collapse"
+                                                th:attr="data-bs-target=${'#catChildren' + cat.categoryId}"
+                                                th:aria-expanded="${filter.categoryId != null and #lists.contains(cat.children.![categoryId], filter.categoryId)}"
+                                                aria-label="Mở rộng danh mục con">
+                                            <i class="bi bi-chevron-down fs-9 category-tree-caret"></i>
+                                        </button>
+                                    </div>
+                                    <div th:if="${not #lists.isEmpty(cat.children)}"
+                                         th:id="'catChildren' + ${cat.categoryId}"
+                                         class="collapse"
+                                         th:classappend="${filter.categoryId != null and #lists.contains(cat.children.![categoryId], filter.categoryId)} ? 'show' : ''">
+                                        <div class="d-flex flex-column gap-1 ps-3">
+                                            <a th:each="child : ${cat.children}"
+                                               th:if="${child.active}"
+                                               th:href="@{/products(keyword=${filter.keyword}, categoryId=${child.categoryId})}"
+                                               class="text-decoration-none fs-8 py-1"
+                                               th:classappend="${filter.categoryId != null and filter.categoryId == child.categoryId} ? 'fw-bold text-danger' : 'text-secondary'"
+                                               th:text="${child.name}">
+                                                Tên danh mục con
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
+                            <h6 class="fw-bold mb-2">Khoảng giá</h6>
+                            <input type="hidden" name="categoryId" th:value="${filter.categoryId}">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" name="minPrice" th:value="${filter.minPrice}"
+                                       class="form-control form-control-sm" placeholder="Từ" min="0">
+                                <span class="text-muted">-</span>
+                                <input type="number" name="maxPrice" th:value="${filter.maxPrice}"
+                                       class="form-control form-control-sm" placeholder="Đến" min="0">
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-3 shadow-sm border p-3 mb-3">
+                            <h6 class="fw-bold mb-2">Thương hiệu</h6>
+                            <div class="d-flex flex-column gap-1">
+                                <div class="form-check" th:each="b : ${filterOptions.brands}">
+                                    <input class="form-check-input" type="radio" name="brand"
+                                           th:id="${'brand-' + b}" th:value="${b}"
+                                           th:checked="${filter.brand == b}">
+                                    <label class="form-check-label fs-8" th:for="${'brand-' + b}" th:text="${b}">Brand</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100 btn-sm fw-semibold">Áp dụng</button>
+                        <a th:href="@{/products}" class="btn btn-outline-secondary w-100 btn-sm fw-semibold mt-2">Xóa bộ lọc</a>
+                    </form>
+                </div>
+
+                <!-- PRODUCT GRID -->
+                <div class="col-lg-9">
+                    <div class="bg-white rounded-3 shadow-sm border p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="fs-8 text-muted" th:text="${productPage.totalElements} + ' sản phẩm'">0 sản phẩm</span>
+
+                            <form th:action="@{/products}" method="get" id="sortForm">
+                                <input type="hidden" name="keyword" th:value="${filter.keyword}">
+                                <input type="hidden" name="categoryId" th:value="${filter.categoryId}">
+                                <input type="hidden" name="brand" th:value="${filter.brand}">
+                                <input type="hidden" name="minPrice" th:value="${filter.minPrice}">
+                                <input type="hidden" name="maxPrice" th:value="${filter.maxPrice}">
+                                <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="document.getElementById('sortForm').submit()">
+                                    <option value="newest" th:selected="${filter.sort == 'newest'}">Mới nhất</option>
+                                    <option value="priceAsc" th:selected="${filter.sort == 'priceAsc'}">Giá tăng dần</option>
+                                    <option value="priceDesc" th:selected="${filter.sort == 'priceDesc'}">Giá giảm dần</option>
+                                </select>
+                            </form>
+                        </div>
+
+                        <!-- Trạng thái rỗng -->
+                        <div th:if="${productPage.totalElements == 0}" class="text-center py-5">
+                            <i class="bi bi-search fs-1 text-muted"></i>
+                            <p class="text-muted mt-2 mb-3">Không tìm thấy sản phẩm phù hợp.</p>
+                            <a th:href="@{/products}" class="btn btn-outline-danger btn-sm">Xóa bộ lọc</a>
+                        </div>
+
+                        <!-- Grid sản phẩm -->
+                        <div th:if="${productPage.totalElements > 0}" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                            <div class="col" th:each="product : ${productPage.content}">
+                                <div th:replace="~{fragments/product-card :: card(product=${product})}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav th:if="${productPage.totalPages > 1}" class="mt-4" aria-label="Phân trang sản phẩm">
+                            <ul class="pagination justify-content-center pagination-sm mb-0">
+                                <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${productPage.number - 1})}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                                    th:classappend="${i == productPage.number} ? 'active'">
+                                    <a class="page-link"
+                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${i})}"
+                                       th:text="${i + 1}">1</a>
+                                </li>
+                                <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
+                                    <a class="page-link"
+                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${productPage.number + 1})}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="none">
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".add-to-cart-btn").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const productId = btn.getAttribute("data-product-id");
+                    const productName = btn.getAttribute("data-product-name");
+                    const price = btn.getAttribute("data-product-price");
+                    const imageUrl = btn.getAttribute("data-product-image");
+                    addToCartAjax(productId, productName, price, imageUrl);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

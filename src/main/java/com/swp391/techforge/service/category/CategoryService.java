@@ -40,6 +40,13 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    public List<Category> findRootCategoriesForNav() {
+        // Con inactive bị lọc ở template (th:if child.active), không mutate
+        // entity managed ở đây để tránh side-effect ngoài ý muốn với Hibernate.
+        return categoryRepository.findAllByParentIsNullAndActiveTrueOrderByNameAsc();
+    }
+
+    @Transactional(readOnly = true)
     public Category getById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục."));
