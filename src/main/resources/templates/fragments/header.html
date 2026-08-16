@@ -190,7 +190,8 @@
               class="header-action-btn text-white text-decoration-none d-flex flex-column align-items-center"
             >
               <i class="bi bi-person-circle fs-5"></i>
-              <span class="fs-8 mt-1">Tài khoản</span>
+              <span class="fs-8 mt-1" th:if="${#authorization.expression('isAuthenticated()')}" th:text="${#authentication.principal.fullName}">Tài khoản</span>
+              <span class="fs-8 mt-1" th:unless="${#authorization.expression('isAuthenticated()')}">Tài khoản</span>
             </a>
           </nav>
         </div>

@@ -37,7 +37,7 @@ public class SecurityConfig {
 
 				.formLogin(form -> form
 						.loginPage("/login")
-						.defaultSuccessUrl("/account", true)
+						.successHandler(authenticationSuccessHandler())
 						.failureHandler(authenticationFailureHandler())
 						.permitAll())
 
@@ -51,6 +51,19 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable());
 
 		return http.build();
+	}
+
+	@Bean
+	public org.springframework.security.web.authentication.AuthenticationSuccessHandler authenticationSuccessHandler() {
+		return (request, response, authentication) -> {
+			boolean isAdmin = authentication.getAuthorities().stream()
+					.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+			if (isAdmin) {
+				response.sendRedirect("/admin/products");
+			} else {
+				response.sendRedirect("/");
+			}
+		};
 	}
 
 	@Bean
