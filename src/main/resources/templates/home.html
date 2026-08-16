@@ -239,8 +239,13 @@
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-danger fw-bold fs-6" th:text="${#numbers.formatDecimal(product.basePrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">Giá</span>
                                     </div>
-                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold" 
-                                            th:onclick="'addToCartAjax(' + ${product.productId} + ', \'' + ${#strings.escapeJavaScript(product.name)} + '\', ' + ${product.basePrice} + ', \'' + (${product.images != null and !product.images.isEmpty() ? product.images[0].imageUrl : '/images/placeholder.jpg'}) + '\')'">
+                                    <button th:unless="${#authorization.expression('hasRole(''ADMIN'')')}"
+                                            type="button" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold" 
+                                            th:data-id="${product.productId}"
+                                            th:data-name="${product.name}"
+                                            th:data-price="${product.basePrice}"
+                                            th:data-img="${product.images != null and !product.images.isEmpty() ? product.images[0].imageUrl : '/images/placeholder.jpg'}"
+                                            onclick="addToCartAjax(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-price'), this.getAttribute('data-img'))">
                                         <i class="bi bi-cart-plus me-1"></i> Thêm Giỏ Hàng
                                     </button>
                                 </div>
@@ -281,8 +286,13 @@
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-danger fw-bold fs-6" th:text="${#numbers.formatDecimal(product.basePrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">Giá</span>
                                     </div>
-                                    <button type="button" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold" 
-                                            th:onclick="'addToCartAjax(' + ${product.productId} + ', \'' + ${#strings.escapeJavaScript(product.name)} + '\', ' + ${product.basePrice} + ', \'' + (${product.images != null and !product.images.isEmpty() ? product.images[0].imageUrl : '/images/placeholder.jpg'}) + '\')'">
+                                    <button th:unless="${#authorization.expression('hasRole(''ADMIN'')')}"
+                                            type="button" class="btn btn-outline-danger btn-sm w-100 mt-2 fw-semibold" 
+                                            th:data-id="${product.productId}"
+                                            th:data-name="${product.name}"
+                                            th:data-price="${product.basePrice}"
+                                            th:data-img="${product.images != null and !product.images.isEmpty() ? product.images[0].imageUrl : '/images/placeholder.jpg'}"
+                                            onclick="addToCartAjax(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-price'), this.getAttribute('data-img'))">
                                         <i class="bi bi-cart-plus me-1"></i> Thêm Giỏ Hàng
                                     </button>
                                 </div>

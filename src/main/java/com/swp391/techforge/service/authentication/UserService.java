@@ -63,6 +63,9 @@ public class UserService {
     @Transactional
     public User lockUser(Long userId) {
         User user = getById(userId);
+        if (user.getRole() != null && "ADMIN".equalsIgnoreCase(user.getRole().getRoleName())) {
+            throw new IllegalStateException("Không thể khóa tài khoản quản trị viên (ADMIN)!");
+        }
         user.setStatus(UserStatus.LOCKED);
         return userRepository.save(user);
     }

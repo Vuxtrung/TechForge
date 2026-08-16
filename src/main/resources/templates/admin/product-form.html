@@ -12,10 +12,15 @@
   <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <main class="main-body">
-      <section class="container-fluid px-lg-5 my-4">
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
+    <main class="main-body d-flex">
+      <!-- Sidebar -->
+      <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+      
+      <!-- Main Content -->
+      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-lg-10">
             <div class="bg-white rounded-3 shadow-sm border p-4">
               <div
                 class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2"
@@ -130,6 +135,7 @@
                       placeholder="VD: 15000000"
                       required
                     />
+                    <div id="priceFormattedDisplay" class="form-text text-danger fw-bold mt-1"></div>
                     <div
                       class="invalid-feedback"
                       th:if="${#fields.hasErrors('basePrice')}"
@@ -315,12 +321,75 @@
                   });
               </script>
               
+              <!-- Script Format VNĐ -->
+              <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                  const priceInput = document.getElementById("basePrice");
+                  const priceDisplay = document.getElementById("priceFormattedDisplay");
+                  
+                  if (!priceInput || !priceDisplay) return;
+
+                  function updatePriceDisplay() {
+                    const val = parseInt(priceInput.value, 10);
+                    if (!isNaN(val)) {
+                      priceDisplay.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+                    } else {
+                      priceDisplay.textContent = "";
+                    }
+                  }
+
+                  priceInput.addEventListener("input", updatePriceDisplay);
+                  updatePriceDisplay(); // initial load
+                });
+              </script>
+
+              <!-- Script Auto Fill Specs -->
+              <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                  const categorySelect = document.getElementById("categoryId");
+                  const specRowsContainer = document.getElementById("specRows");
+
+                  if (!categorySelect || !specRowsContainer) return;
+
+                  categorySelect.addEventListener("change", function() {
+                    const categoryId = categorySelect.value;
+                    if (!categoryId) return;
+
+                    fetch("/api/admin/categories/" + categoryId + "/specs")
+                      .then(response => response.json())
+                      .then(specs => {
+                        if (specs && specs.length > 0) {
+                          // Xác nhận người dùng nếu đang có sẵn specs
+                          if (specRowsContainer.innerHTML.trim() !== "" && !confirm("Đổi danh mục sẽ xóa các thông số kỹ thuật hiện tại và thay bằng các thông số chuẩn của danh mục mới. Bạn có chắc chắn muốn đổi?")) {
+                              return;
+                          }
+                          specRowsContainer.innerHTML = "";
+                          specs.forEach(spec => {
+                            const row = document.createElement("div");
+                            row.className = "spec-row";
+                            row.style = "display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:6px;";
+                            row.innerHTML = `
+                              <input type="text" name="specKey" value="${spec}" placeholder="Tên thuộc tính (VD: Socket)">
+                              <input type="text" name="specValue" placeholder="Giá trị (VD: AM5)">
+                              <button type="button" class="removeSpecRow">Xóa</button>
+                            `;
+                            specRowsContainer.appendChild(row);
+                          });
+                        }
+                      })
+                      .catch(err => console.error("Error fetching specs:", err));
+                  });
+                });
+              </script>
+
+            </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </main>
 
+    <!-- Bootstrap 5 JS -->
     <div th:replace="~{fragments/footer :: footer}"></div>
   </body>
 </html>
