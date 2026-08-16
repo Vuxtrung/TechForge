@@ -110,7 +110,7 @@
         >
           <!-- Brand Logo -->
           <a
-            th:href="@{/}"
+            th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/products} : @{/}"
             class="text-decoration-none d-flex align-items-center gap-2"
           >
             <div
@@ -131,6 +131,7 @@
 
           <!-- Search Bar -->
           <form
+            th:unless="${#authorization.expression('hasRole(''ADMIN'')')}"
             th:action="@{/products}"
             method="get"
             class="search-form mx-auto flex-grow-1 max-w-600"
@@ -153,6 +154,7 @@
           <nav class="d-flex align-items-center gap-3">
             <!-- Build PC Tool Button -->
             <a
+              th:unless="${#authorization.expression('hasRole(''ADMIN'')')}"
               th:href="@{/buildpc}"
               class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50"
             >
@@ -162,6 +164,7 @@
 
             <!-- Budget PC Recommender -->
             <a
+              th:unless="${#authorization.expression('hasRole(''ADMIN'')')}"
               th:href="@{/pc-recommender}"
               class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50"
             >
@@ -171,6 +174,7 @@
 
             <!-- Cart Link -->
             <a
+              th:unless="${#authorization.expression('hasRole(''ADMIN'')')}"
               th:href="@{/cart}"
               class="header-action-btn position-relative text-white text-decoration-none d-flex flex-column align-items-center"
             >
@@ -186,10 +190,10 @@
 
             <!-- Account Link -->
             <a
-              th:href="${#authorization.expression('isAuthenticated()')} ? @{/account} : @{/login}"
+              th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/products} : (${#authorization.expression('isAuthenticated()')} ? @{/account} : @{/login})"
               class="header-action-btn text-white text-decoration-none d-flex flex-column align-items-center"
             >
-              <i class="bi bi-person-circle fs-5"></i>
+              <i class="bi bi-person-circle fs-5" th:classappend="${#authorization.expression('hasRole(''ADMIN'')')} ? 'text-warning' : ''"></i>
               <span class="fs-8 mt-1" th:if="${#authorization.expression('isAuthenticated()')}" th:text="${#authentication.principal.fullName}">Tài khoản</span>
               <span class="fs-8 mt-1" th:unless="${#authorization.expression('isAuthenticated()')}">Tài khoản</span>
             </a>

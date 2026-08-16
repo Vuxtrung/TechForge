@@ -9,10 +9,15 @@
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <main class="main-body">
-        <section class="container-fluid px-lg-5 my-4">
+    <main class="main-body d-flex">
+      <!-- Sidebar -->
+      <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+      
+      <!-- Main Content -->
+      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+        <div class="container-fluid">
             <div class="row justify-content-center">
-                <div class="col-lg-7">
+                <div class="col-lg-9">
                     <div class="bg-white rounded-3 shadow-sm border p-4">
 
                         <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
@@ -92,7 +97,8 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+      </div>
     </main>
 
     <div th:replace="~{fragments/footer :: footer}"></div>

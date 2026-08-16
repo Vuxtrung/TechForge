@@ -3,7 +3,7 @@
 
 <body>
     <th:block th:fragment="footer">
-    <footer class="site-footer bg-dark text-white pt-5">
+    <footer th:unless="${#authorization.expression('hasRole(''ADMIN'')')}" class="site-footer bg-dark text-white pt-5">
         <div class="footer-container container-fluid px-lg-5">
             <div class="row g-4">
                 <!-- Col 1: About TechForge -->
