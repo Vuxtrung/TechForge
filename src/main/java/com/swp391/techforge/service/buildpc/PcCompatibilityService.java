@@ -49,8 +49,7 @@ public class PcCompatibilityService {
      */
     public CompatibilityReport checkCompatibility(Product cpu, Product mainboard, Product ram, Product vga, Product psu) {
         CompatibilityReport report = new CompatibilityReport();
-        int totalWattage = 100; // Mặc định 100W cho Mainboard, Fans, Ổ cứng...
-
+        int totalWattage = 100;
         // 1. Kiểm tra Socket (CPU & Mainboard)
         if (cpu != null && mainboard != null) {
             String cpuSocket = extractSpecValue(cpu, "Socket");
