@@ -379,20 +379,19 @@ CREATE TABLE voucher_usages (
 
 
 -- =========================================================
--- 18. PASSWORD RESET OTP
+-- 18. PASSWORD RESET OTP VERIFICATION
 -- =========================================================
 
-CREATE TABLE password_reset_otp (
+CREATE TABLE otp_verification (
     otp_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    otp_code VARCHAR(10) NOT NULL,
-    expires_at DATETIME NOT NULL,
-    used TINYINT(1) DEFAULT 0,
+    email VARCHAR(150) NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    purpose ENUM('REGISTER','RESET_PASSWORD','CHECKOUT') NOT NULL,
+    expired_at DATETIME NOT NULL,
+    attempt_count INT NOT NULL DEFAULT 0,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT password_reset_otp_ibfk_1
-        FOREIGN KEY (user_id)
-        REFERENCES users(user_id)
+    INDEX idx_email_purpose (email, purpose)
 ) ENGINE = InnoDB;
 
 
