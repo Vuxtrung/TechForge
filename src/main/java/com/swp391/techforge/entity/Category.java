@@ -23,7 +23,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long categoryId;
-
+    
     @NotBlank(message = "Tên danh mục không được để trống")
     @Size(max = 100, message = "Tên danh mục không được vượt quá 100 ký tự")
     @Column(name = "name", nullable = false, length = 100)
@@ -33,7 +33,7 @@ public class Category {
     @Column(name = "description", length = 255)
     private String description;
 
-    @NotNull(message = "Vui long chọn loại danh mục")
+    @NotNull(message = "Vui lòng chọn loại danh mục")
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 20)
     private CategoryType type;
@@ -53,7 +53,7 @@ public class Category {
     private boolean active = true;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt;    
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

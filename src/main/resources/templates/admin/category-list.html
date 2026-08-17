@@ -166,12 +166,13 @@
                   <th scope="col">Danh Mục Cha</th>
                   <th scope="col" class="text-center">Số Sản Phẩm</th>
                   <th scope="col" class="text-center">Trạng Thái</th>
+                  <th scope="col">Cập Nhật</th>
                   <th scope="col" class="text-end">Thao Tác</th>
                 </tr>
               </thead>
               <tbody>
                 <tr th:if="${categoryPage.empty}">
-                  <td colspan="7" class="text-center text-muted py-4">
+                  <td colspan="8" class="text-center text-muted py-4">
                     Không tìm thấy danh mục nào phù hợp.
                   </td>
                 </tr>
@@ -218,6 +219,15 @@
                     <span class="badge bg-secondary" th:unless="${cat.active}"
                       >Đã ẩn</span
                     >
+                  </td>
+                  <td>
+                    <span
+                      class="fs-8 text-muted"
+                      th:if="${cat.updatedAt != null}"
+                      th:text="${#temporals.format(cat.updatedAt, 'dd/MM/yyyy HH:mm')}"
+                      >01/01/2026 00:00</span
+                    >
+                    <span class="fs-8 text-muted" th:unless="${cat.updatedAt != null}">—</span>
                   </td>
                   <td class="text-end">
                     <a
