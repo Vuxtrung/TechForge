@@ -181,9 +181,11 @@ public class CartController {
             if (code.equals("TECHFORGE10")) {
                 // Giảm 10% tổng hóa đơn (ví dụ giả lập giảm 500,000đ)
                 session.setAttribute(VOUCHER_SESSION_KEY, 500000.0);
+                session.setAttribute("APPLIED_VOUCHER_CODE", code);
                 redirectAttributes.addFlashAttribute("voucherSuccessMessage", "Áp dụng mã TECHFORGE10 giảm 500.000đ thành công!");
             } else if (code.equals("DISCOUNT50K")) {
                 session.setAttribute(VOUCHER_SESSION_KEY, 50000.0);
+                session.setAttribute("APPLIED_VOUCHER_CODE", code);
                 redirectAttributes.addFlashAttribute("voucherSuccessMessage", "Áp dụng mã DISCOUNT50K giảm 50.000đ thành công!");
             } else {
                 redirectAttributes.addFlashAttribute("voucherErrorMessage", "Mã giảm giá không hợp lệ hoặc đã hết hạn!");

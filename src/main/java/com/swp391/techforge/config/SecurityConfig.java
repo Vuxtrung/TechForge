@@ -16,8 +16,9 @@ import com.swp391.techforge.service.authentication.CustomUserDetailsService;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception {
 		http
+				.authenticationProvider(authenticationProvider)
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/",
@@ -31,9 +32,10 @@ public class SecurityConfig {
 								"/reset-password")
 						.permitAll()
 
-						.requestMatchers("/account/**").authenticated()
+						.requestMatchers("/account/**", "/checkout/**").authenticated()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.anyRequest().permitAll())
+						.anyRequest().permitAll()
+				)
 
 				.formLogin(form -> form
 						.loginPage("/login")

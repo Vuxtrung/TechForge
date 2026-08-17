@@ -5,8 +5,6 @@ import com.swp391.techforge.entity.Product;
 import com.swp391.techforge.entity.ProductSpecification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class PcCompatibilityService {
 

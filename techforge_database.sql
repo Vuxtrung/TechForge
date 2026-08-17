@@ -47,6 +47,10 @@ CREATE TABLE users (
         REFERENCES roles(role_id)
 ) ENGINE = InnoDB;
 
+INSERT INTO users (user_id, role_id, full_name, email, password_hash, phone, address, status) VALUES
+    (1, 5, 'TechForge Admin', 'admin@techforge.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIui', '0988888888', 'Hà Nội', 'ACTIVE'),
+    (2, 2, 'Khách Hàng Mẫu', 'customer@techforge.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIui', '0977777777', 'Hà Nội', 'ACTIVE');
+
 
 -- =========================================================
 -- 3. CATEGORIES
