@@ -19,7 +19,7 @@ public class RegisterRequest {
     private String fullName;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Size(max = 20, message = "Số điện thoại không được vượt quá 20 ký tự")
+    @Size(min = 10, max = 10, message = "Số điện thoại phải là 10 ký tự")
     private String phone;
 
     @NotBlank(message = "Mật khẩu không được để trống")
