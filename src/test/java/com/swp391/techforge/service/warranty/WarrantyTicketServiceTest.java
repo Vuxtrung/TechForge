@@ -1,22 +1,11 @@
 package com.swp391.techforge.service.warranty;
 
-import com.swp391.techforge.entity.Role;
-import com.swp391.techforge.entity.User;
-import com.swp391.techforge.entity.UserStatus;
 import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.repository.warranty.WarrantyTicketRepository;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WarrantyTicketServiceTest {

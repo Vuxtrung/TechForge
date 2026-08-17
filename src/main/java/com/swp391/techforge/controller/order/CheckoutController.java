@@ -3,18 +3,19 @@ package com.swp391.techforge.controller.order;
 import com.swp391.techforge.dto.cart.CartItemDTO;
 import com.swp391.techforge.dto.order.CheckoutRequest;
 import com.swp391.techforge.entity.*;
+import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.repository.order.PaymentRepository;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.service.order.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -27,15 +28,17 @@ public class CheckoutController {
     private final OrderService orderService;
     private final VNPayService vnPayService;
     private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
 
-    public CheckoutController(OrderService orderService, VNPayService vnPayService, PaymentRepository paymentRepository) {
+    public CheckoutController(OrderService orderService, VNPayService vnPayService, PaymentRepository paymentRepository, UserRepository userRepository) {
         this.orderService = orderService;
         this.vnPayService = vnPayService;
         this.paymentRepository = paymentRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
-    public String viewCheckoutPage(HttpSession session, Model model) {
+    public String viewCheckoutPage(HttpSession session, Model model, Principal principal) {
         @SuppressWarnings("unchecked")
         List<CartItemDTO> cartItems = (List<CartItemDTO>) session.getAttribute(CART_SESSION_KEY);
         if (cartItems == null || cartItems.isEmpty()) {
@@ -47,9 +50,30 @@ public class CheckoutController {
             subtotal = subtotal.add(BigDecimal.valueOf(item.getTotalPrice()));
         }
 
+        CheckoutRequest request = new CheckoutRequest();
+        if (principal != null) {
+            userRepository.findByEmail(principal.getName()).ifPresent(u -> {
+                request.setRecipientName(u.getFullName());
+                request.setEmail(u.getEmail());
+                request.setPhone(u.getPhone());
+                request.setAddressLine(u.getAddress());
+            });
+        }
+
+        String appliedVoucherCode = (String) session.getAttribute("APPLIED_VOUCHER_CODE");
+        if (appliedVoucherCode != null && !appliedVoucherCode.trim().isEmpty()) {
+            request.setVoucherCode(appliedVoucherCode.trim());
+        }
+
+        Double voucherDiscount = (Double) session.getAttribute("APPLIED_VOUCHER_DISCOUNT");
+        if (voucherDiscount == null) {
+            voucherDiscount = 0.0;
+        }
+
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("subtotal", subtotal);
-        model.addAttribute("checkoutRequest", new CheckoutRequest());
+        model.addAttribute("voucherDiscount", voucherDiscount);
+        model.addAttribute("checkoutRequest", request);
         return "checkout";
     }
 
@@ -57,6 +81,7 @@ public class CheckoutController {
     public String processCheckout(@ModelAttribute CheckoutRequest checkoutRequest,
                                   HttpSession session,
                                   HttpServletRequest request,
+                                  Principal principal,
                                   RedirectAttributes redirectAttributes) {
 
         @SuppressWarnings("unchecked")
@@ -67,7 +92,12 @@ public class CheckoutController {
         }
 
         try {
-            Order order = orderService.createOrder(checkoutRequest, cartItems, null);
+            User loggedInUser = null;
+            if (principal != null) {
+                loggedInUser = userRepository.findByEmail(principal.getName()).orElse(null);
+            }
+
+            Order order = orderService.createOrder(checkoutRequest, cartItems, loggedInUser);
             session.removeAttribute(CART_SESSION_KEY);
 
             if ("VNPAY".equalsIgnoreCase(checkoutRequest.getPaymentMethod())) {
