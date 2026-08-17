@@ -91,7 +91,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // 2b. API Thêm vào giỏ hàng qua AJAX (KHÔNG LOAD LẠI TRANG)
     @PostMapping("/api/add")
     @ResponseBody
     public java.util.Map<String, Object> addToCartApi(@RequestParam("productId") Long productId,
