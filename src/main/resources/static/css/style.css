@@ -249,3 +249,14 @@ body {
 
 @media (max-width: 700px) { .register-container { max-width: 500px; } .register-form-box { padding: 25px 20px; } }
 
+
+
+
+/* Category tree (sidebar /products) */
+.category-tree-caret {
+  transition: transform 0.2s ease;
+}
+
+.category-tree-toggle[aria-expanded="true"] .category-tree-caret {
+  transform: rotate(180deg);
+}

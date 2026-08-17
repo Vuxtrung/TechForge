@@ -1,5 +1,7 @@
 package com.swp391.techforge.service.product;
 
+import com.swp391.techforge.dto.product.ProductFilterOptions;
+import com.swp391.techforge.dto.product.ProductFilterRequest;
 import com.swp391.techforge.entity.Category;
 import com.swp391.techforge.entity.Product;
 import com.swp391.techforge.entity.ProductImage;
@@ -53,6 +55,38 @@ public class ProductService {
         Page<Product> result = productRepository.search(keyword, categoryId, status, pageable);
         result.forEach(p -> p.setCategoryId(p.getCategory() != null ? p.getCategory().getCategoryId() : null));
         return result;
+    }
+
+    // Dùng cho trang khách /products (F_07): map sort string -> Sort thật,
+    // gọi searchPublic() (chỉ lấy ACTIVE), gán lại categoryId để View hiển thị đúng
+    @Transactional(readOnly = true)
+    public Page<Product> searchPublic(ProductFilterRequest filter) {
+        Sort sort = switch (filter.getSort()) {
+            case "priceAsc" -> Sort.by("basePrice").ascending();
+            case "priceDesc" -> Sort.by("basePrice").descending();
+            default -> Sort.by("createdAt").descending(); // "newest"
+        };
+        Pageable pageable = PageRequest.of(filter.getPage(), filter.getPageSize(), sort);
+
+        Page<Product> result = productRepository.searchPublic(
+                filter.getKeyword(),
+                filter.getCategoryId(),
+                filter.getType(),
+                filter.getBrand(),
+                filter.getMinPrice(),
+                filter.getMaxPrice(),
+                pageable);
+
+        result.forEach(p -> p.setCategoryId(p.getCategory() != null ? p.getCategory().getCategoryId() : null));
+        return result;
+    }
+
+    // Dữ liệu cho sidebar filter: danh mục cha (kèm con) đang active + toàn bộ thương hiệu đang có sản phẩm
+    @Transactional(readOnly = true)
+    public ProductFilterOptions getFilterOptions() {
+        List<Category> categories = categoryRepository.findAllByParentIsNullAndActiveTrueOrderByNameAsc();
+        List<String> brands = productRepository.findDistinctBrands();
+        return new ProductFilterOptions(categories, brands);
     }
 
     @Transactional(readOnly = true)
@@ -161,7 +195,6 @@ public class ProductService {
     public void delete(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
-        productSpecificationRepository.deleteAllByProduct_ProductId(id);
         productRepository.delete(product);
     }
 
