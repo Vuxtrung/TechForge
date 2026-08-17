@@ -40,6 +40,13 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
+    public List<Category> findRootCategoriesForNav() {
+        // Con inactive bị lọc ở template (th:if child.active), không mutate
+        // entity managed ở đây để tránh side-effect ngoài ý muốn với Hibernate.
+        return categoryRepository.findAllByParentIsNullAndActiveTrueOrderByNameAsc();
+    }
+
+    @Transactional(readOnly = true)
     public Category getById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục."));
@@ -83,6 +90,24 @@ public class CategoryService {
         if (!newStatus) {
             cascadeDeactivate(id);
         }
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy danh mục."));
+
+        List<Category> children = categoryRepository.findAllByParent_CategoryId(id);
+        if (!children.isEmpty()) {
+            throw new IllegalArgumentException("Không thể xóa danh mục đang có danh mục con bên trong.");
+        }
+
+        long productCount = categoryRepository.countProductsByCategoryId(id);
+        if (productCount > 0) {
+            throw new IllegalArgumentException("Không thể xóa danh mục đang có sản phẩm.");
+        }
+
+        categoryRepository.delete(category);
     }
 
     private void cascadeDeactivate(Long parentId) {

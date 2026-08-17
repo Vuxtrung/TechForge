@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý người dùng - TechForge</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+        .container-fluid {
+            padding-top: 20px;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: none;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-bottom: none;
+        }
+        .badge-active {
+            background-color: #28a745;
+        }
+        .badge-locked {
+            background-color: #dc3545;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .search-box input {
+            padding-left: 35px;
+        }
+        .filter-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .pagination {
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="main-body d-flex">
+  <!-- Sidebar -->
+  <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+  
+  <!-- Main Content -->
+  <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+    <div class="container-fluid">
+    <!-- Alert Messages -->
+    <div th:if="${message}" class="alert" th:classappend="${'alert-' + messageType}" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <span th:text="${message}"></span>
+    </div>
+
+    <!-- Card Header -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="bi bi-people"></i> Quản lý Người dùng
+            </h5>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="card-body">
+            <form method="get" action="/admin/users" class="filter-section">
+                <div class="row g-3">
+                    <!-- Search Box -->
+                    <div class="col-md-3">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="keyword" class="form-control form-control-sm"
+                                   placeholder="Tìm tên, email, SĐT..."
+                                   th:value="${keyword}">
+                        </div>
+                    </div>
+
+                    <!-- Filter by Role -->
+                    <div class="col-md-2">
+                        <select name="roleId" class="form-select form-select-sm">
+                            <option value="">-- Tất cả Phòng ban --</option>
+                            <option value="1" th:selected="${roleId == 1}">GUEST</option>
+                            <option value="2" th:selected="${roleId == 2}">CUSTOMER</option>
+                            <option value="3" th:selected="${roleId == 3}">STAFF_SALES</option>
+                            <option value="4" th:selected="${roleId == 4}">STAFF_WARRANTY</option>
+                            <option value="5" th:selected="${roleId == 5}">ADMIN</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter by Status -->
+                    <div class="col-md-2">
+                        <select name="status" class="form-select form-select-sm">
+                            <option value="">-- Tất cả Trạng thái --</option>
+                            <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">Hoạt động</option>
+                            <option value="LOCKED" th:selected="${status == 'LOCKED'}">Bị khóa</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="col-md-2">
+                        <select name="sort" class="form-select form-select-sm">
+                            <option value="fullName,asc" th:selected="${sort == 'fullName,asc'}">Tên (A-Z)</option>
+                            <option value="fullName,desc" th:selected="${sort == 'fullName,desc'}">Tên (Z-A)</option>
+                            <option value="createdAt,desc" th:selected="${sort == 'createdAt,desc'}">Mới nhất</option>
+                            <option value="createdAt,asc" th:selected="${sort == 'createdAt,asc'}">Cũ nhất</option>
+                        </select>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        <a href="/admin/users" class="btn btn-secondary btn-sm w-100 mt-2">
+                            <i class="bi bi-arrow-clockwise"></i> Đặt lại
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Results Info -->
+            <div class="mb-3">
+                <small class="text-muted">
+                    Tổng cộng: <strong th:text="${userPage.totalElements}"></strong> người dùng
+                    (Trang <strong th:text="${userPage.number + 1}"></strong> / <strong th:text="${userPage.totalPages}"></strong>)
+                </small>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>
+                            <a th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'fullName,' + (sort == 'fullName,asc' ? 'desc' : 'asc')}, page=0)}">
+                                Tên người dùng
+                                <i class="bi" th:classappend="${sort.startsWith('fullName,desc')} ? 'bi-sort-down' : 'bi-sort-up'"></i>
+                            </a>
+                        </th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Phòng ban</th>
+                        <th>
+                            <a th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'status,' + (sort == 'status,asc' ? 'desc' : 'asc')}, page=0)}">
+                                Trạng thái
+                                <i class="bi" th:classappend="${sort.startsWith('status,desc')} ? 'bi-sort-down' : 'bi-sort-up'"></i>
+                            </a>
+                        </th>
+                        <th>
+                            <a th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'createdAt,' + (sort == 'createdAt,asc' ? 'desc' : 'asc')}, page=0)}">
+                                Ngày tạo
+                                <i class="bi" th:classappend="${sort.startsWith('createdAt,desc')} ? 'bi-sort-down' : 'bi-sort-up'"></i>
+                            </a>
+                        </th>
+                        <th>Điểm thành viên</th>
+                        <th>Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user, iterStat : ${userPage.content}">
+                        <td th:text="${userPage.number * userPage.size + iterStat.count}"></td>
+                        <td>
+                            <a th:href="@{/admin/users/{id}(id=${user.userId})}" class="text-decoration-none">
+                                <strong th:text="${user.fullName}"></strong>
+                            </a>
+                        </td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.phone != null ? user.phone : '-'}"></td>
+                        <td>
+                            <span class="badge bg-info" th:text="${user.role.roleName}"></span>
+                        </td>
+                        <td>
+                            <span th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).ACTIVE}" class="badge badge-active">
+                                <i class="bi bi-check-circle"></i> Hoạt động
+                            </span>
+                            <span th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).LOCKED}" class="badge badge-locked">
+                                <i class="bi bi-lock-fill"></i> Bị khóa
+                            </span>
+                        </td>
+                        <td>
+                            <small th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
+                        </td>
+                        <td th:text="${user.loyaltyPoints}"></td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a th:href="@{/admin/users/{id}(id=${user.userId})}" 
+                                   class="btn btn-outline-info btn-sm" title="Xem chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <th:block th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).ACTIVE and user.role.roleName != 'ADMIN'}">
+                                    <form th:action="@{/admin/users/{id}/lock(id=${user.userId})}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                onclick="return confirm('Bạn chắc chắn muốn khóa tài khoản này?')"
+                                                title="Khóa tài khoản">
+                                            <i class="bi bi-lock"></i>
+                                        </button>
+                                    </form>
+                                </th:block>
+                                <th:block th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).LOCKED}">
+                                    <form th:action="@{/admin/users/{id}/unlock(id=${user.userId})}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-outline-success btn-sm"
+                                                onclick="return confirm('Bạn chắc chắn muốn mở khóa tài khoản này?')"
+                                                title="Mở khóa tài khoản">
+                                            <i class="bi bi-unlock"></i>
+                                        </button>
+                                    </form>
+                                </th:block>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${userPage.empty}" class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Không tìm thấy người dùng nào</p>
+            </div>
+
+            <!-- Pagination -->
+            <nav th:if="${userPage.totalPages > 1}" aria-label="Page navigation">
+                <ul class="pagination">
+                    <!-- Previous Button -->
+                    <li class="page-item" th:classappend="${!userPage.hasPrevious()} ? 'disabled'">
+                        <a class="page-link" th:if="${userPage.hasPrevious()}"
+                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number - 1})}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                        <span class="page-link" th:unless="${userPage.hasPrevious()}">&laquo;</span>
+                    </li>
+
+                    <!-- Page Numbers -->
+                    <th:block th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}">
+                        <li class="page-item" th:classappend="${i == userPage.number} ? 'active'">
+                            <a class="page-link" th:if="${i != userPage.number}"
+                               th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${i})}"
+                               th:text="${i + 1}"></a>
+                            <span class="page-link" th:if="${i == userPage.number}" th:text="${i + 1}"></span>
+                        </li>
+                    </th:block>
+
+                    <!-- Next Button -->
+                    <li class="page-item" th:classappend="${!userPage.hasNext()} ? 'disabled'">
+                        <a class="page-link" th:if="${userPage.hasNext()}"
+                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number + 1})}"
+                           aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        <span class="page-link" th:unless="${userPage.hasNext()}">&raquo;</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        </div>
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

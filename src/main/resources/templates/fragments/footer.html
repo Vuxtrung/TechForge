@@ -2,7 +2,8 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
 <body>
-    <footer th:fragment="footer" class="site-footer bg-dark text-white pt-5">
+    <th:block th:fragment="footer">
+    <footer th:unless="${#authorization.expression('hasRole(''ADMIN'')')}" class="site-footer bg-dark text-white pt-5">
         <div class="footer-container container-fluid px-lg-5">
             <div class="row g-4">
                 <!-- Col 1: About TechForge -->
@@ -64,7 +65,7 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/js/main.js}"></script>
+    </th:block>
 </body>
 
 </html>

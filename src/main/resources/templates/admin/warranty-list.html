@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title>Quản lý bảo hành</title>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="main-body">
+    <section class="container-fluid px-lg-5 my-4">
+        <div class="bg-white rounded-3 shadow-sm border p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <span class="fs-4 text-dark fw-bold">
+                    <i class="bi bi-shield-check text-success"></i> Quản lý bảo hành
+                </span>
+                <button class="btn btn-success fw-semibold" data-bs-toggle="modal" data-bs-target="#receiveWarrantyModal">
+                    <i class="bi bi-plus-lg me-1"></i> Tiếp nhận sản phẩm
+                </button>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-1"></i>
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-1"></i>
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form th:action="@{/admin/warranty}" method="get" class="row g-2 align-items-end mb-3">
+                <div class="col-md-5">
+                    <label class="form-label fs-8 text-muted mb-1">Tìm kiếm</label>
+                    <input type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="Tên khách hàng, email, imei, mô tả lỗi..." />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fs-8 text-muted mb-1">Trạng thái</label>
+                    <select name="status" class="form-select">
+                        <option value="" th:selected="${status == null || status == ''}">Tất cả</option>
+                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.name()}" th:selected="${status == s.name()}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-dark w-100">Lọc</button>
+                </div>
+                <div class="col-md-2">
+                    <a th:href="@{/admin/warranty}" class="btn btn-outline-secondary w-100">Reset</a>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Khách hàng</th>
+                        <th>IMEI / Serial</th>
+                        <th>Vấn đề</th>
+                        <th>Nhân viên</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tiếp nhận</th>
+                        <th>Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${ticketPage.empty}">
+                        <td colspan="8" class="text-center text-muted py-4">Chưa có phiếu bảo hành nào.</td>
+                    </tr>
+                    <tr th:each="ticket, iter : ${ticketPage.content}">
+                        <td th:text="${ticketPage.number * ticketPage.size + iter.index + 1}">1</td>
+                        <td>
+                            <div class="fw-semibold" th:text="${ticket.user.fullName}">Tên khách</div>
+                            <small class="text-muted" th:text="${ticket.user.email}">email</small>
+                        </td>
+                        <td th:text="${ticket.imeiSerial}">IMEI</td>
+                        <td class="text-wrap" th:text="${ticket.issueDesc != null ? ticket.issueDesc : '—'}">Lỗi</td>
+                        <td th:text="${ticket.assignedStaff != null ? ticket.assignedStaff.fullName : 'Chưa phân công'}">Nhân viên</td>
+                        <td>
+                            <span class="badge bg-primary" th:text="${ticket.status}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(ticket.createdAt, 'dd/MM/yyyy HH:mm')}">Ngày</td>
+                        <td>
+                            <a th:href="@{/admin/warranty/{id}(id=${ticket.ticketId})}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav th:if="${ticketPage.totalPages > 1}" aria-label="Pagination">
+                <ul class="pagination justify-content-center mt-3">
+                    <li class="page-item" th:classappend="${ticketPage.first} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number - 1}, keyword=${keyword}, status=${status})}">Trước</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, ticketPage.totalPages - 1)}"
+                        th:classappend="${ticketPage.number == i} ? 'active' : ''">
+                        <a class="page-link" th:href="@{/admin/warranty(page=${i}, keyword=${keyword}, status=${status})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${ticketPage.last} ? 'disabled' : ''">
+                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number + 1}, keyword=${keyword}, status=${status})}">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </section>
+</main>
+
+<div class="modal fade" id="receiveWarrantyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form th:action="@{/admin/warranty/receive}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tiếp nhận sản phẩm bảo hành</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">User ID</label>
+                        <input type="number" name="userId" class="form-control" placeholder="Nhập userId" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">IMEI / Serial</label>
+                        <input type="text" name="imeiSerial" class="form-control" placeholder="Nhập IMEI hoặc serial" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại tra cứu</label>
+                        <input type="text" name="phoneLookup" class="form-control" placeholder="SĐT khách hàng" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Order Item ID</label>
+                        <input type="number" name="orderItemId" class="form-control" placeholder="Nếu có" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Mô tả sự cố</label>
+                        <textarea name="issueDesc" class="form-control" rows="4" placeholder="Mô tả triệu chứng, lỗi, thời gian gặp sự cố..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">Tiếp nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

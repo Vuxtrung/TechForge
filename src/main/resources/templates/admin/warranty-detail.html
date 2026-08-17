@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title>Chi tiết bảo hành</title>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="main-body">
+    <section class="container-fluid px-lg-5 my-4">
+        <div class="bg-white rounded-3 shadow-sm border p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                <span class="fs-4 text-dark fw-bold">
+                    <i class="bi bi-ticket-detailed text-warning"></i> Chi tiết phiếu bảo hành
+                </span>
+                <a th:href="@{/admin/warranty}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại
+                </a>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Thông tin phiếu</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Mã phiếu</label>
+                                    <div class="fw-semibold" th:text="${ticket.ticketId}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Trạng thái</label>
+                                    <div><span class="badge bg-primary" th:text="${ticket.status}"></span></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Khách hàng</label>
+                                    <div class="fw-semibold" th:text="${ticket.user.fullName}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Email</label>
+                                    <div th:text="${ticket.user.email}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">IMEI / Serial</label>
+                                    <div class="fw-semibold" th:text="${ticket.imeiSerial}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Số điện thoại tra cứu</label>
+                                    <div th:text="${ticket.phoneLookup != null ? ticket.phoneLookup : '—'}">—</div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="text-muted small">Mô tả lỗi</label>
+                                    <div class="border rounded p-3 bg-light" th:text="${ticket.issueDesc != null ? ticket.issueDesc : 'Không có mô tả'}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Ngày tiếp nhận</label>
+                                    <div th:text="${#temporals.format(ticket.createdAt, 'dd/MM/yyyy HH:mm')}"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Ngày xử lý</label>
+                                    <div th:text="${ticket.resolvedAt != null ? #temporals.format(ticket.resolvedAt, 'dd/MM/yyyy HH:mm') : 'Chưa xử lý'}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Cập nhật tiến độ kỹ thuật</h5>
+                            <form th:action="@{/admin/warranty/{id}/update(id=${ticket.ticketId})}" method="post">
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái xử lý</label>
+                                    <select name="status" class="form-select">
+                                        <option value="" th:selected="${ticket.status == null}">Không đổi</option>
+                                        <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.name()}" th:selected="${ticket.status == s}"></option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Nhân viên kỹ thuật</label>
+                                    <input type="text" name="assignedStaffId" class="form-control" placeholder="Nhập staffId" />
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
+                            </form>
+
+                            <hr class="my-4" />
+
+                            <div class="d-grid gap-2">
+                                <form th:action="@{/admin/warranty/{id}/replace(id=${ticket.ticketId})}" method="post">
+                                    <button type="submit" class="btn btn-warning w-100">Xử lý 1 đổi 1</button>
+                                </form>
+                                <form th:action="@{/admin/warranty/{id}/repair(id=${ticket.ticketId})}" method="post">
+                                    <button type="submit" class="btn btn-success w-100">Đánh dấu đã sửa</button>
+                                </form>
+                                <form th:action="@{/admin/warranty/{id}/close(id=${ticket.ticketId})}" method="post">
+                                    <button type="submit" class="btn btn-dark w-100">Đóng phiếu</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

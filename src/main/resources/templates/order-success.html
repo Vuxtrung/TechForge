@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title>Đặt Hàng Thành Công - TechForge</title>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body container text-center my-5 py-4">
+        <div class="bg-white rounded-3 shadow-sm border p-5 mx-auto" style="max-width: 650px;">
+            <div class="display-1 text-success mb-3"><i class="bi bi-check-circle-fill"></i></div>
+            <h3 class="fw-bold text-dark mb-2">ĐẶT HÀNG THÀNH CÔNG!</h3>
+            <p class="text-muted fs-7 mb-4">Cảm ơn bạn đã tin tưởng lựa chọn thiết bị công nghệ tại <strong>TechForge</strong>. Đơn hàng của bạn đang được hệ thống tiếp nhận và xử lý.</p>
+
+            <div class="bg-light rounded p-3 text-start mb-4 border">
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2 fs-7">
+                    <span class="text-muted">Mã Đơn Hàng:</span>
+                    <strong class="text-danger fs-6" th:text="'#' + ${order.orderId}">#1001</strong>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2 fs-7">
+                    <span class="text-muted">Người Nhận Hàng:</span>
+                    <strong class="text-dark" th:text="${order.recipientName}">Nguyễn Văn A</strong>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2 fs-7">
+                    <span class="text-muted">Số Điện Thoại:</span>
+                    <span class="text-dark" th:text="${order.phone}">0988888888</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2 fs-7">
+                    <span class="text-muted">Phương Thức Thanh Toán:</span>
+                    <span class="badge bg-primary fs-8" th:text="${order.payment != null ? order.payment.method : 'COD'}">COD</span>
+                </div>
+                <div class="d-flex justify-content-between fs-7 pt-1">
+                    <span class="text-muted">Tổng Tiền Thanh Toán:</span>
+                    <strong class="text-danger fs-6" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">18.020.000đ</strong>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-center">
+                <a th:href="@{/orders}" class="btn btn-outline-danger btn-sm px-4 fw-bold">
+                    <i class="bi bi-clock-history me-1"></i> Xem Lịch Sử Đơn Hàng
+                </a>
+                <a th:href="@{/}" class="btn btn-danger btn-sm px-4 fw-bold">
+                    <i class="bi bi-house-door me-1"></i> Trở Về Trang Chủ
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

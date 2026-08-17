@@ -8,8 +8,13 @@
   <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <main class="main-body">
-      <section class="container-fluid px-lg-5 my-4">
+    <main class="main-body d-flex">
+      <!-- Sidebar -->
+      <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+      
+      <!-- Main Content -->
+      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+        <div class="container-fluid">
         <div class="bg-white rounded-3 shadow-sm border p-4">
           <!-- Page Title + Add button -->
           <div
@@ -190,12 +195,12 @@
                   <td>
                     <span
                       class="badge bg-secondary"
-                      th:if="${cat.type == 'PC_PRODUCT'}"
+                      th:if="${cat.type.name() == 'PC_PRODUCT'}"
                       >Sản phẩm PC</span
                     >
                     <span
                       class="badge bg-info text-dark"
-                      th:if="${cat.type == 'PC_COMPONENT'}"
+                      th:if="${cat.type.name() == 'PC_COMPONENT'}"
                       >Linh kiện</span
                     >
                   </td>
@@ -229,14 +234,28 @@
                     >
                       <button
                         type="submit"
-                        class="btn btn-outline-warning btn-sm"
+                        class="btn btn-outline-warning btn-sm js-toggle-category"
                         th:title="${cat.active ? 'Ẩn danh mục' : 'Hiện danh mục'}"
-                        th:onclick="|return confirm('Xác nhận đổi trạng thái danh mục &quot;${cat.name}&quot;? Nếu ẩn, các danh mục con bên trong cũng sẽ bị ẩn theo.')|"
+                        th:data-name="${cat.name}"
                       >
                         <i
                           class="bi"
                           th:classappend="${cat.active ? 'bi-eye-slash' : 'bi-eye'}"
                         ></i>
+                      </button>
+                    </form>
+                    <form
+                      th:action="@{/admin/categories/{id}/delete(id=${cat.categoryId})}"
+                      method="post"
+                      class="d-inline"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-outline-danger btn-sm js-delete-category"
+                        title="Xóa"
+                        th:data-name="${cat.name}"
+                      >
+                        <i class="bi bi-trash"></i>
                       </button>
                     </form>
                   </td>
@@ -288,9 +307,29 @@
             </ul>
           </nav>
         </div>
-      </section>
+        </div>
+      </div>
     </main>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="none">
+      document.querySelectorAll('.js-toggle-category').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          var name = btn.getAttribute('data-name');
+          if (!confirm('Xác nhận đổi trạng thái danh mục "' + name + '"? Nếu ẩn, các danh mục con bên trong cũng sẽ bị ẩn theo.')) {
+            e.preventDefault();
+          }
+        });
+      });
+      document.querySelectorAll('.js-delete-category').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          var name = btn.getAttribute('data-name');
+          if (!confirm('Xác nhận XÓA VĨNH VIỄN danh mục "' + name + '"? Hành động này không thể hoàn tác.')) {
+            e.preventDefault();
+          }
+        });
+      });
+    </script>
   </body>
 </html>

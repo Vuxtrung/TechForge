@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title th:text="'Chi Tiết Đơn Hàng #' + ${order.orderId}">Chi Tiết Đơn Hàng - TechForge</title>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body container-fluid px-lg-5 my-4">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb fs-7">
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none text-muted">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/orders}" class="text-decoration-none text-muted">Lịch sử đơn hàng</a></li>
+                <li class="breadcrumb-item active text-danger fw-semibold" th:text="'Chi tiết đơn #' + ${order.orderId}">#1001</li>
+            </ol>
+        </nav>
+
+        <!-- THÔNG BÁO FLASH MESSAGE -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold text-dark mb-0">
+                <i class="bi bi-file-earmark-text text-danger me-2"></i> CHI TIẾT HÓA ĐƠN ĐƠN HÀNG <span class="text-danger" th:text="'#' + ${order.orderId}">#1001</span>
+            </h4>
+
+            <!-- ACTION BUTTONS: In Hóa Đơn, Đặt Lại Đơn, Hủy Đơn -->
+            <div class="d-flex gap-2">
+                <a th:href="@{'/orders/' + ${order.orderId} + '/print'}" target="_blank" class="btn btn-outline-dark btn-sm fw-bold">
+                    <i class="bi bi-printer me-1"></i> In Hóa Đơn Bán Hàng
+                </a>
+
+                <form th:action="@{'/orders/' + ${order.orderId} + '/reorder'}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">
+                        <i class="bi bi-cart-plus me-1"></i> Đặt Lại Đơn Này
+                    </button>
+                </form>
+
+                <button th:if="${order.status.name() == 'PENDING' || order.status.name() == 'CONFIRMED'}" type="button" class="btn btn-danger btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                    <i class="bi bi-x-circle me-1"></i> Hủy Đơn Hàng
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- CỘT TRÁI: DANH SÁCH SẢN PHẨM MUA -->
+            <div class="col-lg-8">
+                <div class="bg-white rounded-3 shadow-sm border p-4 mb-4">
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">DANH SÁCH SẢN PHẨM ĐÃ ĐẶT MUA</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 fs-7">
+                            <thead class="table-light text-secondary">
+                                <tr>
+                                    <th scope="col">Sản Phẩm</th>
+                                    <th scope="col" class="text-center">Đơn Giá</th>
+                                    <th scope="col" class="text-center">Số Lượng</th>
+                                    <th scope="col" class="text-end">Thành Tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="item : ${order.orderItems}">
+                                    <td><strong class="text-dark" th:text="${item.productName}">Màn hình Asus</strong></td>
+                                    <td class="text-center fw-semibold" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
+                                    <td class="text-center fw-bold" th:text="${item.quantity}">1</td>
+                                    <td class="text-end fw-bold text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- LÝ DO HỦY ĐƠN HÀNG (NẾU ĐÃ HỦY) -->
+                <div th:if="${order.status.name() == 'CANCELLED'}" class="bg-danger-subtle rounded-3 border border-danger p-3 mb-4">
+                    <h6 class="fw-bold text-danger mb-1 fs-7"><i class="bi bi-info-circle-fill me-1"></i> ĐƠN HÀNG ĐÃ BỊ HỦY</h6>
+                    <p class="mb-0 fs-7 text-dark"><strong>Lý do hủy:</strong> <span th:text="${order.cancelReason}">Khách hàng yêu cầu hủy</span></p>
+                </div>
+            </div>
+
+            <!-- CỘT PHẢI: THÔNG TIN GIAO HÀNG VÀ THANH TOÁN -->
+            <div class="col-lg-4">
+                <div class="bg-white rounded-3 shadow-sm border p-4 mb-4">
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">THÔNG TIN GIAO HÀNG</h6>
+                    <div class="fs-7 mb-2">
+                        <span class="text-muted d-block">Người nhận:</span>
+                        <strong class="text-dark" th:text="${order.recipientName}">Nguyễn Văn A</strong>
+                    </div>
+                    <div class="fs-7 mb-2">
+                        <span class="text-muted d-block">Số điện thoại:</span>
+                        <span class="text-dark" th:text="${order.phone}">0988888888</span>
+                    </div>
+                    <div class="fs-7 mb-2">
+                        <span class="text-muted d-block">Email:</span>
+                        <span class="text-dark" th:text="${order.email}">khachhang@gmail.com</span>
+                    </div>
+                    <div class="fs-7 mb-2">
+                        <span class="text-muted d-block">Địa chỉ nhận hàng:</span>
+                        <span class="text-dark" th:text="${order.shippingAddress}">18 Trần Thái Tông, Cầu Giấy, Hà Nội</span>
+                    </div>
+                    <div class="fs-7">
+                        <span class="text-muted d-block">Ghi chú:</span>
+                        <span class="text-muted italic" th:text="${order.orderNote != null && order.orderNote != '' ? order.orderNote : 'Không có ghi chú'}">Không có</span>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3 shadow-sm border p-4">
+                    <h6 class="fw-bold text-dark border-bottom pb-2 mb-3 fs-7">TỔNG QUAN THANH TOÁN</h6>
+                    <div class="d-flex justify-content-between mb-2 fs-7">
+                        <span class="text-muted">Phí vận chuyển:</span>
+                        <span class="fw-semibold" th:text="${#numbers.formatDecimal(order.shippingFee, 0, 'COMMA', 0, 'POINT')} + 'đ'">30.000đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 fs-7" th:if="${order.voucher != null}">
+                        <span class="text-muted">Voucher đã áp dụng:</span>
+                        <span class="fw-bold text-success" th:text="${order.voucher.code}">TECHFORGE10</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 fs-7">
+                        <span class="text-muted">Phương thức thanh toán:</span>
+                        <span class="badge bg-primary fs-8" th:text="${order.payment != null ? order.payment.method : 'COD'}">COD</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 fs-7">
+                        <span class="text-muted">Trạng thái thanh toán:</span>
+                        <span class="badge bg-success fs-8" th:text="${order.payment != null ? order.payment.status : 'PENDING'}">PENDING</span>
+                    </div>
+                    <div class="d-flex justify-content-between my-3 pt-2 border-top">
+                        <span class="fw-bold fs-6 text-dark">TỔNG THANH TOÁN:</span>
+                        <span class="text-danger fw-extrabold fs-5" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">18.020.000đ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL XÁC NHẬN HỦY ĐƠN HÀNG -->
+    <div class="modal fade" id="cancelModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{'/orders/' + ${order.orderId} + '/cancel'}" method="post">
+                    <div class="modal-header">
+                        <h6 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-octagon me-1"></i> XÁC NHẬN HỦY ĐƠN HÀNG</h6>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body fs-7">
+                        <p class="mb-2">Bạn có chắc chắn muốn hủy đơn hàng <strong th:text="'#' + ${order.orderId}">#1001</strong> không?</p>
+                        <label for="cancelReason" class="form-label fw-semibold">Lý do hủy đơn:</label>
+                        <textarea class="form-control form-control-sm" id="cancelReason" name="cancelReason" rows="2" placeholder="Nhập lý do muốn hủy đơn hàng..." required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger btn-sm fw-bold">Đồng Ý Hủy Đơn</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>
