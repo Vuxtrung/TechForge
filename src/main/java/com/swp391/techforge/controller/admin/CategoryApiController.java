@@ -47,4 +47,9 @@ public class CategoryApiController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/testdump")
+    public ResponseEntity<List<String>> dumpCategories() {
+        return ResponseEntity.ok(categoryService.findAllActive().stream().map(Category::getName).toList());
+    }
 }

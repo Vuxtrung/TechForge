@@ -44,7 +44,7 @@
                             <!-- Field 2: Số điện thoại -->
                             <div class="col-md-6">
                                 <label for="phone" class="form-label fs-7 fw-semibold">Số điện thoại liên hệ <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control form-control-sm" id="phone" name="phone" placeholder="VD: 0988888888" required>
+                                <input type="tel" class="form-control form-control-sm" id="phone" th:field="*{phone}" placeholder="VD: 0988888888" pattern="^(0[35789])[0-9]{8}$" maxlength="10" title="Số điện thoại phải gồm đúng 10 chữ số hợp lệ (VD: 0988888888)" required>
                             </div>
 
                             <!-- Field 3: Email nhận hóa đơn -->
@@ -160,8 +160,8 @@
                         <div class="mb-3">
                             <label for="voucherCode" class="form-label fs-7 fw-semibold">Mã giảm giá (Nếu có)</label>
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control text-uppercase" id="voucherCode" name="voucherCode" placeholder="Mã giảm giá (VD: TECHFORGE10)">
-                                <button type="button" class="btn btn-outline-danger fw-bold" onclick="alert('Đã cập nhật mã giảm giá vào đơn hàng!')">Áp dụng</button>
+                                <input type="text" class="form-control text-uppercase" id="voucherCode" th:field="*{voucherCode}" placeholder="Mã giảm giá (VD: TECHFORGE10)">
+                                <button type="button" class="btn btn-outline-danger fw-bold" onclick="alert('Mã giảm giá đã được áp dụng vào đơn hàng!')">Áp dụng</button>
                             </div>
                         </div>
 
@@ -171,6 +171,11 @@
                                 <span class="fw-semibold" th:text="${#numbers.formatDecimal(subtotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
                             </div>
 
+                            <div class="d-flex justify-content-between mb-2 fs-7 text-success" th:if="${voucherDiscount > 0}">
+                                <span>Giảm giá Voucher:</span>
+                                <span class="fw-bold" th:text="'-' + ${#numbers.formatDecimal(voucherDiscount, 0, 'COMMA', 0, 'POINT')} + 'đ'">-500.000đ</span>
+                            </div>
+
                             <div class="d-flex justify-content-between mb-2 fs-7">
                                 <span class="text-muted">Phí vận chuyển:</span>
                                 <span class="fw-bold text-primary" id="shippingFeeDisplay">30.000đ</span>
@@ -178,7 +183,7 @@
 
                             <div class="d-flex justify-content-between my-3 pt-2 border-top">
                                 <span class="fw-bold fs-6 text-dark">TỔNG CỘNG THANH TOÁN:</span>
-                                <span class="text-danger fw-extrabold fs-4" id="grandTotalDisplay" th:text="${#numbers.formatDecimal(subtotal + 30000, 0, 'COMMA', 0, 'POINT')} + 'đ'">18.020.000đ</span>
+                                <span class="text-danger fw-extrabold fs-4" id="grandTotalDisplay" th:text="${#numbers.formatDecimal((subtotal - voucherDiscount > 0 ? subtotal - voucherDiscount : 0) + 30000, 0, 'COMMA', 0, 'POINT')} + 'đ'">18.020.000đ</span>
                             </div>
 
                             <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm py-2 fs-6">
@@ -196,10 +201,12 @@
     <script th:inline="javascript">
         /* Dynamic Shipping Fee & Grand Total Calculation */
         var subtotal = /*[[${subtotal}]]*/ 0;
+        var voucherDiscount = /*[[${voucherDiscount}]]*/ 0;
         function updateTotalDisplay() {
             var expressRadio = document.getElementById('shipExpress');
-            var shipFee = expressRadio.checked ? 50000 : 30000;
-            var grandTotal = subtotal + shipFee;
+            var shipFee = (expressRadio && expressRadio.checked) ? 50000 : 30000;
+            var grandTotal = subtotal - voucherDiscount + shipFee;
+            if (grandTotal < 0) grandTotal = 0;
 
             document.getElementById('shippingFeeDisplay').innerText = shipFee.toLocaleString('vi-VN') + 'đ';
             document.getElementById('grandTotalDisplay').innerText = grandTotal.toLocaleString('vi-VN') + 'đ';

@@ -3,9 +3,11 @@ package com.swp391.techforge.service.order;
 import com.swp391.techforge.dto.cart.CartItemDTO;
 import com.swp391.techforge.dto.order.CheckoutRequest;
 import com.swp391.techforge.entity.*;
+import com.swp391.techforge.repository.authentication.RoleRepository;
+import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.repository.order.*;
 import com.swp391.techforge.repository.product.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +24,26 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
     private final VoucherRepository voucherRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
                         PaymentRepository paymentRepository,
                         VoucherRepository voucherRepository,
-                        ProductRepository productRepository) {
+                        ProductRepository productRepository,
+                        UserRepository userRepository,
+                        RoleRepository roleRepository,
+                        PasswordEncoder passwordEncoder) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.paymentRepository = paymentRepository;
         this.voucherRepository = voucherRepository;
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Voucher validateVoucher(String code, BigDecimal subtotal) {
@@ -106,8 +117,17 @@ public class OrderService {
             grandTotal = BigDecimal.ZERO;
         }
 
+        User orderUser = user;
+        if (orderUser == null && request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            orderUser = userRepository.findByEmail(request.getEmail().trim()).orElse(null);
+        }
+
+        if (orderUser == null) {
+            throw new IllegalStateException("Vui lòng đăng nhập tài khoản trước khi thực hiện đặt hàng!");
+        }
+
         Order order = new Order();
-        order.setUser(user);
+        order.setUser(orderUser);
         order.setRecipientName(request.getRecipientName());
         order.setPhone(request.getPhone());
         order.setEmail(request.getEmail());

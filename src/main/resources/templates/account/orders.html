@@ -4,11 +4,67 @@
 
 <body>
     <div th:fragment="content">
-        <div class="d-flex align-items-center border-bottom pb-3 mb-4">
-            <i class="bi bi-box-seam text-primary fs-4 me-2"></i>
-            <h5 class="fw-bold text-dark mb-0">Quản lý đơn hàng</h5>
+        <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-4">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-box-seam text-danger fs-4 me-2"></i>
+                <h5 class="fw-bold text-dark mb-0">Quản Lý Lịch Sử Đơn Hàng</h5>
+            </div>
+            <a th:href="@{/orders}" class="btn btn-outline-danger btn-sm fs-8 fw-bold">
+                <i class="bi bi-funnel me-1"></i> Tìm Kiếm &amp; Lọc Nâng Cao
+            </a>
         </div>
-        <p class="text-muted fs-7">Danh sách đơn hàng sẽ được xây dựng ở đây.</p>
+
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0 fs-7">
+                <thead class="table-light text-secondary">
+                    <tr>
+                        <th scope="col">Mã Đơn</th>
+                        <th scope="col">Ngày Đặt</th>
+                        <th scope="col">Người Nhận</th>
+                        <th scope="col" class="text-center">Thanh Toán</th>
+                        <th scope="col" class="text-center">Trạng Thái</th>
+                        <th scope="col" class="text-end">Tổng Tiền</th>
+                        <th scope="col" class="text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td><strong class="text-danger" th:text="'#' + ${order.orderId}">#1001</strong></td>
+                        <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">17/08/2026 10:30</td>
+                        <td>
+                            <strong class="text-dark" th:text="${order.recipientName}">Nguyễn Văn A</strong>
+                            <div class="fs-8 text-muted" th:text="${order.phone}">0988888888</div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary fs-8" th:text="${order.payment != null ? order.payment.method : 'COD'}">COD</span>
+                        </td>
+                        <td class="text-center">
+                            <span th:if="${order.status.name() == 'PENDING'}" class="badge bg-warning text-dark fs-8">Chờ xử lý</span>
+                            <span th:if="${order.status.name() == 'CONFIRMED'}" class="badge bg-info text-white fs-8">Đã xác nhận</span>
+                            <span th:if="${order.status.name() == 'SHIPPING'}" class="badge bg-primary fs-8">Đang giao hàng</span>
+                            <span th:if="${order.status.name() == 'DELIVERED'}" class="badge bg-success fs-8">Giao thành công</span>
+                            <span th:if="${order.status.name() == 'CANCELLED'}" class="badge bg-danger fs-8">Đã hủy</span>
+                        </td>
+                        <td class="text-end fw-bold text-danger" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                            18.020.000đ
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{'/orders/' + ${order.orderId}}" class="btn btn-outline-danger btn-sm px-2 py-0 fs-8 fw-semibold">
+                                <i class="bi bi-eye me-1"></i> Chi tiết
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(orders)}">
+                        <td colspan="7" class="text-center py-5">
+                            <i class="bi bi-journal-x text-muted display-4"></i>
+                            <p class="text-muted mt-2 fs-7 mb-0">Bạn chưa có đơn hàng nào!</p>
+                            <a th:href="@{/}" class="btn btn-danger btn-sm mt-3 px-4 fw-bold">Mua Sắm Ngay</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 

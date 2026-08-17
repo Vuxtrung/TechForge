@@ -33,7 +33,8 @@ public class BuildPcApiController {
     }
 
     @GetMapping("/components")
-    public ResponseEntity<List<BuildPcProductDto>> getComponents(
+    public ResponseEntity<List<BuildPcProductDto>> 
+            getComponents(
             @RequestParam String categoryName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -48,6 +49,8 @@ public class BuildPcApiController {
         Page<Category> catPage = categoryRepository.search(categoryName, null, true, PageRequest.of(0, 1));
         if (!catPage.isEmpty()) {
             categoryId = catPage.getContent().get(0).getCategoryId();
+        } else {
+            return ResponseEntity.ok(java.util.Collections.emptyList());
         }
         
         // Fetch products

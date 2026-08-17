@@ -1,6 +1,5 @@
 package com.swp391.techforge.entity;
 
-import jakarta.annotation.Generated;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
