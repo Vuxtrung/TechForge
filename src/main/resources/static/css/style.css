@@ -181,18 +181,9 @@ body {
 
 .login-box, .register-box { border: 1px solid #e5e7eb; padding: 30px; background-color: #ffffff; box-sizing: border-box; }
 
-.product-img {
-    height: 180px;
-    object-fit: contain;
-    background-color: #ffffff;
-}
+.product-img { height: 180px; object-fit: contain; background-color: #ffffff; }
 
-.text-truncate-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+.text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 .form-group { display: flex; flex-direction: column; gap: 7px; }
 
@@ -246,6 +237,17 @@ body {
 .register-submit { width: 100%; margin-top: 5px; border: none; cursor: pointer; }
 
 .register-submit:hover { background-color: #1f2937; }
+
+.register-form .field-error {
+                color: #dc3545;
+                font-size: 0.8rem;
+                margin-top: 4px;
+                display: block;
+            }
+            .register-form input.is-invalid,
+            .register-form textarea.is-invalid {
+                border-color: #dc3545 !important;
+            }
 
 @media (max-width: 700px) { .register-container { max-width: 500px; } .register-form-box { padding: 25px 20px; } }
 

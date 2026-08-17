@@ -12,6 +12,19 @@
 
     <!-- Register -->
     <main class="login-page">
+        <style>
+            .register-form .field-error {
+                color: #dc3545;
+                font-size: 0.8rem;
+                margin-top: 4px;
+                display: block;
+            }
+            .register-form input.is-invalid,
+            .register-form textarea.is-invalid {
+                border-color: #dc3545 !important;
+            }
+        </style>
+
         <div class="register-container">
 
             <section class="register-form-box">
@@ -30,7 +43,10 @@
                             Email đăng ký<span class="required">*</span>
                         </label>
 
-                        <input type="email" id="email" th:field="*{email}" placeholder="Nhập email của bạn" required>
+                        <input type="email" id="email" th:field="*{email}"
+                               th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                               placeholder="Nhập email của bạn">
+                        <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
                     </div>
 
                     <!-- Name -->
@@ -39,7 +55,10 @@
                             Tên<span class="required">*</span>
                         </label>
 
-                        <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nhập tên của bạn" required>
+                        <input type="text" id="fullName" th:field="*{fullName}"
+                               th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
+                               placeholder="Nhập tên của bạn">
+                        <span class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
                     </div>
 
                     <!-- Phone -->
@@ -48,7 +67,10 @@
                             Số di động<span class="required">*</span>
                         </label>
 
-                        <input type="tel" id="phone" th:field="*{phone}" placeholder="Nhập số điện thoại" required>
+                        <input type="tel" id="phone" th:field="*{phone}"
+                               th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'"
+                               placeholder="Nhập số điện thoại">
+                        <span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
                     </div>
 
                     <!-- Password -->
@@ -57,8 +79,10 @@
                             Mật khẩu<span class="required">*</span>
                         </label>
 
-                        <input type="password" id="password" th:field="*{password}" placeholder="Nhập mật khẩu"
-                            required>
+                        <input type="password" id="password" th:field="*{password}"
+                               th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'"
+                               placeholder="Nhập mật khẩu">
+                        <span class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
                     </div>
 
                     <!-- Confirm password -->
@@ -68,7 +92,9 @@
                         </label>
 
                         <input type="password" id="confirmPassword" th:field="*{confirmPassword}"
-                            placeholder="Nhập lại mật khẩu" required>
+                               th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'"
+                               placeholder="Nhập lại mật khẩu">
+                        <span class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
                     </div>
 
                     <!-- Address -->
@@ -77,8 +103,10 @@
                             Địa chỉ<span class="required">*</span>
                         </label>
 
-                        <textarea id="address" th:field="*{address}" rows="3" placeholder="Nhập địa chỉ của bạn"
-                            required></textarea>
+                        <textarea id="address" th:field="*{address}" rows="3"
+                                  th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'"
+                                  placeholder="Nhập địa chỉ của bạn"></textarea>
+                        <span class="field-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
                     </div>
 
                     <!-- Submit -->
