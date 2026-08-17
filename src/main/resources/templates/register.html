@@ -12,27 +12,12 @@
 
     <!-- Register -->
     <main class="login-page">
-        <style>
-            .register-form .field-error {
-                color: #dc3545;
-                font-size: 0.8rem;
-                margin-top: 4px;
-                display: block;
-            }
-            .register-form input.is-invalid,
-            .register-form textarea.is-invalid {
-                border-color: #dc3545 !important;
-            }
-        </style>
-
         <div class="register-container">
-
             <section class="register-form-box">
-
                 <h1>Tạo tài khoản khách hàng cá nhân</h1>
-
+                
+                <!-- Register form -->
                 <form th:action="@{/register}" th:object="${registerRequest}" method="post" class="register-form">
-
                     <!-- General error -->
                     <div th:if="${registerError}" class="alert alert-danger" th:text="${registerError}">
                     </div>
