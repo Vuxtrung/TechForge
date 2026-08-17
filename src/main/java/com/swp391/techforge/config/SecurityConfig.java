@@ -2,11 +2,9 @@ package com.swp391.techforge.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -18,8 +16,9 @@ import com.swp391.techforge.service.authentication.CustomUserDetailsService;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception {
 		http
+				.authenticationProvider(authenticationProvider)
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers(
 								"/",
@@ -27,13 +26,16 @@ public class SecurityConfig {
 								"/register",
 								"/css/**",
 								"/js/**",
-								"/images/**")
+								"/images/**",
+								"/forgot-password",
+								"/forgot-password/**",
+								"/reset-password")
 						.permitAll()
 
-                        .requestMatchers("/account/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
-                )
+						.requestMatchers("/account/**", "/checkout/**").authenticated()
+						.requestMatchers("/admin/**").hasRole("ADMIN")
+						.anyRequest().permitAll()
+				)
 
 				.formLogin(form -> form
 						.loginPage("/login")

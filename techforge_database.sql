@@ -47,6 +47,10 @@ CREATE TABLE users (
         REFERENCES roles(role_id)
 ) ENGINE = InnoDB;
 
+INSERT INTO users (user_id, role_id, full_name, email, password_hash, phone, address, status) VALUES
+    (1, 5, 'TechForge Admin', 'admin@techforge.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIui', '0988888888', 'Hà Nội', 'ACTIVE'),
+    (2, 2, 'Khách Hàng Mẫu', 'customer@techforge.com', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIui', '0977777777', 'Hà Nội', 'ACTIVE');
+
 
 -- =========================================================
 -- 3. CATEGORIES
@@ -379,20 +383,19 @@ CREATE TABLE voucher_usages (
 
 
 -- =========================================================
--- 18. PASSWORD RESET OTP
+-- 18. PASSWORD RESET OTP VERIFICATION
 -- =========================================================
 
-CREATE TABLE password_reset_otp (
+CREATE TABLE otp_verification (
     otp_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    otp_code VARCHAR(10) NOT NULL,
-    expires_at DATETIME NOT NULL,
-    used TINYINT(1) DEFAULT 0,
+    email VARCHAR(150) NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    purpose ENUM('REGISTER','RESET_PASSWORD','CHECKOUT') NOT NULL,
+    expired_at DATETIME NOT NULL,
+    attempt_count INT NOT NULL DEFAULT 0,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT password_reset_otp_ibfk_1
-        FOREIGN KEY (user_id)
-        REFERENCES users(user_id)
+    INDEX idx_email_purpose (email, purpose)
 ) ENGINE = InnoDB;
 
 

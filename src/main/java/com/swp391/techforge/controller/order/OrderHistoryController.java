@@ -2,15 +2,16 @@ package com.swp391.techforge.controller.order;
 
 import com.swp391.techforge.dto.cart.CartItemDTO;
 import com.swp391.techforge.entity.*;
+import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.service.order.OrderService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -25,9 +26,11 @@ public class OrderHistoryController {
     private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
 
     private final OrderService orderService;
+    private final UserRepository userRepository;
 
-    public OrderHistoryController(OrderService orderService) {
+    public OrderHistoryController(OrderService orderService, UserRepository userRepository) {
         this.orderService = orderService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -35,7 +38,8 @@ public class OrderHistoryController {
                                    @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                    @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                    @RequestParam(value = "search", required = false) String search,
-                                   Model model) {
+                                   Model model,
+                                   Principal principal) {
 
         OrderStatus status = null;
         if (statusStr != null && !statusStr.trim().isEmpty()) {
@@ -48,7 +52,12 @@ public class OrderHistoryController {
         LocalDateTime startDateTime = (startDate != null) ? startDate.atStartOfDay() : null;
         LocalDateTime endDateTime = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
 
-        List<Order> orders = orderService.getCustomerOrders(null, status, startDateTime, endDateTime, search);
+        User loggedInUser = null;
+        if (principal != null) {
+            loggedInUser = userRepository.findByEmail(principal.getName()).orElse(null);
+        }
+
+        List<Order> orders = orderService.getCustomerOrders(loggedInUser, status, startDateTime, endDateTime, search);
 
         model.addAttribute("orders", orders);
         model.addAttribute("selectedStatus", statusStr);
