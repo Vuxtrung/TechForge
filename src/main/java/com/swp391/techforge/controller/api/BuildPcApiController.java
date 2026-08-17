@@ -33,7 +33,8 @@ public class BuildPcApiController {
     }
 
     @GetMapping("/components")
-    public ResponseEntity<List<BuildPcProductDto>> getComponents(
+    public ResponseEntity<List<BuildPcProductDto>> 
+            getComponents(
             @RequestParam String categoryName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,

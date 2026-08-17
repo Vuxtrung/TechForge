@@ -275,14 +275,13 @@ function addToCartAll() {
     const productIds = Object.values(selectedComponents).map(p => p.productId);
     if (productIds.length === 0) return;
     
-    // Disable button to prevent double click
+
     const btn = document.getElementById('btnAddToCart');
     const originalText = btn.innerHTML;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ĐANG THÊM...`;
     btn.disabled = true;
 
-    // Simulate adding all items to cart (or make multiple API calls / one bulk API call)
-    // We assume there's a cart API, if not we just show success.
+    
     let addedCount = 0;
     let errorCount = 0;
     
@@ -300,10 +299,7 @@ function addToCartAll() {
     ))
     .then(responses => {
         alert("Đã thêm toàn bộ linh kiện vào giỏ hàng thành công!");
-        // Clear state if desired:
-        // selectedComponents = {};
-        // saveState();
-        // window.location.href = '/cart';
+
     })
     .catch(err => {
         console.error(err);
