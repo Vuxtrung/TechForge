@@ -1,13 +1,34 @@
 package com.swp391.techforge.dto.order;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 public class CheckoutRequest {
+
+    @NotBlank(message = "Họ tên người nhận không được để trống")
     private String recipientName;
+
+    @NotBlank(message = "Số điện thoại không được để trống")
+    @Pattern(regexp = "^(0[35789])[0-9]{8}$", message = "Số điện thoại phải gồm đúng 10 chữ số hợp lệ (VD: 0988888888)")
     private String phone;
+
+    @NotBlank(message = "Email không được để trống")
+    @Email(message = "Email không đúng định dạng")
     private String email;
+
+    @NotBlank(message = "Tỉnh / Thành phố không được để trống")
     private String province;
+
+    @NotBlank(message = "Quận / Huyện không được để trống")
     private String district;
+
+    @NotBlank(message = "Phường / Xã không được để trống")
     private String ward;
+
+    @NotBlank(message = "Địa chỉ chi tiết không được để trống")
     private String addressLine;
+
     private String orderNote;
     private String paymentMethod; // COD or VNPAY
     private String shippingMethod; // STANDARD (30.000đ) or EXPRESS (50.000đ)
