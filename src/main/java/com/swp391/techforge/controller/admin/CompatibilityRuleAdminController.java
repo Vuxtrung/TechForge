@@ -31,30 +31,47 @@ public class CompatibilityRuleAdminController {
     }
 
     @PostMapping("/save")
-    public String saveRule(@ModelAttribute CompatibilityRule rule) {
-        ruleService.saveRule(rule);
+    public String saveRule(@ModelAttribute CompatibilityRule rule, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            if (rule.getIsActive() == null) rule.setIsActive(true);
+            ruleService.saveRule(rule);
+            redirectAttributes.addFlashAttribute("successMessage", "Lưu quy tắc thành công!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi lưu quy tắc: " + e.getMessage());
+        }
         return "redirect:/admin/compatibility-rules";
     }
 
     @GetMapping("/edit/{id}")
-    public String editRuleForm(@PathVariable Long id, Model model) {
+    public String editRuleForm(@PathVariable Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         Optional<CompatibilityRule> rule = ruleService.getRuleById(id);
         if (rule.isPresent()) {
             model.addAttribute("rule", rule.get());
             return "admin/compatibility/form";
         }
+        redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy quy tắc này!");
         return "redirect:/admin/compatibility-rules";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteRule(@PathVariable Long id) {
-        ruleService.deleteRule(id);
+    public String deleteRule(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            ruleService.deleteRule(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã xóa quy tắc!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi xóa quy tắc!");
+        }
         return "redirect:/admin/compatibility-rules";
     }
 
     @GetMapping("/toggle/{id}")
-    public String toggleRuleStatus(@PathVariable Long id) {
-        ruleService.toggleRuleStatus(id);
+    public String toggleRuleStatus(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            ruleService.toggleRuleStatus(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái quy tắc!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi khi cập nhật trạng thái!");
+        }
         return "redirect:/admin/compatibility-rules";
     }
 }

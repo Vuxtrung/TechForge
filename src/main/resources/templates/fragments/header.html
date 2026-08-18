@@ -110,7 +110,7 @@
         >
           <!-- Brand Logo -->
           <a
-            th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/} : @{/}"
+            th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin} : @{/}"
             class="text-decoration-none d-flex align-items-center gap-2"
           >
             <div

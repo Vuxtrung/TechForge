@@ -26,18 +26,18 @@
             </div>
 
             <form th:action="@{/admin/compatibility-rules/save}" th:object="${rule}" method="post">
-              <input type="hidden" th:field="*{id}" />
-              <input type="hidden" th:field="*{isActive}" />
+              <input type="hidden" name="id" th:value="${rule.id}" />
+              <input type="hidden" name="isActive" th:value="${rule.getIsActive()}" />
 
               <div class="mb-3">
                 <label for="ruleName" class="form-label fw-bold">Tên Quy Tắc <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="ruleName" th:field="*{ruleName}" required
+                <input type="text" class="form-control" id="ruleName" name="ruleName" th:value="${rule.ruleName}" required
                        placeholder="Ví dụ: Kiểm tra Socket CPU và Mainboard" />
               </div>
 
               <div class="mb-3">
                 <label for="expression" class="form-label fw-bold">Biểu Thức SpEL <span class="text-danger">*</span></label>
-                <textarea class="form-control font-monospace" id="expression" th:field="*{expression}" rows="3" required
+                <textarea class="form-control font-monospace" id="expression" name="expression" th:text="${rule.expression}" rows="3" required
                           placeholder="Ví dụ: #CPU_Socket == #Mainboard_Socket" style="background-color: #f8f9fa;"></textarea>
                 <div class="form-text">
                   <strong>Các biến hỗ trợ:</strong> <code>#CPU_Socket</code>, <code>#CPU_TDP</code>, <code>#Mainboard_Socket</code>, <code>#Mainboard_RAM_Type</code>, <code>#RAM_Type</code>, <code>#VGA_TDP</code>, <code>#PSU_Wattage</code>, <code>#Total_Wattage</code>
@@ -46,15 +46,15 @@
 
               <div class="mb-3">
                 <label for="severity" class="form-label fw-bold">Loại Cảnh Báo <span class="text-danger">*</span></label>
-                <select class="form-select" id="severity" th:field="*{severity}">
-                  <option value="ERROR">Lỗi (Ngăn chặn Build)</option>
-                  <option value="WARNING">Cảnh Báo (Vẫn cho phép Build)</option>
+                <select class="form-select" id="severity" name="severity">
+                  <option value="ERROR" th:selected="${rule.severity == 'ERROR'}">Lỗi (Ngăn chặn Build)</option>
+                  <option value="WARNING" th:selected="${rule.severity == 'WARNING'}">Cảnh Báo (Vẫn cho phép Build)</option>
                 </select>
               </div>
 
               <div class="mb-4">
                 <label for="message" class="form-label fw-bold">Nội Dung Thông Báo <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="message" th:field="*{message}" rows="2" required
+                <textarea class="form-control" id="message" name="message" th:text="${rule.message}" rows="2" required
                           placeholder="Ví dụ: Lỗi tương thích: Socket CPU không khớp với Mainboard."></textarea>
               </div>
 
@@ -70,6 +70,6 @@
       </div>
     </main>
     
-    <div th:replace="~{fragments/footer :: footer-scripts}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
   </body>
 </html>
