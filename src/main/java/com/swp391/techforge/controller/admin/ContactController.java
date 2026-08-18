@@ -83,6 +83,9 @@ public class ContactController {
 
     @GetMapping("/admin/contacts/{id}")
     public String viewContactDetail(@PathVariable Long id, Model model) {
+        if (id == null) {
+            return "admin/contacts";
+        }
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin liên hệ với ID: " + id));
         model.addAttribute("contact", contact);
@@ -91,6 +94,9 @@ public class ContactController {
 
     @PostMapping("/admin/contacts/{id}/delete")
     public String deleteContact(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        if (id == null) {
+            return "admin/contacts";
+        }
         if (!contactRepository.existsById(id)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy liên hệ để xoá.");
             return "redirect:/admin/contacts";
@@ -105,6 +111,9 @@ public class ContactController {
     public String replyContact(@PathVariable Long id,
             @RequestParam("replyMessage") String replyMessage,
             Model model) {
+        if (id == null) {
+            return "admin/contacts";
+        }
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin liên hệ với ID: " + id));
 
