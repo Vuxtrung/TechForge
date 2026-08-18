@@ -95,10 +95,12 @@
                     <textarea
                       th:field="*{description}"
                       class="form-control"
+                      th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"
                       rows="3"
                       placeholder="Mô tả ngắn gọn về danh mục..."
-                      maxlength="500"
+                      maxlength="255"
                     ></textarea>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
                   </div>
 
                   <div class="row">
