@@ -3,6 +3,7 @@ package com.swp391.techforge.controller.admin;
 import com.swp391.techforge.entity.WarrantyTicket;
 import com.swp391.techforge.entity.WarrantyTicketStatus;
 import com.swp391.techforge.service.warranty.WarrantyTicketService;
+import com.swp391.techforge.util.SortUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,11 +22,17 @@ public class WarrantyTicketController {
 
     @GetMapping
     public String list(@RequestParam(required = false) String keyword,
-                       @RequestParam(required = false) String status,
-                       @RequestParam(defaultValue = "0") int page,
-                       Model model) {
-        Page<WarrantyTicket> ticketPage = warrantyTicketService.search(keyword, status, page, 10);
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "createdAt,desc") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+
+        Page<WarrantyTicket> ticketPage = warrantyTicketService.search(
+                keyword, status, page, size, SortUtil.parse(sort, "createdAt", "desc"));
         model.addAttribute("ticketPage", ticketPage);
+        model.addAttribute("sort", sort);
+        model.addAttribute("size", size);
         model.addAttribute("keyword", keyword);
         model.addAttribute("status", status);
         model.addAttribute("statuses", WarrantyTicketStatus.values());
@@ -42,11 +49,11 @@ public class WarrantyTicketController {
 
     @PostMapping("/receive")
     public String receive(@RequestParam Long userId,
-                          @RequestParam String imeiSerial,
-                          @RequestParam(required = false) String phoneLookup,
-                          @RequestParam(required = false) String issueDesc,
-                          @RequestParam(required = false) Long orderItemId,
-                          RedirectAttributes redirectAttributes) {
+            @RequestParam String imeiSerial,
+            @RequestParam(required = false) String phoneLookup,
+            @RequestParam(required = false) String issueDesc,
+            @RequestParam(required = false) Long orderItemId,
+            RedirectAttributes redirectAttributes) {
         try {
             warrantyTicketService.receiveProduct(userId, imeiSerial, phoneLookup, issueDesc, orderItemId);
             redirectAttributes.addFlashAttribute("successMessage", "Tiếp nhận sản phẩm bảo hành thành công.");
@@ -58,9 +65,9 @@ public class WarrantyTicketController {
 
     @PostMapping("/{id}/update")
     public String update(@PathVariable Long id,
-                         @RequestParam(required = false) String status,
-                         @RequestParam(required = false) String assignedStaffId,
-                         RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String assignedStaffId,
+            RedirectAttributes redirectAttributes) {
         try {
             warrantyTicketService.updateProgress(id, status, assignedStaffId);
             redirectAttributes.addFlashAttribute("successMessage", "Cập nhật tiến độ kỹ thuật thành công.");

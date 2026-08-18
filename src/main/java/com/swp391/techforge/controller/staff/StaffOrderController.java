@@ -4,8 +4,8 @@ import com.swp391.techforge.entity.Order;
 import com.swp391.techforge.entity.OrderStatus;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.util.ExcelExportUtil;
+import com.swp391.techforge.util.SortUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -46,15 +46,11 @@ public class StaffOrderController {
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        String[] sortParts = sort.split(",");
-        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
-                ? Sort.Direction.DESC : Sort.Direction.ASC;
-
         LocalDateTime start = startDate != null ? startDate.atStartOfDay() : null;
         LocalDateTime end = endDate != null ? endDate.atTime(LocalTime.MAX) : null;
 
         Page<Order> orderPage = orderService.searchForStaff(search, status, start, end, page, size,
-                Sort.by(direction, sortParts[0]));
+            SortUtil.parse(sort, "orderDate", "desc"));
 
         model.addAttribute("orderPage", orderPage);
         model.addAttribute("search", search);
