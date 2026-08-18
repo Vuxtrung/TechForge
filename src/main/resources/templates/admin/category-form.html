@@ -107,7 +107,8 @@
                       <label class="form-label fw-semibold"
                         >Loại Danh Mục <span class="text-danger">*</span></label
                       >
-                      <select th:field="*{type}" class="form-select" required>
+                      <select th:field="*{type}" class="form-select"
+                        th:classappend="${#fields.hasErrors('type')} ? 'is-invalid'" required>
                         <option value="">-- Chọn loại --</option>
                         <option value="PC_PRODUCT">
                           Sản phẩm PC (bán trực tiếp)
@@ -116,6 +117,7 @@
                           Linh kiện (dùng cho Build PC)
                         </option>
                       </select>
+                      <div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></div>
                     </div>
 
                     <!-- Parent category -->
