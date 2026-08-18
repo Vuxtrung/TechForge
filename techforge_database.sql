@@ -457,6 +457,20 @@ CREATE TABLE compatibility_rules (
 ) ENGINE = InnoDB;
 
 
+-- ====================================
+-- 22. CONTACT
+-- ====================================
+
+CREATE TABLE contacts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE = InnoDB;
+
+
 -- ===================================
 -- DONE
 -- ===================================
