@@ -110,7 +110,7 @@
         >
           <!-- Brand Logo -->
           <a
-            th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin} : @{/}"
+            th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/products} : @{/}"
             class="text-decoration-none d-flex align-items-center gap-2"
           >
             <div
@@ -188,19 +188,9 @@
               <span class="fs-8 mt-1">Giỏ hàng</span>
             </a>
 
-            <!-- Admin Dashboard Button -->
-            <a
-              th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
-              th:href="@{/admin/products}"
-              class="btn btn-outline-warning btn-sm d-flex align-items-center gap-1 py-2 px-3 fw-bold rounded-pill text-white border-white-50"
-            >
-              <i class="bi bi-speedometer2 fs-6 text-warning"></i>
-              <span class="d-none d-md-inline fs-7">Dashboard</span>
-            </a>
-
             <!-- Account Link -->
             <a
-              th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/account} : (${#authorization.expression('isAuthenticated()')} ? @{/account} : @{/login})"
+              th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/products} : (${#authorization.expression('isAuthenticated()')} ? @{/account} : @{/login})"
               class="header-action-btn text-white text-decoration-none d-flex flex-column align-items-center"
             >
               <i class="bi bi-person-circle fs-5" th:classappend="${#authorization.expression('hasRole(''ADMIN'')')} ? 'text-warning' : ''"></i>
