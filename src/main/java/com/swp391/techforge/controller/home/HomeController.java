@@ -22,8 +22,8 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        // 1. Fetch categories for Homepage Menu
-        model.addAttribute("categories", categoryService.findRootCategoriesForNav());
+        // 1. Fetch top categories (nhiều sản phẩm nhất) for Homepage Menu
+        model.addAttribute("categories", categoryService.findTopCategoriesByProductCount(4));
 
         // 2. Fetch top 8 active products for Flash Sale
         Page<Product> productPage = productService.search(null, null, "ACTIVE", 0, 8, Sort.by(Sort.Direction.DESC, "productId"));
