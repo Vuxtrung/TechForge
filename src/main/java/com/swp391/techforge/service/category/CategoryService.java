@@ -109,7 +109,7 @@ public class CategoryService {
 
         categoryRepository.delete(category);
     }
-
+    // Đệ quy ẩn danh mục con khi ẩn danh mục cha
     private void cascadeDeactivate(Long parentId) {
         List<Category> children = categoryRepository.findAllByParent_CategoryId(parentId);
         for (Category child : children) {

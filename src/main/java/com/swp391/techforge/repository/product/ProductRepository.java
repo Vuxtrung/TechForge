@@ -16,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByNameIgnoreCaseAndProductIdNot(String name, Long productId);
 
+    // Dùng cho trang admin: tìm kiếm sản phẩm theo keyword, categoryId, status
     @Query("""
             SELECT p FROM Product p
             WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
