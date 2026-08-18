@@ -27,7 +27,7 @@ public class WarrantyTicketService {
     }
 
     @Transactional(readOnly = true)
-    public Page<WarrantyTicket> search(String keyword, String status, int page, int size) {
+    public Page<WarrantyTicket> search(String keyword, String status, int page, int size, Sort sort) {
         WarrantyTicketStatus ticketStatus = null;
         if (status != null && !status.isBlank()) {
             try {
@@ -37,10 +37,7 @@ public class WarrantyTicketService {
             }
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        if (keyword == null || keyword.isBlank()) {
-            return warrantyTicketRepository.findAllByOrderByCreatedAtDesc(pageable);
-        }
+        Pageable pageable = PageRequest.of(page, size, sort);
         return warrantyTicketRepository.search(keyword, ticketStatus, pageable);
     }
 
