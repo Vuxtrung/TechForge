@@ -68,9 +68,15 @@ public class ProductService {
         };
         Pageable pageable = PageRequest.of(filter.getPage(), filter.getPageSize(), sort);
 
+        // Nếu có lọc theo category, lấy luôn cả danh mục con cháu (đệ quy) để
+        // bấm vào category cha (VD: "CPU - Vi Xử Lý") vẫn ra sản phẩm nằm ở category con
+        List<Long> categoryIds = filter.getCategoryId() != null
+                ? categoryRepository.findSelfAndDescendantIds(filter.getCategoryId())
+                : null;
+
         Page<Product> result = productRepository.searchPublic(
                 filter.getKeyword(),
-                filter.getCategoryId(),
+                categoryIds,
                 filter.getType(),
                 filter.getBrand(),
                 filter.getMinPrice(),

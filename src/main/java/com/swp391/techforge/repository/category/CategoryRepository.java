@@ -39,6 +39,19 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query(value = "SELECT COUNT(*) FROM products WHERE category_id = :categoryId", nativeQuery = true)
     long countProductsByCategoryId(@Param("categoryId") Long categoryId);
 
+    // Lấy id của chính danh mục này VÀ toàn bộ danh mục con cháu (đệ quy),
+    // dùng để lọc sản phẩm khi bấm vào 1 danh mục cha ở trang chủ / trang danh sách
+    @Query(value = """
+            WITH RECURSIVE category_tree AS (
+                SELECT category_id FROM categories WHERE category_id = :categoryId
+                UNION ALL
+                SELECT c.category_id FROM categories c
+                INNER JOIN category_tree ct ON c.parent_id = ct.category_id
+            )
+            SELECT category_id FROM category_tree
+            """, nativeQuery = true)
+    List<Long> findSelfAndDescendantIds(@Param("categoryId") Long categoryId);
+
     // Đếm sản phẩm của danh mục VÀ tất cả danh mục con (đệ quy)
     @Query(value = """
             WITH RECURSIVE category_tree AS (
