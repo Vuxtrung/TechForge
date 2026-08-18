@@ -66,7 +66,6 @@ CREATE TABLE categories (
     created_at DATETIME(6),
     description VARCHAR(255),
     updated_at DATETIME(6),
-    
     CONSTRAINT categories_ibfk_1
         FOREIGN KEY (parent_id)
         REFERENCES categories(category_id)
@@ -454,6 +453,20 @@ CREATE TABLE compatibility_rules (
     message VARCHAR(500) NOT NULL,
     severity VARCHAR(50) NOT NULL,
     is_active TINYINT(1) DEFAULT 1
+) ENGINE = InnoDB;
+
+
+-- ====================================
+-- 22. CONTACT
+-- ====================================
+
+CREATE TABLE contacts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE = InnoDB;
 
 

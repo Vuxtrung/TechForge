@@ -33,10 +33,15 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
+        if (size < 1) {
+            size = 1;
+        }
+
         // Parse sort parameter
         String[] sortParts = sort.split(",");
         Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
-                ? Sort.Direction.DESC : Sort.Direction.ASC;
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
 
         // Thực hiện tìm kiếm
         Page<User> userPage = userService.search(keyword, roleId, status, page, size,
@@ -48,6 +53,7 @@ public class UserController {
         model.addAttribute("roleId", roleId);
         model.addAttribute("status", status);
         model.addAttribute("sort", sort);
+        model.addAttribute("size", size);
         model.addAttribute("userStatuses", UserStatus.values());
 
         return "admin/user-list";

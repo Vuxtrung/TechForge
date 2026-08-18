@@ -8,6 +8,10 @@ import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.repository.order.*;
 import com.swp391.techforge.repository.product.ProductRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,6 +182,49 @@ public class OrderService {
 
     public List<Order> getCustomerOrders(User user, OrderStatus status, LocalDateTime startDate, LocalDateTime endDate, String search) {
         return orderRepository.filterCustomerOrders(user, status, startDate, endDate, search);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Order> searchForStaff(String search, String status, LocalDateTime startDate, LocalDateTime endDate,
+                                     int page, int size, Sort sort) {
+        OrderStatus orderStatus = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                orderStatus = OrderStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                // ignore invalid status
+            }
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return orderRepository.searchForStaff(orderStatus, startDate, endDate, search, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Order> getAllOrdersForStaffExport(String search, String status, LocalDateTime startDate, LocalDateTime endDate) {
+        OrderStatus orderStatus = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                orderStatus = OrderStatus.valueOf(status.trim().toUpperCase());
+                
+            } catch (IllegalArgumentException ignored) {
+                // ignore invalid status
+            }
+        }
+
+        final OrderStatus finalOrderStatus = orderStatus;
+        
+        // Get all orders without pagination for export
+        return orderRepository.findAll().stream()
+                .filter(o -> finalOrderStatus == null || o.getStatus() == finalOrderStatus)
+                .filter(o -> startDate == null || o.getOrderDate().isAfter(startDate) || o.getOrderDate().isEqual(startDate))
+                .filter(o -> endDate == null || o.getOrderDate().isBefore(endDate) || o.getOrderDate().isEqual(endDate))
+                .filter(o -> search == null || search.isBlank() ||
+                        o.getOrderId().toString().contains(search) ||
+                        (o.getRecipientName() != null && o.getRecipientName().toLowerCase().contains(search.toLowerCase())) ||
+                        (o.getPhone() != null && o.getPhone().contains(search)))
+                .sorted((a, b) -> b.getOrderDate().compareTo(a.getOrderDate()))
+                .toList();
     }
 
     public Optional<Order> getOrderById(Long orderId) {

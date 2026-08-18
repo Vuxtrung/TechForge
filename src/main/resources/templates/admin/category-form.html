@@ -1,107 +1,182 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title
+      th:text="${category.categoryId == null ? 'Thêm Danh Mục' : 'Sửa Danh Mục'}"
+    >
+      Danh Mục
+    </title>
+  </head>
 
-<head th:replace="~{fragments/header :: header-head}">
-    <meta charset="UTF-8">
-    <title th:text="${category.categoryId == null ? 'Thêm Danh Mục' : 'Sửa Danh Mục'}">Danh Mục</title>
-</head>
-
-<body>
+  <body>
     <div th:replace="~{fragments/header :: header}"></div>
 
     <main class="main-body d-flex">
       <!-- Sidebar -->
       <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
-      
+
       <!-- Main Content -->
-      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+      <div
+        class="content flex-grow-1 p-4 bg-light"
+        style="min-height: calc(100vh - 72px)"
+      >
         <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-lg-9">
-                    <div class="bg-white rounded-3 shadow-sm border p-4">
-
-                        <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
-                            <span class="fs-4 text-dark fw-bold">
-                                <i class="bi bi-tags text-danger"></i>
-                                <span th:text="${category.categoryId == null ? 'Thêm Danh Mục Mới' : 'Cập Nhật Danh Mục'}">Danh Mục</span>
-                            </span>
-                            <a th:href="@{/admin/categories}" class="btn btn-outline-secondary btn-sm">
-                                <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
-                            </a>
-                        </div>
-
-                        <div th:if="${errorMessage}" class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle me-1"></i> <span th:text="${errorMessage}"></span>
-                        </div>
-
-                        <form th:action="${category.categoryId == null ? '/admin/categories' : '/admin/categories/' + category.categoryId}"
-                              th:object="${category}" method="post" novalidate>
-
-                            <!-- Name -->
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Tên Danh Mục <span class="text-danger">*</span></label>
-                                <input type="text" th:field="*{name}" class="form-control"
-                                       th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
-                                       placeholder="VD: CPU - Bộ Vi Xử Lý" required maxlength="100">
-                                <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-                            </div>
-
-                            <!-- Description -->
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Mô Tả</label>
-                                <textarea th:field="*{description}" class="form-control" rows="3"
-                                          placeholder="Mô tả ngắn gọn về danh mục..." maxlength="500"></textarea>
-                            </div>
-
-                            <div class="row">
-                                <!-- Type -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-semibold">Loại Danh Mục <span class="text-danger">*</span></label>
-                                    <select th:field="*{type}" class="form-select" required>
-                                        <option value="">-- Chọn loại --</option>
-                                        <option value="PC_PRODUCT">Sản phẩm PC (bán trực tiếp)</option>
-                                        <option value="PC_COMPONENT">Linh kiện (dùng cho Build PC)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Parent category -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label fw-semibold">Danh Mục Cha</label>
-                                    <select th:field="*{parentId}" class="form-select">
-                                        <option value="">-- Không có (danh mục gốc) --</option>
-                                        <option th:each="p : ${parentCategories}"
-                                                th:if="${p.categoryId != category.categoryId}"
-                                                th:value="${p.categoryId}"
-                                                th:text="${p.name}">Danh mục cha</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Active toggle -->
-                            <div class="form-check form-switch mb-4">
-                                <input class="form-check-input" type="checkbox" th:field="*{active}" role="switch" id="activeSwitch">
-                                <label class="form-check-label fw-semibold" for="activeSwitch">
-                                    Hiển thị danh mục này trên website
-                                </label>
-                            </div>
-
-                            <div class="d-flex gap-2 justify-content-end border-top pt-3">
-                                <a th:href="@{/admin/categories}" class="btn btn-outline-secondary px-4">Hủy</a>
-                                <button type="submit" class="btn btn-danger px-4 fw-semibold">
-                                    <i class="bi bi-check-lg me-1"></i>
-                                    <span th:text="${category.categoryId == null ? 'Thêm Danh Mục' : 'Lưu Thay Đổi'}">Lưu</span>
-                                </button>
-                            </div>
-                        </form>
-
-                    </div>
+          <div class="row justify-content-center">
+            <div class="col-lg-9">
+              <div class="bg-white rounded-3 shadow-sm border p-4">
+                <div
+                  class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2"
+                >
+                  <span class="fs-4 text-dark fw-bold">
+                    <i class="bi bi-tags text-danger"></i>
+                    <span
+                      th:text="${category.categoryId == null ? 'Thêm Danh Mục Mới' : 'Cập Nhật Danh Mục'}"
+                      >Danh Mục</span
+                    >
+                  </span>
+                  <a
+                    th:href="@{/admin/categories}"
+                    class="btn btn-outline-secondary btn-sm"
+                  >
+                    <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
+                  </a>
                 </div>
+
+                <!-- Success and error messages -->
+                <div
+                  th:if="${successMessage}"
+                  class="alert alert-success alert-dismissible fade show"
+                  role="alert"
+                >
+                  <i class="bi bi-check-circle me-1"></i>
+                  <span th:text="${successMessage}"></span>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                  ></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger">
+                  <i class="bi bi-exclamation-triangle me-1"></i>
+                  <span th:text="${errorMessage}"></span>
+                </div>
+
+                <form
+                  th:action="${category.categoryId == null ? '/admin/categories' : '/admin/categories/' + category.categoryId}"
+                  th:object="${category}"
+                  method="post"
+                  novalidate
+                >
+                  <!-- Name -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold"
+                      >Tên Danh Mục <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      th:field="*{name}"
+                      class="form-control"
+                      th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                      placeholder="VD: CPU - Bộ Vi Xử Lý"
+                      required
+                      maxlength="100"
+                    />
+                    <div
+                      class="invalid-feedback"
+                      th:if="${#fields.hasErrors('name')}"
+                      th:errors="*{name}"
+                    ></div>
+                  </div>
+
+                  <!-- Description -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Mô Tả</label>
+                    <textarea
+                      th:field="*{description}"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Mô tả ngắn gọn về danh mục..."
+                      maxlength="500"
+                    ></textarea>
+                  </div>
+
+                  <div class="row">
+                    <!-- Type -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold"
+                        >Loại Danh Mục <span class="text-danger">*</span></label
+                      >
+                      <select th:field="*{type}" class="form-select" required>
+                        <option value="">-- Chọn loại --</option>
+                        <option value="PC_PRODUCT">
+                          Sản phẩm PC (bán trực tiếp)
+                        </option>
+                        <option value="PC_COMPONENT">
+                          Linh kiện (dùng cho Build PC)
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- Parent category -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold">Danh Mục Cha</label>
+                      <select th:field="*{parentId}" class="form-select">
+                        <option value="">-- Không có (danh mục gốc) --</option>
+                        <option
+                          th:each="p : ${parentCategories}"
+                          th:if="${p.categoryId != category.categoryId}"
+                          th:value="${p.categoryId}"
+                          th:text="${p.name}"
+                        >
+                          Danh mục cha
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Active toggle -->
+                  <div class="form-check form-switch mb-4">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      th:field="*{active}"
+                      role="switch"
+                      id="activeSwitch"
+                    />
+                    <label
+                      class="form-check-label fw-semibold"
+                      for="activeSwitch"
+                    >
+                      Hiển thị danh mục này trên website
+                    </label>
+                  </div>
+
+                  <div class="d-flex gap-2 justify-content-end border-top pt-3">
+                    <a
+                      th:href="@{/admin/categories}"
+                      class="btn btn-outline-secondary px-4"
+                      >Hủy</a
+                    >
+                    <button
+                      type="submit"
+                      class="btn btn-danger px-4 fw-semibold"
+                    >
+                      <i class="bi bi-check-lg me-1"></i>
+                      <span
+                        th:text="${category.categoryId == null ? 'Thêm Danh Mục' : 'Lưu Thay Đổi'}"
+                        >Lưu</span
+                      >
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
+          </div>
         </div>
       </div>
     </main>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
-</body>
-
+  </body>
 </html>
