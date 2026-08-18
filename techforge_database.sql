@@ -66,7 +66,6 @@ CREATE TABLE categories (
     created_at DATETIME(6),
     description VARCHAR(255),
     updated_at DATETIME(6),
-    
     CONSTRAINT categories_ibfk_1
         FOREIGN KEY (parent_id)
         REFERENCES categories(category_id)

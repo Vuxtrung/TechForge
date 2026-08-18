@@ -10,9 +10,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-
+    // Check trùng ở validatename
     boolean existsByNameIgnoreCase(String name);
-
+    // Check trùng khi sửa
     boolean existsByNameIgnoreCaseAndCategoryIdNot(String name, Long categoryId);
 
     List<Category> findAllByActiveTrueOrderByNameAsc();
@@ -20,10 +20,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     // Lấy danh mục gốc (cha) đang active, dùng cho mega-menu ở header
     List<Category> findAllByParentIsNullAndActiveTrueOrderByNameAsc();
 
-    // Lấy toàn bộ danh mục con trực tiếp của 1 danh mục (dùng cho cascade ẩn/hiện)
-    List<Category> findAllByParent_CategoryId(Long parentId);
+    // Lấy toàn bộ danh mục con trực tiếp của 1 danh mục (dùng cho cascade ẩn/hiện) đi qua field Parent và lấy categoryId của nó
+    List<Category> findAllByParent_CategoryId(Long parentId); 
 
-    // Lấy toàn bộ danh mục con trực tiếp của 1 danh mục đang active (dùng cho dropdown filter)
+    // Lấy toàn bộ danh mục con trực tiếp của 1 danh mục đang active cho màn admin có thể lọc theo tên, type, active - mỗi điều kiện đều không bắt buộc
     @Query("""
             SELECT c FROM Category c
             WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
@@ -51,4 +51,24 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
             WHERE category_id IN (SELECT category_id FROM category_tree)
             """, nativeQuery = true)
     long countProductsByCategoryIdRecursive(@Param("categoryId") Long categoryId);
+
+          // Lấy ID của N danh mục gốc có nhiều sản phẩm nhất (tính cả sản phẩm của danh mục con, đệ quy)
+    @Query(value = """
+            WITH RECURSIVE category_tree AS (
+                SELECT category_id, category_id AS root_id
+                FROM categories
+                WHERE parent_id IS NULL AND is_active = true
+                UNION ALL
+                SELECT c.category_id, ct.root_id
+                FROM categories c
+                INNER JOIN category_tree ct ON c.parent_id = ct.category_id
+            )
+            SELECT ct.root_id
+            FROM category_tree ct
+            INNER JOIN products p ON p.category_id = ct.category_id
+            GROUP BY ct.root_id
+            ORDER BY COUNT(p.product_id) DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<Long> findTopRootCategoryIdsByProductCount(@Param("limit") int limit);
 }
