@@ -3,12 +3,20 @@ package com.swp391.techforge.controller.admin;
 import com.swp391.techforge.entity.WarrantyTicket;
 import com.swp391.techforge.entity.WarrantyTicketStatus;
 import com.swp391.techforge.service.warranty.WarrantyTicketService;
+import com.swp391.techforge.util.ExcelExportUtil;
 import com.swp391.techforge.util.SortUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/admin/warranty")
@@ -37,6 +45,22 @@ public class WarrantyTicketController {
         model.addAttribute("status", status);
         model.addAttribute("statuses", WarrantyTicketStatus.values());
         return "admin/warranty-list";
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<?> export(@RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String status) {
+        try {
+            ByteArrayOutputStream outputStream = ExcelExportUtil.exportWarrantyTicketsToExcel(
+                    warrantyTicketService.getAllForExport(keyword, status));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "warranty-tickets.xlsx");
+            return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Export failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}")

@@ -31,7 +31,7 @@
             </div>
 
             <form th:action="@{/admin/warranty}" method="get" class="row g-2 align-items-end mb-3">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label class="form-label fs-8 text-muted mb-1">Tìm kiếm</label>
                     <input type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="Tên khách hàng, email, imei, mô tả lỗi..." />
                 </div>
@@ -42,11 +42,25 @@
                         <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.name()}" th:selected="${status == s.name()}"></option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-dark w-100">Lọc</button>
+                <div class="col-md-3">
+                    <label class="form-label fs-8 text-muted mb-1">Sắp xếp</label>
+                    <select name="sort" class="form-select">
+                        <option value="createdAt,desc" th:selected="${sort == 'createdAt,desc'}">Ngày tiếp nhận mới nhất</option>
+                        <option value="createdAt,asc" th:selected="${sort == 'createdAt,asc'}">Ngày tiếp nhận cũ nhất</option>
+                        <option value="resolvedAt,desc" th:selected="${sort == 'resolvedAt,desc'}">Ngày xử lý mới nhất</option>
+                        <option value="resolvedAt,asc" th:selected="${sort == 'resolvedAt,asc'}">Ngày xử lý cũ nhất</option>
+                        <option value="status,asc" th:selected="${sort == 'status,asc'}">Trạng thái A-Z</option>
+                    </select>
                 </div>
-                <div class="col-md-2">
-                    <a th:href="@{/admin/warranty}" class="btn btn-outline-secondary w-100">Reset</a>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-dark flex-grow-1">Lọc</button>
+                    <a th:href="@{/admin/warranty}" class="btn btn-outline-secondary">Reset</a>
+                </div>
+                <div class="col-12">
+                    <a class="btn btn-success"
+                       th:href="@{/admin/warranty/export(keyword=${keyword}, status=${status})}">
+                        <i class="bi bi-file-earmark-excel me-1"></i> Xuất Excel
+                    </a>
                 </div>
             </form>
 
@@ -94,14 +108,14 @@
             <nav th:if="${ticketPage.totalPages > 1}" aria-label="Pagination">
                 <ul class="pagination justify-content-center mt-3">
                     <li class="page-item" th:classappend="${ticketPage.first} ? 'disabled' : ''">
-                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number - 1}, keyword=${keyword}, status=${status})}">Trước</a>
+                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number - 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}">Trước</a>
                     </li>
                     <li class="page-item" th:each="i : ${#numbers.sequence(0, ticketPage.totalPages - 1)}"
                         th:classappend="${ticketPage.number == i} ? 'active' : ''">
-                        <a class="page-link" th:href="@{/admin/warranty(page=${i}, keyword=${keyword}, status=${status})}" th:text="${i + 1}"></a>
+                        <a class="page-link" th:href="@{/admin/warranty(page=${i}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}" th:text="${i + 1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${ticketPage.last} ? 'disabled' : ''">
-                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number + 1}, keyword=${keyword}, status=${status})}">Sau</a>
+                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number + 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}">Sau</a>
                     </li>
                 </ul>
             </nav>
