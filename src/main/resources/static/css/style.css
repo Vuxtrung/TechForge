@@ -262,3 +262,19 @@ body {
 .category-tree-toggle[aria-expanded="true"] .category-tree-caret {
   transform: rotate(180deg);
 }
+
+.table thead tr {
+  height: 50px !important;
+}
+
+.table thead th {
+  padding: 0.35rem 0.5rem !important;
+  line-height: 1.2 !important;
+  height: 50px !important;
+  white-space: nowrap;
+  vertical-align: middle !important;
+}
+
+.table tbody td {
+  vertical-align: middle;
+}

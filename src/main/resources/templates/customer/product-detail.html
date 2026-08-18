@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8">
+    <title th:text="${product.name} + ' - TechForge'">Chi tiết sản phẩm - TechForge</title>
+</head>
+
+<body>
+    <!-- Header Fragment -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body">
+        <div class="container-fluid px-lg-5 my-3">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb fs-8 mb-0">
+                    <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none">Trang chủ</a></li>
+                    <li class="breadcrumb-item">
+                        <a th:if="${product.category != null}"
+                           th:href="@{/products(categoryId=${product.category.categoryId})}"
+                           class="text-decoration-none"
+                           th:text="${product.category.name}">Danh mục</a>
+                    </li>
+                    <li class="breadcrumb-item active text-truncate" style="max-width: 300px;" aria-current="page" th:text="${product.name}">Sản phẩm</li>
+                </ol>
+            </nav>
+
+            <div class="bg-white rounded-3 shadow-sm border p-3 p-lg-4 mb-4">
+                <div class="row g-4">
+                    <!-- Ảnh sản phẩm -->
+                    <div class="col-lg-5">
+                        <div class="border rounded-3 p-2 mb-2 text-center">
+                            <img id="mainProductImage"
+                                 th:src="${product.getPrimaryImageUrl() != null ? product.getPrimaryImageUrl() : '/images/placeholder.jpg'}"
+                                 th:alt="${product.name}"
+                                 class="img-fluid rounded"
+                                 style="max-height: 380px; object-fit: contain;">
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap" th:if="${product.images != null and !product.images.isEmpty()}">
+                            <img th:each="img : ${product.images}"
+                                 th:src="${img.imageUrl}"
+                                 th:alt="${product.name}"
+                                 class="border rounded thumb-img"
+                                 style="width: 64px; height: 64px; object-fit: cover; cursor: pointer;"
+                                 onclick="document.getElementById('mainProductImage').src = this.src">
+                        </div>
+                    </div>
+
+                    <!-- Thông tin & mua hàng -->
+                    <div class="col-lg-7">
+                        <span class="text-muted fs-8" th:text="${product.category != null ? product.category.name : 'Chưa phân loại'}">Danh mục</span>
+                        <h4 class="fw-bold mt-1 mb-2" th:text="${product.name}">Tên sản phẩm</h4>
+
+                        <div class="mb-2" th:if="${product.brand != null and !product.brand.isEmpty()}">
+                            <span class="text-muted fs-8">Thương hiệu: </span>
+                            <span class="fw-semibold fs-8" th:text="${product.brand}">Thương hiệu</span>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2 my-3">
+                            <span class="text-danger fw-bold fs-3"
+                                  th:text="${#numbers.formatDecimal(product.basePrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">Giá</span>
+                        </div>
+
+                        <div class="mb-3">
+                            <span th:if="${product.stockQuantity > 0}" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                <i class="bi bi-check-circle me-1"></i>Còn hàng (<span th:text="${product.stockQuantity}">0</span> sản phẩm)
+                            </span>
+                            <span th:unless="${product.stockQuantity > 0}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                <i class="bi bi-x-circle me-1"></i>Tạm hết hàng
+                            </span>
+                        </div>
+
+                        <!-- Chọn số lượng + thêm giỏ hàng -->
+                        <div class="d-flex align-items-center gap-2 mb-3" th:if="${product.stockQuantity > 0}">
+                            <label class="fw-semibold fs-8 mb-0">Số lượng:</label>
+                            <div class="input-group" style="width: 130px;">
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="qtyMinus">−</button>
+                                <input type="number" id="qtyInput" class="form-control form-control-sm text-center"
+                                       th:value="1" min="1" th:max="${product.stockQuantity}">
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="qtyPlus">+</button>
+                            </div>
+                        </div>
+
+                        <button type="button"
+                                id="detailAddToCartBtn"
+                                class="btn btn-danger fw-semibold px-4"
+                                th:disabled="${product.stockQuantity <= 0}"
+                                th:data-product-id="${product.productId}"
+                                th:data-product-name="${product.name}"
+                                th:data-product-price="${product.basePrice}"
+                                th:data-product-image="${product.getPrimaryImageUrl() != null ? product.getPrimaryImageUrl() : '/images/placeholder.jpg'}">
+                            <i class="bi bi-cart-plus me-1"></i> Thêm Vào Giỏ Hàng
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mô tả sản phẩm -->
+            <div class="bg-white rounded-3 shadow-sm border p-3 p-lg-4 mb-4" th:if="${product.description != null and !product.description.isEmpty()}">
+                <h6 class="fw-bold mb-3">Mô Tả Sản Phẩm</h6>
+                <p class="fs-8 text-dark" style="white-space: pre-line;" th:text="${product.description}">Mô tả</p>
+            </div>
+
+            <!-- Thông số kỹ thuật -->
+            <div class="bg-white rounded-3 shadow-sm border p-3 p-lg-4 mb-4" th:if="${product.specifications != null and !product.specifications.isEmpty()}">
+                <h6 class="fw-bold mb-3">Thông Số Kỹ Thuật</h6>
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr th:each="spec, iter : ${product.specifications}" th:classappend="${iter.odd} ? 'table-light'">
+                            <td class="fs-8 text-muted fw-semibold" style="width: 240px;" th:text="${spec.specKey}">Thông số</td>
+                            <td class="fs-8 text-dark" th:text="${spec.specValue}">Giá trị</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Sản phẩm cùng danh mục -->
+            <div th:if="${relatedProducts != null and !relatedProducts.isEmpty()}">
+                <h6 class="fw-bold mb-3">Sản Phẩm Cùng Danh Mục</h6>
+                <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+                    <div class="col" th:each="rp : ${relatedProducts}">
+                        <div th:replace="~{fragments/product-card :: card(product=${rp})}"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Fragment -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="none">
+        document.addEventListener("DOMContentLoaded", function () {
+            const qtyInput = document.getElementById("qtyInput");
+            const minusBtn = document.getElementById("qtyMinus");
+            const plusBtn = document.getElementById("qtyPlus");
+            const addBtn = document.getElementById("detailAddToCartBtn");
+
+            if (minusBtn && qtyInput) {
+                minusBtn.addEventListener("click", function () {
+                    const current = parseInt(qtyInput.value) || 1;
+                    if (current > 1) qtyInput.value = current - 1;
+                });
+            }
+            if (plusBtn && qtyInput) {
+                plusBtn.addEventListener("click", function () {
+                    const current = parseInt(qtyInput.value) || 1;
+                    const max = parseInt(qtyInput.getAttribute("max")) || 9999;
+                    if (current < max) qtyInput.value = current + 1;
+                });
+            }
+            if (addBtn) {
+                addBtn.addEventListener("click", function () {
+                    const productId = addBtn.getAttribute("data-product-id");
+                    const productName = addBtn.getAttribute("data-product-name");
+                    const price = addBtn.getAttribute("data-product-price");
+                    const imageUrl = addBtn.getAttribute("data-product-image");
+                    const quantity = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+                    addToCartAjax(productId, productName, price, imageUrl, quantity);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

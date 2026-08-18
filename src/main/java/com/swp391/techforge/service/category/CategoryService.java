@@ -1,5 +1,6 @@
 package com.swp391.techforge.service.category;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 
 import com.swp391.techforge.entity.Category;
@@ -82,6 +83,7 @@ public class CategoryService {
         existing.setType(incoming.getType());
         existing.setActive(incoming.isActive());
         existing.setParent(resolveParent(incoming.getParentId(), id));
+        existing.setUpdatedAt(LocalDateTime.now());
 
         return categoryRepository.save(existing);
     }

@@ -175,13 +175,13 @@
                   <tr>
                     <th scope="col" style="width: 60px">#</th>
                     <th scope="col" style="width: 80px">Ảnh</th>
-                    <th scope="col"class="text-center">Tên Sản Phẩm</th>
+                    <th scope="col" class="text-center">Tên Sản Phẩm</th>
                     <th scope="col">Danh Mục</th>
                     <th scope="col">Thương Hiệu</th>
                     <th scope="col" class="text-center">Giá Bán</th>
                     <th scope="col" class="text-center">Tồn Kho</th>
                     <th scope="col" class="text-center">Trạng Thái</th>
-                    <th scope="col"class="text-center">Cập Nhật</th>
+                    <th scope="col" class="text-center">Cập Nhật</th>
                     <th scope="col" class="text-center">Thao Tác</th>
                   </tr>
                 </thead>
@@ -256,45 +256,50 @@
                         >-</span
                       >
                     </td>
-                    <td class="text-end">
-                      <a
-                        th:href="@{/admin/products/{id}/edit(id=${p.productId})}"
-                        class="btn btn-outline-primary btn-sm"
-                        title="Sửa"
-                      >
-                        <i class="bi bi-pencil-square"></i>
-                      </a>
-                      <form
-                        th:action="@{/admin/products/{id}/toggle(id=${p.productId})}"
-                        method="post"
-                        class="d-inline"
-                      >
-                        <button
-                          type="submit"
-                          class="btn btn-outline-warning btn-sm js-toggle-product"
-                          th:title="${p.status.name() == 'ACTIVE' ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'}"
-                          th:data-name="${p.name}"
+                    <td
+                      class="text-center"
+                      style="width: 160px; min-width: 160px"
+                    >
+                      <div class="d-flex gap-1 justify-content-center">
+                        <a
+                          th:href="@{/admin/products/{id}/edit(id=${p.productId})}"
+                          class="btn btn-outline-primary btn-sm"
+                          title="Sửa"
                         >
-                          <i
-                            class="bi"
-                            th:classappend="${p.status.name() == 'ACTIVE' ? 'bi-eye-slash' : 'bi-eye'}"
-                          ></i>
-                        </button>
-                      </form>
-                      <form
-                        th:action="@{/admin/products/{id}/delete(id=${p.productId})}"
-                        method="post"
-                        class="d-inline"
-                      >
-                        <button
-                          type="submit"
-                          class="btn btn-outline-danger btn-sm js-delete-product"
-                          title="Xóa"
-                          th:data-name="${p.name}"
+                          <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <form
+                          th:action="@{/admin/products/{id}/toggle(id=${p.productId})}"
+                          method="post"
+                          class="d-inline"
                         >
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </form>
+                          <button
+                            type="submit"
+                            class="btn btn-outline-warning btn-sm js-toggle-product"
+                            th:title="${p.status.name() == 'ACTIVE' ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'}"
+                            th:data-name="${p.name}"
+                          >
+                            <i
+                              class="bi"
+                              th:classappend="${p.status.name() == 'ACTIVE' ? 'bi-eye-slash' : 'bi-eye'}"
+                            ></i>
+                          </button>
+                        </form>
+                        <form
+                          th:action="@{/admin/products/{id}/delete(id=${p.productId})}"
+                          method="post"
+                          class="d-inline"
+                        >
+                          <button
+                            type="submit"
+                            class="btn btn-outline-danger btn-sm js-delete-product"
+                            title="Xóa"
+                            th:data-name="${p.name}"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -307,6 +312,7 @@
               aria-label="Product pagination"
             >
               <ul class="pagination justify-content-center mb-0">
+                <!-- Previous button -->
                 <li
                   class="page-item"
                   th:classappend="${productPage.first} ? 'disabled'"
@@ -318,18 +324,63 @@
                     <i class="bi bi-chevron-left"></i>
                   </a>
                 </li>
+
+                <!-- Trang 1 -->
                 <li
                   class="page-item"
-                  th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                  th:classappend="${productPage.number == 0} ? 'active'"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/admin/products(page=0, keyword=${keyword}, categoryId=${categoryId}, status=${status}, sort=${sort})}"
+                    >1</a
+                  >
+                </li>
+
+                <!-- Ellipsis left (nếu khoảng cách > 1) -->
+                <li
+                  class="page-item disabled"
+                  th:if="${productPage.number > 3}"
+                >
+                  <span class="page-link">...</span>
+                </li>
+
+                <!-- Trang xung quanh hiện tại (±2 trang) -->
+                <li
+                  class="page-item"
+                  th:each="i : ${#numbers.sequence(T(java.lang.Math).max(1, productPage.number - 2), T(java.lang.Math).min(productPage.totalPages - 2, productPage.number + 2))}"
                   th:classappend="${i == productPage.number} ? 'active'"
                 >
                   <a
                     class="page-link"
                     th:href="@{/admin/products(page=${i}, keyword=${keyword}, categoryId=${categoryId}, status=${status}, sort=${sort})}"
                     th:text="${i + 1}"
-                    >1</a
+                    >2</a
                   >
                 </li>
+
+                <!-- Ellipsis right (nếu khoảng cách > 1) -->
+                <li
+                  class="page-item disabled"
+                  th:if="${productPage.number < productPage.totalPages - 4}"
+                >
+                  <span class="page-link">...</span>
+                </li>
+
+                <!-- Trang cuối cùng (nếu totalPages > 1) -->
+                <li
+                  class="page-item"
+                  th:if="${productPage.totalPages > 1}"
+                  th:classappend="${productPage.last} ? 'active'"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{/admin/products(page=${productPage.totalPages - 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status}, sort=${sort})}"
+                    th:text="${productPage.totalPages}"
+                  ></a>
+                </li>
+
+                <!-- Next button -->
                 <li
                   class="page-item"
                   th:classappend="${productPage.last} ? 'disabled'"

@@ -2,6 +2,7 @@ package com.swp391.techforge.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -52,6 +53,7 @@ public class Product {
     private BigDecimal basePrice;
 
     @NotNull(message = "Số lượng tồn kho không được để trống")
+    @Min(value = 0, message = "Số lượng tồn kho không được âm")
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity = 0;
 
