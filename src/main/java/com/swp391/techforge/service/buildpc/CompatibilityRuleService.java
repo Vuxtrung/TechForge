@@ -38,7 +38,11 @@ public class CompatibilityRuleService {
         Optional<CompatibilityRule> optionalRule = ruleRepository.findById(id);
         if (optionalRule.isPresent()) {
             CompatibilityRule rule = optionalRule.get();
-            rule.setIsActive(!rule.getIsActive());
+            if (rule.getIsActive() == null) {
+                rule.setIsActive(false); // default to false if it was null when toggling
+            } else {
+                rule.setIsActive(!rule.getIsActive());
+            }
             ruleRepository.save(rule);
         }
     }

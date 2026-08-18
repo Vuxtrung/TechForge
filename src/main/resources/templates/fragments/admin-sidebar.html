@@ -76,7 +76,7 @@
     <div class="d-flex align-items-center w-100 pb-2 justify-content-between">
         <a th:href="@{/account}" class="d-flex align-items-center text-white text-decoration-none" title="Hồ sơ của tôi">
             <i class="bi bi-person-circle fs-4 me-2 text-warning"></i>
-            <strong th:text="${#authentication.principal.fullName}">Admin</strong>
+            <strong th:text="${#authentication.name}">Admin</strong>
         </a>
         <form th:action="@{/logout}" method="post" class="m-0 p-0">
             <button type="submit" class="btn btn-link text-danger p-0 border-0" title="Đăng xuất">
