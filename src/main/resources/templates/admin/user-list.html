@@ -19,7 +19,7 @@
             border: none;
         }
         .card-header {
-            background-color: #007bff;
+            background-color: #0b0b0c;
             color: white;
             border-bottom: none;
         }
@@ -131,7 +131,7 @@
 
                     <!-- Buttons -->
                     <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <button type="submit" class="btn btn-dark btn-sm w-100">
                             <i class="bi bi-search"></i> Tìm kiếm
                         </button>
                         <a href="/admin/users" class="btn btn-secondary btn-sm w-100 mt-2">
@@ -242,13 +242,13 @@
                 <p class="text-muted mt-3">Không tìm thấy người dùng nào</p>
             </div>
 
-            <!-- Pagination -->
+            <!-- Paging -->
             <nav th:if="${userPage.totalPages > 1}" aria-label="Page navigation">
                 <ul class="pagination">
-                    <!-- Previous Button -->
+                    <!-- Previous -->
                     <li class="page-item" th:classappend="${!userPage.hasPrevious()} ? 'disabled'">
                         <a class="page-link" th:if="${userPage.hasPrevious()}"
-                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number - 1})}"
+                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number - 1}, size=${size})}"
                            aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
@@ -259,16 +259,16 @@
                     <th:block th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}">
                         <li class="page-item" th:classappend="${i == userPage.number} ? 'active'">
                             <a class="page-link" th:if="${i != userPage.number}"
-                               th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${i})}"
+                               th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${i}, size=${size})}"
                                th:text="${i + 1}"></a>
                             <span class="page-link" th:if="${i == userPage.number}" th:text="${i + 1}"></span>
                         </li>
                     </th:block>
 
-                    <!-- Next Button -->
+                    <!-- Next -->
                     <li class="page-item" th:classappend="${!userPage.hasNext()} ? 'disabled'">
                         <a class="page-link" th:if="${userPage.hasNext()}"
-                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number + 1})}"
+                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number + 1}, size=${size})}"
                            aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
