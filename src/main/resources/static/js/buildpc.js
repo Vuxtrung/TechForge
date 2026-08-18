@@ -2,7 +2,7 @@ const CATEGORIES = [
     { id: 'cpu', key: 'CPU', name: 'CPU', icon: 'bi-cpu', mapKey: 'cpuId' },
     { id: 'mainboard', key: 'Mainboard', name: 'Bo Mạch Chủ', icon: 'bi-motherboard', mapKey: 'mainboardId' },
     { id: 'ram', key: 'RAM', name: 'RAM', icon: 'bi-memory', mapKey: 'ramId' },
-    { id: 'vga', key: 'GPU', name: 'Card Màn Hình', icon: 'bi-gpu-card', mapKey: 'vgaId' },
+    { id: 'vga', key: 'VGA', name: 'Card Màn Hình', icon: 'bi-gpu-card', mapKey: 'vgaId' },
     { id: 'psu', key: 'Nguồn', name: 'Nguồn (PSU)', icon: 'bi-plug', mapKey: 'psuId' },
     { id: 'storage', key: 'Ổ Cứng', name: 'Ổ Cứng', icon: 'bi-hdd', mapKey: 'storageId' },
     { id: 'cooler', key: 'Fan tản nhiệt', name: 'Tản Nhiệt', icon: 'bi-fan', mapKey: 'coolerId' },

@@ -442,23 +442,37 @@ CREATE TABLE reviews (
 ) ENGINE = InnoDB;
 
 
--- =========================================================
--- 21. COMPATIBILITY RULES (bảng mới, bổ sung để khớp bản dump)
--- =========================================================
+-- ====================================
+-- 21. COMPATIBILITY RULES 
+-- ====================================
 
 CREATE TABLE compatibility_rules (
-    rule_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    component_type_a VARCHAR(50) NOT NULL,
-    component_type_b VARCHAR(50) NOT NULL,
-    rule_type ENUM('SOCKET_MATCH','PSU_WATTAGE','CASE_SIZE','RAM_TYPE','OTHER') NOT NULL,
-    rule_expression VARCHAR(255) NOT NULL,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    rule_name VARCHAR(255) NOT NULL,
+    expression VARCHAR(255) NOT NULL,
+    message VARCHAR(500) NOT NULL,
+    severity VARCHAR(50) NOT NULL,
     is_active TINYINT(1) DEFAULT 1
 ) ENGINE = InnoDB;
 
 
--- =========================================================
+-- ====================================
+-- 22. CONTACT
+-- ====================================
+
+CREATE TABLE contacts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    subject VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE = InnoDB;
+
+
+-- ===================================
 -- DONE
--- =========================================================
+-- ===================================
 
 SELECT 'TechForge database created successfully!' AS message;
 
