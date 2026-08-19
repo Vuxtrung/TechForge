@@ -38,19 +38,24 @@ public class VNPayConfig {
     }
 
     public static String getIpAddress(HttpServletRequest request) {
-        String ipAdress;
+        String ipAddress = null;
         try {
-            ipAdress = request.getHeader("X-FORWARDED-FOR");
-            if (ipAdress == null || ipAdress.isEmpty() || "0:0:0:0:0:0:0:1".equals(ipAdress)) {
-                ipAdress = request.getRemoteAddr();
-            }
-            if (ipAdress == null || ipAdress.isEmpty() || "0:0:0:0:0:0:0:1".equals(ipAdress)) {
-                ipAdress = "127.0.0.1";
+            ipAddress = request.getHeader("X-FORWARDED-FOR");
+            if (ipAddress != null && !ipAddress.isEmpty() && !"unknown".equalsIgnoreCase(ipAddress)) {
+                if (ipAddress.contains(",")) {
+                    ipAddress = ipAddress.split(",")[0].trim();
+                }
+            } else {
+                ipAddress = request.getRemoteAddr();
             }
         } catch (Exception e) {
-            ipAdress = "127.0.0.1";
+            ipAddress = "127.0.0.1";
         }
-        return ipAdress;
+
+        if (ipAddress == null || ipAddress.isEmpty() || "0:0:0:0:0:0:0:1".equals(ipAddress) || ipAddress.contains(":")) {
+            ipAddress = "127.0.0.1";
+        }
+        return ipAddress;
     }
 
     public static String getRandomNumber(int len) {

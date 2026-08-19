@@ -1,6 +1,8 @@
 package com.swp391.techforge.controller.cart;
 
 import com.swp391.techforge.dto.cart.CartItemDTO;
+import com.swp391.techforge.entity.Product;
+import com.swp391.techforge.repository.product.ProductRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/cart")
@@ -19,10 +21,24 @@ public class CartController {
     private static final String VOUCHER_SESSION_KEY = "APPLIED_VOUCHER_DISCOUNT";
     private static final String POINTS_SESSION_KEY = "USED_LOYALTY_POINTS";
 
+    private final ProductRepository productRepository;
+
+    public CartController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
     // 1. Màn hình Xem Giỏ hàng (View Cart)
     @GetMapping
     public String viewCart(HttpSession session, Model model) {
         List<CartItemDTO> cartItems = getCartFromSession(session);
+
+        // Đọc tồn kho thực tế từ DB cho từng sản phẩm
+        for (CartItemDTO item : cartItems) {
+            if (item.getProductId() != null) {
+                productRepository.findById(item.getProductId())
+                        .ifPresent(p -> item.setStockQuantity(p.getStockQuantity()));
+            }
+        }
 
         // Tính tổng tiền tạm tính
         double subtotal = 0.0;

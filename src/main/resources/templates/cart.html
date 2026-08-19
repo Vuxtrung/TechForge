@@ -56,7 +56,10 @@
                                             <img th:src="${item.imageUrl}" class="rounded border p-1" style="width: 65px; height: 65px; object-fit: contain;" alt="Product">
                                             <div>
                                                 <h6 class="fw-bold fs-7 mb-1 text-dark" th:text="${item.productName}">Màn hình Gaming</h6>
-                                                <span class="badge bg-light text-secondary border fs-8">Chính Hãng 100%</span>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <span class="badge bg-light text-secondary border fs-8">Chính Hãng 100%</span>
+                                                    <span class="badge bg-secondary-subtle text-secondary border fs-8" th:if="${item.stockQuantity != null}" th:text="'Kho còn: ' + ${item.stockQuantity}">Kho còn: 15</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -69,7 +72,7 @@
                                             <input type="hidden" name="productId" th:value="${item.productId}">
                                             <button type="submit" name="quantity" th:value="${item.quantity - 1}" class="btn btn-outline-secondary btn-sm px-2 py-0" th:disabled="${item.quantity <= 1}">-</button>
                                             <span class="px-2 fw-bold fs-7" th:text="${item.quantity}">1</span>
-                                            <button type="submit" name="quantity" th:value="${item.quantity + 1}" class="btn btn-outline-secondary btn-sm px-2 py-0">+</button>
+                                            <button type="submit" name="quantity" th:value="${item.quantity + 1}" class="btn btn-outline-secondary btn-sm px-2 py-0" th:disabled="${item.stockQuantity != null and item.quantity >= item.stockQuantity}">+</button>
                                         </form>
                                     </td>
                                     <td class="text-end text-danger fw-bold fs-7" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">

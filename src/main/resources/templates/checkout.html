@@ -148,8 +148,9 @@
                                 <img th:src="${item.imageUrl}" style="width: 50px; height: 50px; object-fit: contain;" class="rounded border p-1" alt="Product">
                                 <div class="flex-grow-1">
                                     <h6 class="fs-8 fw-bold text-dark mb-0 text-truncate-2" th:text="${item.productName}">Tên sản phẩm</h6>
-                                    <div class="fs-8 text-muted">
-                                        <span th:text="${item.quantity}">1</span> x <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
+                                    <div class="fs-8 text-muted d-flex align-items-center gap-2">
+                                        <span><span th:text="${item.quantity}">1</span> x <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span></span>
+                                        <span class="badge bg-secondary-subtle text-secondary border fs-8" th:if="${item.stockQuantity != null}" th:text="'Kho còn: ' + ${item.stockQuantity}">Kho còn: 15</span>
                                     </div>
                                 </div>
                                 <span class="fw-bold fs-7 text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
