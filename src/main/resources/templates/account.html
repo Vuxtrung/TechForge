@@ -40,9 +40,14 @@
 
                         <!-- Avatar -->
                         <div class="flex-shrink-0">
-                            <div class="rounded-circle bg-danger-subtle text-danger
-                                        d-flex align-items-center justify-content-center"
-                                style="width: 65px; height: 65px;">
+                            <!-- Có avatar -->
+                            <img th:if="${user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)}"
+                                th:src="${user.avatarUrl}" th:alt="${user.fullName}"
+                                class="rounded-circle object-fit-cover" style="width: 65px; height: 65px;">
+
+                            <!-- Không có avatar -->
+                            <div th:unless="${user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)}" class="rounded-circle bg-danger-subtle text-danger
+                                d-flex align-items-center justify-content-center" style="width: 65px; height: 65px;">
                                 <i class="bi bi-person-fill fs-2"></i>
                             </div>
                         </div>
@@ -74,7 +79,9 @@
 
 
                         <!-- Quản lý đơn hàng -->
-                        <a th:href="@{/account(view='orders')}" class="list-group-item list-group-item-action
+                        <a th:href="@{/account(view='orders')}"
+                            th:if="${!#authorization.expression('hasAuthority(''ROLE_ADMIN'')')}"
+                            class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
                             <i class="bi bi-box-seam text-primary me-2"></i>
                             <span class="fs-7 fw-semibold">
@@ -94,8 +101,7 @@
 
                         <!-- Admin / Warranty panel -->
                         <a th:if="${user.role != null and (user.role.roleName == 'ADMIN' or user.role.roleName == 'STAFF_WARRANTY')}"
-                           th:href="@{/admin}"
-                           class="list-group-item list-group-item-action
+                            th:href="@{/admin/products}" class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
 
                             <i class="bi bi-speedometer2 text-success me-2"></i>

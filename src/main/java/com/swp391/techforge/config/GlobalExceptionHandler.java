@@ -18,4 +18,23 @@ public class GlobalExceptionHandler {
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/admin/products");
     }
+
+    @ExceptionHandler(Exception.class)
+    public void handleAllExceptions(Exception ex) throws Exception {
+        try {
+            java.io.StringWriter sw = new java.io.StringWriter();
+            java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+            ex.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            
+            java.nio.file.Files.write(
+                java.nio.file.Paths.get("C:/Users/admin/Desktop/SWP391/TechForge/TechForge/error_debug.log"), 
+                (stackTrace + "\n====================\n").getBytes(), 
+                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        throw ex; // Re-throw to not break default handling
+    }
 }

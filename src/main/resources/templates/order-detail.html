@@ -18,12 +18,6 @@
             </ol>
         </nav>
 
-        <!-- THÔNG BÁO FLASH MESSAGE -->
-        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-
         <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

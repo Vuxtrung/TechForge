@@ -1,12 +1,12 @@
 const CATEGORIES = [
     { id: 'cpu', key: 'CPU', name: 'CPU', icon: 'bi-cpu', mapKey: 'cpuId' },
-    { id: 'mainboard', key: 'Bo Mạch Chủ', name: 'Bo Mạch Chủ', icon: 'bi-motherboard', mapKey: 'mainboardId' },
+    { id: 'mainboard', key: 'Mainboard', name: 'Bo Mạch Chủ', icon: 'bi-motherboard', mapKey: 'mainboardId' },
     { id: 'ram', key: 'RAM', name: 'RAM', icon: 'bi-memory', mapKey: 'ramId' },
     { id: 'vga', key: 'VGA', name: 'Card Màn Hình', icon: 'bi-gpu-card', mapKey: 'vgaId' },
     { id: 'psu', key: 'Nguồn', name: 'Nguồn (PSU)', icon: 'bi-plug', mapKey: 'psuId' },
     { id: 'storage', key: 'Ổ Cứng', name: 'Ổ Cứng', icon: 'bi-hdd', mapKey: 'storageId' },
-    { id: 'cooler', key: 'Tản', name: 'Tản Nhiệt', icon: 'bi-fan', mapKey: 'coolerId' },
-    { id: 'case', key: 'Vỏ', name: 'Vỏ Máy', icon: 'bi-pc', mapKey: 'caseId' }
+    { id: 'cooler', key: 'Fan tản nhiệt', name: 'Tản Nhiệt', icon: 'bi-fan', mapKey: 'coolerId' },
+    { id: 'case', key: 'Vỏ máy', name: 'Vỏ Máy', icon: 'bi-pc', mapKey: 'caseId' }
 ];
 
 let selectedComponents = {};
@@ -272,8 +272,8 @@ function validateBuild() {
 }
 
 function addToCartAll() {
-    const productIds = Object.values(selectedComponents).map(p => p.productId);
-    if (productIds.length === 0) return;
+    const products = Object.values(selectedComponents);
+    if (products.length === 0) return;
     
 
     const btn = document.getElementById('btnAddToCart');
@@ -285,19 +285,35 @@ function addToCartAll() {
     let addedCount = 0;
     let errorCount = 0;
     
-    Promise.all(productIds.map(id => 
-        fetch('/api/cart/add', {
+    Promise.all(products.map(p => 
+        fetch('/cart/api/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
-                'productId': id,
+                'productId': p.productId,
+                'productName': p.name,
+                'price': p.basePrice,
+                'imageUrl': p.primaryImageUrl || '',
                 'quantity': 1
             })
         })
     ))
     .then(responses => {
+        // Parse all JSON responses to get the final cart size
+        Promise.all(responses.map(res => res.json()))
+            .then(dataArray => {
+                if (dataArray.length > 0) {
+                    const lastData = dataArray[dataArray.length - 1];
+                    const badge = document.getElementById("cartBadgeCount");
+                    if (badge && lastData.cartSize !== undefined) {
+                        badge.innerText = lastData.cartSize;
+                    }
+                }
+            })
+            .catch(e => console.error("Could not parse cart response", e));
+            
         alert("Đã thêm toàn bộ linh kiện vào giỏ hàng thành công!");
 
     })

@@ -16,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByNameIgnoreCaseAndProductIdNot(String name, Long productId);
 
+    // Dùng cho trang admin: tìm kiếm sản phẩm theo keyword, categoryId, status
     @Query("""
             SELECT p FROM Product p
             WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
@@ -32,14 +33,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p FROM Product p
             WHERE CAST(p.status AS string) = 'ACTIVE'
               AND (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
-              AND (:categoryId IS NULL OR p.category.categoryId = :categoryId)
+              AND (:categoryIds IS NULL OR p.category.categoryId IN :categoryIds)
               AND (:type IS NULL OR :type = '' OR CAST(p.category.type AS string) = :type)
               AND (:brand IS NULL OR :brand = '' OR p.brand = :brand)
               AND (:minPrice IS NULL OR p.basePrice >= :minPrice)
               AND (:maxPrice IS NULL OR p.basePrice <= :maxPrice)
             """)
     Page<Product> searchPublic(@Param("keyword") String keyword,
-                                @Param("categoryId") Long categoryId,
+                                @Param("categoryIds") List<Long> categoryIds,
                                 @Param("type") String type,
                                 @Param("brand") String brand,
                                 @Param("minPrice") BigDecimal minPrice,

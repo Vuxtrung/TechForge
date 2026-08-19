@@ -3,8 +3,8 @@ package com.swp391.techforge.controller.admin;
 import com.swp391.techforge.entity.User;
 import com.swp391.techforge.entity.UserStatus;
 import com.swp391.techforge.service.authentication.UserService;
+import com.swp391.techforge.util.SortUtil;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,14 +33,13 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        // Parse sort parameter
-        String[] sortParts = sort.split(",");
-        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
-                ? Sort.Direction.DESC : Sort.Direction.ASC;
+        if (size < 1) {
+            size = 1;
+        }
 
         // Thực hiện tìm kiếm
         Page<User> userPage = userService.search(keyword, roleId, status, page, size,
-                Sort.by(direction, sortParts[0]));
+            SortUtil.parse(sort, "fullName", "asc"));
 
         // Thêm dữ liệu vào model
         model.addAttribute("userPage", userPage);
@@ -48,6 +47,7 @@ public class UserController {
         model.addAttribute("roleId", roleId);
         model.addAttribute("status", status);
         model.addAttribute("sort", sort);
+        model.addAttribute("size", size);
         model.addAttribute("userStatuses", UserStatus.values());
 
         return "admin/user-list";

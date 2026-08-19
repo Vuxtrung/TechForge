@@ -9,7 +9,8 @@
             <h5 class="fw-bold text-dark mb-0">Thông tin tài khoản</h5>
         </div>
 
-        <form id="accountInfoForm" th:action="@{/account/info}" method="post" enctype="multipart/form-data" novalidate>
+        <form id="accountInfoForm" th:action="@{/account/info}" th:object="${accountInfoRequest}"
+              method="post" enctype="multipart/form-data" novalidate>
 
             <!-- ===== AVATAR ===== -->
             <div class="d-flex align-items-center gap-4 mb-4">
@@ -44,9 +45,10 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fs-7 fw-semibold">Họ và tên <span class="text-danger">*</span></label>
-                    <input type="text" name="fullName" id="fullName" class="form-control" th:value="${user.fullName}"
-                        maxlength="100" required>
-                    <div class="invalid-feedback">Vui lòng nhập họ tên.</div>
+                    <input type="text" th:field="*{fullName}" class="form-control"
+                        th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid'"
+                        maxlength="100">
+                    <div class="text-danger fs-8 mt-1" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
                 </div>
 
                 <div class="col-md-6">
@@ -55,10 +57,11 @@
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fs-7 fw-semibold">Số điện thoại</label>
-                    <input type="tel" name="phone" id="phone" class="form-control" th:value="${user.phone}"
+                    <label class="form-label fs-7 fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                    <input type="tel" th:field="*{phone}" class="form-control"
+                        th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'"
                         placeholder="VD: 0912345678" maxlength="20">
-                    <div class="invalid-feedback">Số điện thoại không hợp lệ.</div>
+                    <div class="text-danger fs-8 mt-1" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                 </div>
 
                 <div class="col-md-6">
@@ -71,9 +74,11 @@
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label fs-7 fw-semibold">Địa chỉ</label>
-                    <textarea name="address" id="address" class="form-control" rows="2" maxlength="500"
-                        th:text="${user.address}"></textarea>
+                    <label class="form-label fs-7 fw-semibold">Địa chỉ <span class="text-danger">*</span></label>
+                    <textarea th:field="*{address}" class="form-control" rows="2"
+                        th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'"
+                        maxlength="500"></textarea>
+                    <div class="text-danger fs-8 mt-1" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
                 </div>
 
                 <div class="col-md-6">
@@ -84,15 +89,15 @@
             </div>
 
             <div class="d-flex justify-content-end mt-4 pt-3 border-top">
-                <button type="submit" class="btn btn-danger px-4">
+                <button type="submit" class="btn btn-danger btn-sm px-4 fw-bold">
                     <i class="bi bi-check-lg me-1"></i> Lưu thay đổi
                 </button>
             </div>
         </form>
+
+        <script th:src="@{/js/account-info.js}"></script>
+
     </div>
-
-    <script th:src="@{/js/account-info.js}"></script>
-
 </body>
 
 </html>

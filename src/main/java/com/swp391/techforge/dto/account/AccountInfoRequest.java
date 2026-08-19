@@ -15,9 +15,11 @@ public class AccountInfoRequest {
     @Size(max = 100, message = "Họ tên tối đa 100 ký tự")
     private String fullName;
 
-    @Pattern(regexp = "^([0-9]{10})?$", message = "Số điện thoại phải gồm 10 chữ số")
+    @NotBlank(message = "Vui lòng nhập số điện thoại")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Số điện thoại phải gồm đúng 10 chữ số")
     private String phone;
 
+    @NotBlank(message = "Vui lòng nhập địa chỉ")
     @Size(max = 500, message = "Địa chỉ tối đa 500 ký tự")
     private String address;
 

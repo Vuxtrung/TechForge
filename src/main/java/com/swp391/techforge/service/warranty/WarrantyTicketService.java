@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class WarrantyTicketService {
@@ -27,7 +28,7 @@ public class WarrantyTicketService {
     }
 
     @Transactional(readOnly = true)
-    public Page<WarrantyTicket> search(String keyword, String status, int page, int size) {
+    public Page<WarrantyTicket> search(String keyword, String status, int page, int size, Sort sort) {
         WarrantyTicketStatus ticketStatus = null;
         if (status != null && !status.isBlank()) {
             try {
@@ -37,11 +38,22 @@ public class WarrantyTicketService {
             }
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        if (keyword == null || keyword.isBlank()) {
-            return warrantyTicketRepository.findAllByOrderByCreatedAtDesc(pageable);
-        }
+        Pageable pageable = PageRequest.of(page, size, sort);
         return warrantyTicketRepository.search(keyword, ticketStatus, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WarrantyTicket> getAllForExport(String keyword, String status) {
+        WarrantyTicketStatus ticketStatus = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                ticketStatus = WarrantyTicketStatus.valueOf(status);
+            } catch (IllegalArgumentException ignored) {
+                ticketStatus = null;
+            }
+        }
+
+        return warrantyTicketRepository.search(keyword, ticketStatus, Pageable.unpaged()).getContent();
     }
 
     @Transactional(readOnly = true)

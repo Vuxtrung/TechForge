@@ -6,7 +6,6 @@
     const avatarError = document.getElementById('avatarError');
     const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
 
-    // ---- Preview avatar khi chọn ảnh ----
     avatarInput.addEventListener('change', function () {
         avatarError.classList.add('d-none');
         const file = this.files[0];
@@ -42,30 +41,5 @@
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
-    });
-
-    // ---- Validate trước khi submit ----
-    const phoneRegex = /^[0-9]{10}$/;
-
-    form.addEventListener('submit', function (e) {
-        let valid = true;
-
-        const fullName = document.getElementById('fullName');
-        fullName.classList.remove('is-invalid');
-        if (!fullName.value.trim()) {
-            fullName.classList.add('is-invalid');
-            valid = false;
-        }
-
-        const phone = document.getElementById('phone');
-        phone.classList.remove('is-invalid');
-        if (phone.value.trim() && !phoneRegex.test(phone.value.trim())) {
-            phone.classList.add('is-invalid');
-            valid = false;
-        }
-
-        if (!valid) {
-            e.preventDefault();
-        }
     });
 })();

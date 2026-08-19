@@ -190,7 +190,7 @@
 
             <!-- Account Link -->
             <a
-              th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/products} : (${#authorization.expression('isAuthenticated()')} ? @{/account} : @{/login})"
+              th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/account} : (${#authorization.expression('isAuthenticated()')} ? @{/account} : @{/login})"
               class="header-action-btn text-white text-decoration-none d-flex flex-column align-items-center"
             >
               <i class="bi bi-person-circle fs-5" th:classappend="${#authorization.expression('hasRole(''ADMIN'')')} ? 'text-warning' : ''"></i>
@@ -203,13 +203,13 @@
 
       <!-- JS Thêm vào giỏ hàng AJAX không load lại trang -->
       <script>
-        function addToCartAjax(productId, productName, price, imageUrl) {
+        function addToCartAjax(productId, productName, price, imageUrl, quantity) {
           const params = new URLSearchParams();
           params.append("productId", productId);
           params.append("productName", productName);
           params.append("price", price);
           params.append("imageUrl", imageUrl);
-          params.append("quantity", 1);
+          params.append("quantity", quantity || 1);
 
           fetch("/cart/api/add", {
             method: "POST",

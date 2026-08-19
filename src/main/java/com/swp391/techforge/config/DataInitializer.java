@@ -98,12 +98,12 @@ public class DataInitializer implements CommandLineRunner {
             catComponent.setActive(true);
             categoryRepository.save(catComponent);
 
-            Category catGpu = new Category();
-            catGpu.setName("GPU - Card Màn Hình");
-            catGpu.setType(Category.CategoryType.PC_COMPONENT);
-            catGpu.setParent(catComponent);
-            catGpu.setActive(true);
-            categoryRepository.save(catGpu);
+            Category catVga = new Category();
+            catVga.setName("VGA - Card Màn Hình");
+            catVga.setType(Category.CategoryType.PC_COMPONENT);
+            catVga.setParent(catComponent);
+            catVga.setActive(true);
+            categoryRepository.save(catVga);
 
             Category catCpu = new Category();
             catCpu.setName("CPU - Bộ Vi Xử Lý");

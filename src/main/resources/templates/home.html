@@ -7,16 +7,13 @@
 </head>
 
 <body>
-    <!-- Header Fragment -->
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <!-- Main Container -->
     <main class="main-body">
 
         <!-- SECTION 1: HERO & CATEGORY MENU -->
         <section class="hero-section container-fluid px-lg-5 my-3">
             <div class="row g-3">
-                <!-- Left Menu (Categories) -->
                 <div class="col-lg-3 d-none d-lg-block">
                     <div class="category-menu-card bg-white rounded shadow-sm border p-2">
                         <div class="menu-title bg-dark text-white p-2 rounded mb-2 fw-bold text-uppercase fs-6">
@@ -36,10 +33,26 @@
                                 </a>
                             </li>
                         </ul>
+                         <!-- Danh mục nổi bật (nhiều sản phẩm nhất) -->
+                        <div class="mt-2 pt-2 border-top">
+                            <div class="fs-8 fw-bold text-muted text-uppercase px-2 mb-1">
+                                Danh Mục Nổi Bật
+                            </div>
+                            <ul class="list-unstyled mb-0 category-menu-list">
+                                <li th:each="cat : ${categories}">
+                                    <a th:href="@{/products(categoryId=${cat.categoryId})}" class="d-flex align-items-center justify-content-between p-2 text-dark text-decoration-none rounded hover-bg-light">
+                                        <span><i class="bi bi-star-fill me-2 text-warning"></i> <span th:text="${cat.name}">Tên danh mục</span></span>
+                                        <i class="bi bi-chevron-right fs-7 text-muted"></i>
+                                    </a>
+                                </li>
+                                <li th:if="${#lists.isEmpty(categories)}">
+                                    <span class="p-2 text-muted d-block fs-8">Chưa có danh mục nổi bật</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Middle Banner Carousel -->
                 <div class="col-lg-6 col-md-8">
                     <div id="heroCarousel" class="carousel slide rounded overflow-hidden shadow-sm border" data-bs-ride="carousel">
                         <div class="carousel-indicators">
@@ -91,7 +104,6 @@
                     </div>
                 </div>
 
-                <!-- Right Banners -->
                 <div class="col-lg-3 col-md-4 d-flex flex-column justify-content-between gap-2">
                     <div class="side-banner-card bg-primary text-white p-3 rounded shadow-sm border h-100 d-flex flex-column justify-content-center" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
                         <span class="badge bg-warning text-dark mb-1 w-fit">HOT SALE</span>
@@ -128,7 +140,6 @@
                     </a>
                 </div>
 
-                <!-- Budget PC Recommender -->
                 <div class="col-xl-3 col-md-6">
                     <a th:href="@{/pc-recommender}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-primary hover-transform">
                         <div class="d-flex align-items-center gap-3">
@@ -143,7 +154,6 @@
                     </a>
                 </div>
 
-                <!-- Warranty Lookup -->
                 <div class="col-xl-3 col-md-6">
                     <a th:href="@{/warranty-lookup}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-success hover-transform">
                         <div class="d-flex align-items-center gap-3">
@@ -158,7 +168,6 @@
                     </a>
                 </div>
 
-                <!-- Installment 0% -->
                 <div class="col-xl-3 col-md-6">
                     <a th:href="@{/installment}" class="card border-0 shadow-sm rounded-3 p-3 text-decoration-none feature-shortcut-card h-100 bg-white border-start border-4 border-warning hover-transform">
                         <div class="d-flex align-items-center gap-3">
@@ -187,7 +196,6 @@
                     <a th:href="@{/products}" class="text-danger fw-bold text-decoration-none fs-7">Xem Tất Cả <i class="bi bi-chevron-right"></i></a>
                 </div>
 
-                <!-- Dynamic Product Grid -->
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                     <div class="col" th:each="product : ${latestProducts}">
                         <div th:replace="~{fragments/product-card :: card(product=${product})}"></div>
@@ -246,7 +254,6 @@
 
     </main>
 
-    <!-- Footer Fragment -->
     <div th:replace="~{fragments/footer :: footer}"></div>
 
     <script th:inline="none">

@@ -1,7 +1,11 @@
 package com.swp391.techforge.service.category;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+
 import com.swp391.techforge.entity.Category;
 import com.swp391.techforge.repository.category.CategoryRepository;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +23,17 @@ public class CategoryService {
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
+    
+    // Lấy N danh mục nổi bật (nhiều sản phẩm nhất), dùng cho trang chủ
+    @Transactional(readOnly = true)
+    public List<Category> findTopCategoriesByProductCount(int limit) {
+        List<Long> topIds = categoryRepository.findTopRootCategoryIdsByProductCount(limit);
+        List<Category> categories = categoryRepository.findAllById(topIds);
+
+        // findAllById không đảm bảo giữ thứ tự -> sắp lại theo đúng thứ tự topIds (đã ORDER BY count DESC)
+        categories.sort(Comparator.comparingInt(c -> topIds.indexOf(c.getCategoryId())));
+        return categories;
+    }
 
     @Transactional(readOnly = true)
     public Page<Category> search(String keyword, String type, String active,
@@ -34,18 +49,13 @@ public class CategoryService {
         return result;
     }
 
+    // Chọn cha trong form
     @Transactional(readOnly = true)
     public List<Category> findAllActive() {
         return categoryRepository.findAllByActiveTrueOrderByNameAsc();
     }
 
-    @Transactional(readOnly = true)
-    public List<Category> findRootCategoriesForNav() {
-        // Con inactive bị lọc ở template (th:if child.active), không mutate
-        // entity managed ở đây để tránh side-effect ngoài ý muốn với Hibernate.
-        return categoryRepository.findAllByParentIsNullAndActiveTrueOrderByNameAsc();
-    }
-
+    // Lấy 1 category theo ID - Dùng cho form sửa
     @Transactional(readOnly = true)
     public Category getById(Long id) {
         Category category = categoryRepository.findById(id)
@@ -73,6 +83,7 @@ public class CategoryService {
         existing.setType(incoming.getType());
         existing.setActive(incoming.isActive());
         existing.setParent(resolveParent(incoming.getParentId(), id));
+        existing.setUpdatedAt(LocalDateTime.now());
 
         return categoryRepository.save(existing);
     }
@@ -106,10 +117,11 @@ public class CategoryService {
         if (productCount > 0) {
             throw new IllegalArgumentException("Không thể xóa danh mục đang có sản phẩm.");
         }
-
+        
         categoryRepository.delete(category);
     }
 
+    // Đệ quy ẩn danh mục con khi ẩn danh mục cha
     private void cascadeDeactivate(Long parentId) {
         List<Category> children = categoryRepository.findAllByParent_CategoryId(parentId);
         for (Category child : children) {

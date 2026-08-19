@@ -15,374 +15,416 @@
     <main class="main-body d-flex">
       <!-- Sidebar -->
       <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
-      
+
       <!-- Main Content -->
-      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+      <div
+        class="content flex-grow-1 p-4 bg-light"
+        style="min-height: calc(100vh - 72px)"
+      >
         <div class="container-fluid">
           <div class="row justify-content-center">
             <div class="col-lg-10">
-            <div class="bg-white rounded-3 shadow-sm border p-4">
-              <div
-                class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2"
-              >
-                <span class="fs-4 text-dark fw-bold">
-                  <i class="bi bi-box-seam text-danger"></i>
-                  <span
-                    th:text="${product.productId == null ? 'Thêm Sản Phẩm Mới' : 'Cập Nhật Sản Phẩm'}"
-                    >Sản Phẩm</span
-                  >
-                </span>
-                <a
-                  th:href="@{/admin/products}"
-                  class="btn btn-outline-secondary btn-sm"
-                >
-                  <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
-                </a>
-              </div>
-
-              <div th:if="${errorMessage}" class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle me-1"></i>
-                <span th:text="${errorMessage}"></span>
-              </div>
-
-              <form
-                th:action="${product.productId == null ? '/admin/products' : '/admin/products/' + product.productId}"
-                th:object="${product}"
-                method="post"
-                enctype="multipart/form-data"
-                novalidate
-              >
-                <!-- Name -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold"
-                    >Tên Sản Phẩm <span class="text-danger">*</span></label
-                  >
-                  <input
-                    type="text"
-                    th:field="*{name}"
-                    class="form-control"
-                    th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
-                    placeholder="VD: PC Gaming AMD Ryzen 5 - RTX 4060"
-                    required
-                    maxlength="200"
-                  />
-                  <div
-                    class="invalid-feedback"
-                    th:if="${#fields.hasErrors('name')}"
-                    th:errors="*{name}"
-                  ></div>
-                </div>
-
-                <div class="row">
-                  <!-- Category -->
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold"
-                      >Danh Mục <span class="text-danger">*</span></label
-                    >
-                    <select
-                      th:field="*{categoryId}"
-                      class="form-select"
-                      required
-                    >
-                      <option value="">-- Chọn danh mục --</option>
-                      <option
-                        th:each="c : ${categories}"
-                        th:value="${c.categoryId}"
-                        th:text="${c.name}"
-                      >
-                        Danh mục
-                      </option>
-                    </select>
-                  </div>
-
-                  <!-- Brand -->
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-semibold">Thương Hiệu</label>
-                    <input
-                      type="text"
-                      th:field="*{brand}"
-                      class="form-control"
-                      placeholder="VD: Asus, MSI, Intel..."
-                      maxlength="100"
-                    />
-                  </div>
-                </div>
-
-                <!-- Description -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Mô Tả</label>
-                  <textarea
-                    th:field="*{description}"
-                    class="form-control"
-                    rows="4"
-                    placeholder="Mô tả chi tiết sản phẩm..."
-                  ></textarea>
-                </div>
-
-                <div class="row">
-                  <!-- Price -->
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold"
-                      >Giá Bán (VNĐ) <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="number"
-                      th:field="*{basePrice}"
-                      class="form-control"
-                      th:classappend="${#fields.hasErrors('basePrice')} ? 'is-invalid'"
-                      step="1000"
-                      min="0"
-                      placeholder="VD: 15000000"
-                      required
-                    />
-                    <div id="priceFormattedDisplay" class="form-text text-danger fw-bold mt-1"></div>
-                    <div
-                      class="invalid-feedback"
-                      th:if="${#fields.hasErrors('basePrice')}"
-                      th:errors="*{basePrice}"
-                    ></div>
-                  </div>
-
-                  <!-- Stock -->
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold"
-                      >Số Lượng Tồn Kho
-                      <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="number"
-                      th:field="*{stockQuantity}"
-                      class="form-control"
-                      th:classappend="${#fields.hasErrors('stockQuantity')} ? 'is-invalid'"
-                      min="0"
-                      placeholder="0"
-                      required
-                    />
-                    <div
-                      class="invalid-feedback"
-                      th:if="${#fields.hasErrors('stockQuantity')}"
-                      th:errors="*{stockQuantity}"
-                    ></div>
-                  </div>
-
-                  <!-- Status -->
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-semibold"
-                      >Trạng Thái <span class="text-danger">*</span></label
-                    >
-                    <select th:field="*{status}" class="form-select" required>
-                      <option value="ACTIVE">Đang bán</option>
-                      <option value="HIDDEN">Đã ẩn</option>
-                    </select>
-                  </div>
-                </div>
-
-                <!-- Image -->
-                <div class="mb-3">
-                  <label class="form-label fw-semibold">Ảnh Sản Phẩm</label>
-                  <div class="mb-2" th:if="${product.primaryImageUrl}">
-                    <img
-                      th:src="${product.primaryImageUrl}"
-                      alt="Ảnh hiện tại"
-                      style="max-height: 150px"
-                      class="rounded border"
-                    />
-                  </div>
-                  <input
-                    type="file"
-                    id="imageFile"
-                    name="imageFile"
-                    class="form-control"
-                    accept="image/jpeg,image/png,image/webp"
-                  />
-                  <div class="form-text">
-                    Chọn ảnh mới để tải lên (JPG, PNG, WEBP - tối đa 5MB).
-                  </div>
-                  <div
-                    id="imageFileError"
-                    class="text-danger fs-8 mt-1"
-                    style="display: none"
-                  ></div>
-                </div>
-
+              <div class="bg-white rounded-3 shadow-sm border p-4">
                 <div
-                  style="
-                    border-top: 1px solid #e5e5e5;
-                    padding-top: 12px;
-                    margin-top: 16px;
-                  "
+                  class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2"
                 >
-                  <div
-                    style="
-                      display: flex;
-                      justify-content: space-between;
-                      align-items: center;
-                      margin-bottom: 8px;
-                    "
-                  >
-                    <label>Thông số kỹ thuật</label>
-                    <button type="button" id="addSpecRow">+ Thêm dòng</button>
-                  </div>
-                  <div id="specRows">
-                    <div
-                      class="spec-row"
-                      style="
-                        display: grid;
-                        grid-template-columns: 1fr 1fr auto;
-                        gap: 8px;
-                        margin-bottom: 6px;
-                      "
-                      th:each="spec : ${product.specifications}"
+                  <span class="fs-4 text-dark fw-bold">
+                    <i class="bi bi-box-seam text-danger"></i>
+                    <span
+                      th:text="${product.productId == null ? 'Thêm Sản Phẩm Mới' : 'Cập Nhật Sản Phẩm'}"
+                      >Sản Phẩm</span
                     >
-                      <input
-                        type="text"
-                        name="specKey"
-                        th:value="${spec.specKey}"
-                        placeholder="Tên thuộc tính (VD: Socket)"
-                      />
-                      <input
-                        type="text"
-                        name="specValue"
-                        th:value="${spec.specValue}"
-                        placeholder="Giá trị (VD: AM5)"
-                      />
-                      <button type="button" class="removeSpecRow">Xóa</button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="d-flex gap-2 justify-content-end border-top pt-3">
+                  </span>
                   <a
                     th:href="@{/admin/products}"
-                    class="btn btn-outline-secondary px-4"
-                    >Hủy</a
+                    class="btn btn-outline-secondary btn-sm"
                   >
-                  <button
-                    type="submit"
-                    id="submitBtn"
-                    class="btn btn-danger px-4 fw-semibold"
-                  >
-                    <i class="bi bi-check-lg me-1"></i>
-                    <span
-                      th:text="${product.productId == null ? 'Thêm Sản Phẩm' : 'Lưu Thay Đổi'}"
-                      >Lưu</span
-                    >
-                  </button>
+                    <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
+                  </a>
                 </div>
-              </form>
+                
+                 <!-- Success and error messages -->
+                <div
+                  th:if="${successMessage}"
+                  class="alert alert-success alert-dismissible fade show"
+                  role="alert"
+                >
+                  <i class="bi bi-check-circle me-1"></i>
+                  <span th:text="${successMessage}"></span>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                  ></button>
+                </div>
 
-              <script>
-                (function () {
-                  var MAX_SIZE = 5 * 1024 * 1024; // 5MB
-                  var fileInput = document.getElementById("imageFile");
-                  var errorBox = document.getElementById("imageFileError");
-                  var submitBtn = document.getElementById("submitBtn");
+                <div th:if="${errorMessage}" class="alert alert-danger">
+                  <i class="bi bi-exclamation-triangle me-1"></i>
+                  <span th:text="${errorMessage}"></span>
+                </div>
 
-                  fileInput.addEventListener("change", function () {
-                    errorBox.style.display = "none";
-                    errorBox.textContent = "";
-                    submitBtn.disabled = false;
+                <form
+                  th:action="${product.productId == null ? '/admin/products' : '/admin/products/' + product.productId}"
+                  th:object="${product}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  novalidate
+                >
+                  <!-- Name -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold"
+                      >Tên Sản Phẩm <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      th:field="*{name}"
+                      class="form-control"
+                      th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                      placeholder="VD: PC Gaming AMD Ryzen 5 - RTX 4060"
+                      required
+                      maxlength="200"
+                    />
+                    <div
+                      class="invalid-feedback"
+                      th:if="${#fields.hasErrors('name')}"
+                      th:errors="*{name}"
+                    ></div>
+                  </div>
 
-                    var file = fileInput.files[0];
-                    if (!file) return;
+                  <div class="row">
+                    <!-- Category -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold"
+                        >Danh Mục <span class="text-danger">*</span></label
+                      >
+                      <select
+                        th:field="*{categoryId}"
+                        class="form-select"
+                        required
+                      >
+                        <option value="">-- Chọn danh mục --</option>
+                        <option
+                          th:each="c : ${categories}"
+                          th:value="${c.categoryId}"
+                          th:text="${c.name}"
+                        >
+                          Danh mục
+                        </option>
+                      </select>
+                    </div>
 
-                    if (file.size > MAX_SIZE) {
-                      errorBox.textContent =
-                        "Ảnh vượt quá 5MB, vui lòng chọn ảnh khác.";
-                      errorBox.style.display = "block";
-                      fileInput.value = "";
+                    <!-- Brand -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold">Thương Hiệu</label>
+                      <input
+                        type="text"
+                        th:field="*{brand}"
+                        class="form-control"
+                        th:classappend="${#fields.hasErrors('brand')} ? 'is-invalid'"
+                        placeholder="VD: Asus, MSI, Intel..."
+                        maxlength="100"
+                      />
+                      <div class="invalid-feedback" th:if="${#fields.hasErrors('brand')}" th:errors="*{brand}"></div>
+                    </div>
+                  </div>
+
+                  <!-- Description -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Mô Tả</label>
+                    <textarea
+                      th:field="*{description}"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Mô tả chi tiết sản phẩm..."
+                    ></textarea>
+                  </div>
+
+                  <div class="row">
+                    <!-- Price -->
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label fw-semibold"
+                        >Giá Bán (VNĐ) <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        th:field="*{basePrice}"
+                        class="form-control"
+                        th:classappend="${#fields.hasErrors('basePrice')} ? 'is-invalid'"
+                        step="1000"
+                        min="0"
+                        placeholder="VD: 15000000"
+                        required
+                      />
+                      <div
+                        id="priceFormattedDisplay"
+                        class="form-text text-danger fw-bold mt-1"
+                      ></div>
+                      <div
+                        class="invalid-feedback"
+                        th:if="${#fields.hasErrors('basePrice')}"
+                        th:errors="*{basePrice}"
+                      ></div>
+                    </div>
+
+                    <!-- Stock -->
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label fw-semibold"
+                        >Số Lượng Tồn Kho
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        type="number"
+                        th:field="*{stockQuantity}"
+                        class="form-control"
+                        th:classappend="${#fields.hasErrors('stockQuantity')} ? 'is-invalid'"
+                        min="0"
+                        placeholder="0"
+                        required
+                      />
+                      <div
+                        class="invalid-feedback"
+                        th:if="${#fields.hasErrors('stockQuantity')}"
+                        th:errors="*{stockQuantity}"
+                      ></div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label fw-semibold"
+                        >Trạng Thái <span class="text-danger">*</span></label
+                      >
+                      <select th:field="*{status}" class="form-select"
+                        th:classappend="${#fields.hasErrors('status')} ? 'is-invalid'" required>
+                        <option value="ACTIVE">Đang bán</option>
+                        <option value="HIDDEN">Đã ẩn</option>
+                      </select>
+                      <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+                    </div>
+                  </div>
+
+                  <!-- Image -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Ảnh Sản Phẩm</label>
+                    <div
+                      class="mb-2"
+                      th:if="${product.getPrimaryImageUrl() != null}"
+                    >
+                      <img
+                        th:src="${product.getPrimaryImageUrl()}"
+                        alt="Ảnh hiện tại"
+                        style="max-height: 150px"
+                        class="rounded border"
+                      />
+                    </div>
+                    <input
+                      type="file"
+                      id="imageFile"
+                      name="imageFile"
+                      class="form-control"
+                      accept="image/jpeg,image/png,image/webp"
+                    />
+                    <div class="form-text">
+                      Chọn ảnh mới để tải lên (JPG, PNG, WEBP - tối đa 5MB).
+                    </div>
+                    <div
+                      id="imageFileError"
+                      class="text-danger fs-8 mt-1"
+                      style="display: none"
+                    ></div>
+                  </div>
+
+                  <div
+                    style="
+                      border-top: 1px solid #e5e5e5;
+                      padding-top: 12px;
+                      margin-top: 16px;
+                    "
+                  >
+                    <div
+                      style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      <label>Thông số kỹ thuật</label>
+                      <button type="button" id="addSpecRow">+ Thêm dòng</button>
+                    </div>
+                    <div id="specRows">
+                      <div
+                        class="spec-row"
+                        style="
+                          display: grid;
+                          grid-template-columns: 1fr 1fr auto;
+                          gap: 8px;
+                          margin-bottom: 6px;
+                        "
+                        th:each="spec : ${product.specifications}"
+                      >
+                        <input
+                          type="text"
+                          name="specKey"
+                          th:value="${spec.specKey}"
+                          placeholder="Tên thuộc tính (VD: Socket)"
+                        />
+                        <input
+                          type="text"
+                          name="specValue"
+                          th:value="${spec.specValue}"
+                          placeholder="Giá trị (VD: AM5)"
+                        />
+                        <button type="button" class="removeSpecRow">Xóa</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 justify-content-end border-top pt-3">
+                    <a
+                      th:href="@{/admin/products}"
+                      class="btn btn-outline-secondary px-4"
+                      >Hủy</a
+                    >
+                    <button
+                      type="submit"
+                      id="submitBtn"
+                      class="btn btn-danger px-4 fw-semibold"
+                    >
+                      <i class="bi bi-check-lg me-1"></i>
+                      <span
+                        th:text="${product.productId == null ? 'Thêm Sản Phẩm' : 'Lưu Thay Đổi'}"
+                        >Lưu</span
+                      >
+                    </button>
+                  </div>
+                </form>
+
+                <script>
+                  (function () {
+                    var MAX_SIZE = 5 * 1024 * 1024; // 5MB
+                    var fileInput = document.getElementById("imageFile");
+                    var errorBox = document.getElementById("imageFileError");
+                    var submitBtn = document.getElementById("submitBtn");
+
+                    fileInput.addEventListener("change", function () {
+                      errorBox.style.display = "none";
+                      errorBox.textContent = "";
                       submitBtn.disabled = false;
-                    }
-                  });
-                })();
-              </script>
 
-              <script>
-                document
-                  .getElementById("addSpecRow")
-                  .addEventListener("click", function () {
-                    const row = document.createElement("div");
-                    row.className = "spec-row";
-                    row.style =
-                      "display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:6px;";
-                    row.innerHTML = `
+                      var file = fileInput.files[0];
+                      if (!file) return;
+
+                      if (file.size > MAX_SIZE) {
+                        errorBox.textContent =
+                          "Ảnh vượt quá 5MB, vui lòng chọn ảnh khác.";
+                        errorBox.style.display = "block";
+                        fileInput.value = "";
+                        submitBtn.disabled = false;
+                      }
+                    });
+                  })();
+                </script>
+
+                <script>
+                  document
+                    .getElementById("addSpecRow")
+                    .addEventListener("click", function () {
+                      const row = document.createElement("div");
+                      row.className = "spec-row";
+                      row.style =
+                        "display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:6px;";
+                      row.innerHTML = `
         <input type="text" name="specKey" placeholder="Tên thuộc tính (VD: Socket)">
         <input type="text" name="specValue" placeholder="Giá trị (VD: AM5)">
         <button type="button" class="removeSpecRow">Xóa</button>`;
-                    document.getElementById("specRows").appendChild(row);
-                  });
+                      document.getElementById("specRows").appendChild(row);
+                    });
 
-                document
-                  .getElementById("specRows")
-                  .addEventListener("click", function (e) {
-                    if (e.target.classList.contains("removeSpecRow")) {
-                      e.target.closest(".spec-row").remove();
+                  document
+                    .getElementById("specRows")
+                    .addEventListener("click", function (e) {
+                      if (e.target.classList.contains("removeSpecRow")) {
+                        e.target.closest(".spec-row").remove();
+                      }
+                    });
+                </script>
+
+                <!-- Script Format VNĐ -->
+                <script>
+                  document.addEventListener("DOMContentLoaded", function () {
+                    const priceInput = document.getElementById("basePrice");
+                    const priceDisplay = document.getElementById(
+                      "priceFormattedDisplay",
+                    );
+
+                    if (!priceInput || !priceDisplay) return;
+
+                    function updatePriceDisplay() {
+                      const val = parseInt(priceInput.value, 10);
+                      if (!isNaN(val)) {
+                        priceDisplay.textContent = new Intl.NumberFormat(
+                          "vi-VN",
+                          { style: "currency", currency: "VND" },
+                        ).format(val);
+                      } else {
+                        priceDisplay.textContent = "";
+                      }
                     }
+
+                    priceInput.addEventListener("input", updatePriceDisplay);
+                    updatePriceDisplay(); // initial load
                   });
-              </script>
-              
-              <!-- Script Format VNĐ -->
-              <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                  const priceInput = document.getElementById("basePrice");
-                  const priceDisplay = document.getElementById("priceFormattedDisplay");
-                  
-                  if (!priceInput || !priceDisplay) return;
+                </script>
 
-                  function updatePriceDisplay() {
-                    const val = parseInt(priceInput.value, 10);
-                    if (!isNaN(val)) {
-                      priceDisplay.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-                    } else {
-                      priceDisplay.textContent = "";
-                    }
-                  }
+                <!-- Script Auto Fill Specs -->
+                <script>
+                  document.addEventListener("DOMContentLoaded", function () {
+                    const categorySelect =
+                      document.getElementById("categoryId");
+                    const specRowsContainer =
+                      document.getElementById("specRows");
 
-                  priceInput.addEventListener("input", updatePriceDisplay);
-                  updatePriceDisplay(); // initial load
-                });
-              </script>
+                    if (!categorySelect || !specRowsContainer) return;
 
-              <!-- Script Auto Fill Specs -->
-              <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                  const categorySelect = document.getElementById("categoryId");
-                  const specRowsContainer = document.getElementById("specRows");
+                    categorySelect.addEventListener("change", function () {
+                      const categoryId = categorySelect.value;
+                      if (!categoryId) return;
 
-                  if (!categorySelect || !specRowsContainer) return;
-
-                  categorySelect.addEventListener("change", function() {
-                    const categoryId = categorySelect.value;
-                    if (!categoryId) return;
-
-                    fetch("/api/admin/categories/" + categoryId + "/specs")
-                      .then(response => response.json())
-                      .then(specs => {
-                        if (specs && specs.length > 0) {
-                          // Xác nhận người dùng nếu đang có sẵn specs
-                          if (specRowsContainer.innerHTML.trim() !== "" && !confirm("Đổi danh mục sẽ xóa các thông số kỹ thuật hiện tại và thay bằng các thông số chuẩn của danh mục mới. Bạn có chắc chắn muốn đổi?")) {
+                      fetch("/api/admin/categories/" + categoryId + "/specs")
+                        .then((response) => response.json())
+                        .then((specs) => {
+                          if (specs && specs.length > 0) {
+                            // Xác nhận người dùng nếu đang có sẵn specs
+                            if (
+                              specRowsContainer.innerHTML.trim() !== "" &&
+                              !confirm(
+                                "Đổi danh mục sẽ xóa các thông số kỹ thuật hiện tại và thay bằng các thông số chuẩn của danh mục mới. Bạn có chắc chắn muốn đổi?",
+                              )
+                            ) {
                               return;
-                          }
-                          specRowsContainer.innerHTML = "";
-                          specs.forEach(spec => {
-                            const row = document.createElement("div");
-                            row.className = "spec-row";
-                            row.style = "display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:6px;";
-                            row.innerHTML = `
+                            }
+                            specRowsContainer.innerHTML = "";
+                            specs.forEach((spec) => {
+                              const row = document.createElement("div");
+                              row.className = "spec-row";
+                              row.style =
+                                "display:grid; grid-template-columns:1fr 1fr auto; gap:8px; margin-bottom:6px;";
+                              row.innerHTML = `
                               <input type="text" name="specKey" value="${spec}" placeholder="Tên thuộc tính (VD: Socket)">
                               <input type="text" name="specValue" placeholder="Giá trị (VD: AM5)">
                               <button type="button" class="removeSpecRow">Xóa</button>
                             `;
-                            specRowsContainer.appendChild(row);
-                          });
-                        }
-                      })
-                      .catch(err => console.error("Error fetching specs:", err));
+                              specRowsContainer.appendChild(row);
+                            });
+                          }
+                        })
+                        .catch((err) =>
+                          console.error("Error fetching specs:", err),
+                        );
+                    });
                   });
-                });
-              </script>
-
-            </div>
+                </script>
+              </div>
             </div>
           </div>
         </div>
