@@ -5,12 +5,15 @@ import com.swp391.techforge.dto.order.CheckoutRequest;
 import com.swp391.techforge.entity.*;
 import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.repository.order.PaymentRepository;
+import com.swp391.techforge.repository.product.ProductRepository;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.service.order.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -29,12 +32,18 @@ public class CheckoutController {
     private final VNPayService vnPayService;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
-    public CheckoutController(OrderService orderService, VNPayService vnPayService, PaymentRepository paymentRepository, UserRepository userRepository) {
+    public CheckoutController(OrderService orderService,
+                              VNPayService vnPayService,
+                              PaymentRepository paymentRepository,
+                              UserRepository userRepository,
+                              ProductRepository productRepository) {
         this.orderService = orderService;
         this.vnPayService = vnPayService;
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
+        this.productRepository = productRepository;
     }
 
     @GetMapping
@@ -48,6 +57,10 @@ public class CheckoutController {
         BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItemDTO item : cartItems) {
             subtotal = subtotal.add(BigDecimal.valueOf(item.getTotalPrice()));
+            if (item.getProductId() != null) {
+                productRepository.findById(item.getProductId())
+                        .ifPresent(p -> item.setStockQuantity(p.getStockQuantity()));
+            }
         }
 
         CheckoutRequest request = new CheckoutRequest();

@@ -65,7 +65,7 @@ public class CategoryController {
                           RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("parentCategories", categoryService.findAllActive());
-            return "admin/category-form";
+            return "admin/category-form";  //lỗi validate quay lại form
         }
         try {
             categoryService.create(category);

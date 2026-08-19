@@ -40,6 +40,22 @@ public class UserService {
         return userRepository.search(keyword, roleId, userStatus, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<User> searchByRoles(String keyword, java.util.List<Integer> roleIds, String status,
+                                    int page, int size, Sort sort) {
+        UserStatus userStatus = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                userStatus = UserStatus.valueOf(status);
+            } catch (IllegalArgumentException e) {
+                userStatus = null;
+            }
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return userRepository.searchByRoles(keyword, roleIds, userStatus, pageable);
+    }
+
     /**
      * Lấy người dùng theo ID
      */

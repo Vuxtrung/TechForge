@@ -38,7 +38,7 @@
                             <!-- Field 1: Họ tên người nhận -->
                             <div class="col-md-6">
                                 <label for="recipientName" class="form-label fs-7 fw-semibold">Họ và Tên người nhận <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="recipientName" name="recipientName" placeholder="VD: Nguyễn Văn A" required>
+                                <input type="text" class="form-control form-control-sm" id="recipientName" th:field="*{recipientName}" placeholder="VD: Nguyễn Văn A" required>
                             </div>
 
                             <!-- Field 2: Số điện thoại -->
@@ -50,37 +50,37 @@
                             <!-- Field 3: Email nhận hóa đơn -->
                             <div class="col-12">
                                 <label for="email" class="form-label fs-7 fw-semibold">Email nhận xác nhận đơn hàng <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="VD: khachhang@techforge.com" required>
+                                <input type="email" class="form-control form-control-sm" id="email" th:field="*{email}" placeholder="VD: khachhang@techforge.com" required>
                             </div>
 
                             <!-- Field 4: Tỉnh / Thành phố -->
                             <div class="col-md-4">
                                 <label for="province" class="form-label fs-7 fw-semibold">Tỉnh / Thành phố <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="province" name="province" placeholder="VD: Hà Nội" required>
+                                <input type="text" class="form-control form-control-sm" id="province" th:field="*{province}" placeholder="VD: Hà Nội" required>
                             </div>
 
                             <!-- Field 5: Quận / Huyện -->
                             <div class="col-md-4">
                                 <label for="district" class="form-label fs-7 fw-semibold">Quận / Huyện <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="district" name="district" placeholder="VD: Cầu Giấy" required>
+                                <input type="text" class="form-control form-control-sm" id="district" th:field="*{district}" placeholder="VD: Cầu Giấy" required>
                             </div>
 
                             <!-- Field 6: Phường / Xã -->
                             <div class="col-md-4">
                                 <label for="ward" class="form-label fs-7 fw-semibold">Phường / Xã <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="ward" name="ward" placeholder="VD: Dịch Vọng Hậu" required>
+                                <input type="text" class="form-control form-control-sm" id="ward" th:field="*{ward}" placeholder="VD: Dịch Vọng Hậu" required>
                             </div>
 
                             <!-- Field 7: Địa chỉ chi tiết (Số nhà, tên đường) -->
                             <div class="col-12">
                                 <label for="addressLine" class="form-label fs-7 fw-semibold">Địa chỉ chi tiết (Số nhà, Tòa nhà, Tên đường) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-sm" id="addressLine" name="addressLine" placeholder="VD: Số 18 Phố Trần Thái Tông" required>
+                                <input type="text" class="form-control form-control-sm" id="addressLine" th:field="*{addressLine}" placeholder="VD: Số 18 Phố Trần Thái Tông" required>
                             </div>
 
                             <!-- Field 8: Ghi chú đơn hàng -->
                             <div class="col-12">
                                 <label for="orderNote" class="form-label fs-7 fw-semibold">Ghi chú giao hàng (Không bắt buộc)</label>
-                                <textarea class="form-control form-control-sm" id="orderNote" name="orderNote" rows="2" placeholder="Ghi chú thêm cho shipper (Ví dụ: Giao giờ hành chính, gọi trước khi giao...)"></textarea>
+                                <textarea class="form-control form-control-sm" id="orderNote" th:field="*{orderNote}" rows="2" placeholder="Ghi chú thêm cho shipper (Ví dụ: Giao giờ hành chính, gọi trước khi giao...)"></textarea>
                             </div>
                         </div>
                     </div>
@@ -148,8 +148,9 @@
                                 <img th:src="${item.imageUrl}" style="width: 50px; height: 50px; object-fit: contain;" class="rounded border p-1" alt="Product">
                                 <div class="flex-grow-1">
                                     <h6 class="fs-8 fw-bold text-dark mb-0 text-truncate-2" th:text="${item.productName}">Tên sản phẩm</h6>
-                                    <div class="fs-8 text-muted">
-                                        <span th:text="${item.quantity}">1</span> x <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
+                                    <div class="fs-8 text-muted d-flex align-items-center gap-2">
+                                        <span><span th:text="${item.quantity}">1</span> x <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span></span>
+                                        <span class="badge bg-secondary-subtle text-secondary border fs-8" th:if="${item.stockQuantity != null}" th:text="'Kho còn: ' + ${item.stockQuantity}">Kho còn: 15</span>
                                     </div>
                                 </div>
                                 <span class="fw-bold fs-7 text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</span>
