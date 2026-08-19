@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class RegisterController {
@@ -29,7 +30,8 @@ public class RegisterController {
     public String processRegister(
             @Valid @ModelAttribute("registerRequest") RegisterRequest request,
             BindingResult bindingResult,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         // Validation lỗi
         if (bindingResult.hasErrors()) {
@@ -43,6 +45,9 @@ public class RegisterController {
             return "register";
         }
 
+        redirectAttributes.addFlashAttribute("registeredEmail", request.getEmail());
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Đăng ký thành công! Vui lòng đăng nhập bằng email của bạn.");
         return "redirect:/login";
     }
 }
