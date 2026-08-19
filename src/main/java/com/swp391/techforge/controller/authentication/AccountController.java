@@ -43,6 +43,15 @@ public class AccountController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Hiển thị trang quản lý tài khoản chính.
+     * Tùy thuộc vào tham số 'view' truyền vào URL, trang sẽ load nội dung tương ứng (thông tin, đơn hàng, mật khẩu).
+     * 
+     * @param view Chế độ xem (info, orders, password)
+     * @param authentication Thông tin xác thực người dùng hiện tại
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template HTML của trang tài khoản
+     */
     @GetMapping
     public String account(
             @RequestParam(value = "view", defaultValue = "none") String view,
@@ -78,6 +87,15 @@ public class AccountController {
         return "account";
     }
 
+    /**
+     * Xử lý yêu cầu cập nhật thông tin cá nhân (Họ tên, SĐT, Địa chỉ, Ảnh đại diện).
+     * 
+     * @param request Dữ liệu từ form cập nhật thông tin
+     * @param bindingResult Chứa kết quả validate dữ liệu
+     * @param authentication Thông tin xác thực người dùng
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template HTML của trang tài khoản (hiển thị thông báo thành công hoặc lỗi)
+     */
     @PostMapping("/info")
     public String updateInfo(
             @Valid @ModelAttribute("accountInfoRequest") AccountInfoRequest request,
@@ -125,6 +143,16 @@ public class AccountController {
         return "account";
     }
 
+    /**
+     * Xử lý yêu cầu thay đổi mật khẩu của người dùng.
+     * Kiểm tra mật khẩu cũ phải khớp với CSDL, và mật khẩu mới phải khớp với xác nhận.
+     * 
+     * @param request Dữ liệu từ form đổi mật khẩu
+     * @param bindingResult Chứa kết quả validate dữ liệu
+     * @param authentication Thông tin xác thực người dùng
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template HTML của trang tài khoản
+     */
     @PostMapping("/password")
     public String changePassword(
             @Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,

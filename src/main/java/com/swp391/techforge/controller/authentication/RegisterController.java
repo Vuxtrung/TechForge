@@ -19,12 +19,28 @@ public class RegisterController {
         this.registerService = registerService;
     }
 
+    /**
+     * Hiển thị trang đăng ký tài khoản.
+     * Cung cấp một đối tượng RegisterRequest rỗng cho Spring Form binding.
+     * 
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template trang đăng ký (register.html)
+     */
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
         return "register";
     }
 
+    /**
+     * Xử lý yêu cầu đăng ký tài khoản từ người dùng.
+     * Kiểm tra tính hợp lệ của form (rỗng, email trùng, password ngắn).
+     * 
+     * @param request Dữ liệu từ form đăng ký
+     * @param bindingResult Kết quả validation của Spring
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Chuyển hướng tới trang đăng nhập nếu thành công, hoặc trả lại trang đăng ký nếu có lỗi
+     */
     @PostMapping("/register")
     public String processRegister(
             @Valid @ModelAttribute("registerRequest") RegisterRequest request,

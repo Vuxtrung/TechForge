@@ -37,6 +37,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
                       @Param("status") UserStatus status,
                       Pageable pageable);
 
+    /**
+     * Tìm kiếm người dùng với nhiều Role (phục vụ danh sách nhân viên).
+     * 
+     * @param keyword tìm kiếm theo tên, email hoặc số điện thoại
+     * @param roleIds danh sách ID các vai trò nhân viên cần lọc
+     * @param status lọc theo trạng thái ACTIVE/LOCKED (null = tất cả)
+     * @param pageable đối tượng phân trang và sắp xếp
+     * @return trang kết quả tìm kiếm danh sách nhân viên
+     */
     @Query("SELECT u FROM User u WHERE " +
             "(:keyword IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
             "  OR LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) " +

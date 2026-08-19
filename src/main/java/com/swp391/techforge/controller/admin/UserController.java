@@ -21,7 +21,18 @@ public class UserController {
     }
 
     /**
-     * Hiển thị danh sách người dùng
+     * Hiển thị trang danh sách người dùng dành cho Quản trị viên (Admin).
+     * Hỗ trợ tìm kiếm, lọc theo vai trò, lọc theo trạng thái, sắp xếp và phân
+     * trang.
+     * 
+     * @param keyword Từ khóa tìm kiếm (tên, email, số điện thoại)
+     * @param roleId  ID của vai trò cần lọc (null = tất cả)
+     * @param status  Trạng thái cần lọc (ACTIVE, LOCKED)
+     * @param sort    Cú pháp sắp xếp (VD: "fullName,asc")
+     * @param page    Số thứ tự trang hiện tại (mặc định 0)
+     * @param size    Số lượng bản ghi trên một trang (mặc định 10)
+     * @param model   Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template HTML hiển thị danh sách người dùng
      */
     @GetMapping
     public String list(
@@ -30,7 +41,7 @@ public class UserController {
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "fullName,asc") String sort,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "3") int size,
             Model model) {
 
         if (size < 1) {
@@ -60,7 +71,13 @@ public class UserController {
     }
 
     /**
-     * Khóa tài khoản người dùng
+     * Khóa tài khoản của một người dùng.
+     * Người dùng bị khóa sẽ không thể đăng nhập vào hệ thống.
+     * 
+     * @param id                 ID của người dùng cần khóa
+     * @param redirectAttributes Đối tượng dùng để truyền thông báo (flash message)
+     *                           sau khi redirect
+     * @return Redirect về trang danh sách người dùng
      */
     @PostMapping("/{id}/lock")
     public String lockUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -76,7 +93,13 @@ public class UserController {
     }
 
     /**
-     * Mở khóa tài khoản người dùng
+     * Mở khóa tài khoản của một người dùng đã bị khóa.
+     * Phục hồi trạng thái hoạt động bình thường cho tài khoản.
+     * 
+     * @param id                 ID của người dùng cần mở khóa
+     * @param redirectAttributes Đối tượng dùng để truyền thông báo (flash message)
+     *                           sau khi redirect
+     * @return Redirect về trang danh sách người dùng
      */
     @PostMapping("/{id}/unlock")
     public String unlockUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -92,7 +115,11 @@ public class UserController {
     }
 
     /**
-     * Xem chi tiết người dùng
+     * Xem chi tiết thông tin hồ sơ của một người dùng cụ thể.
+     * 
+     * @param id    ID của người dùng
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template HTML hiển thị chi tiết người dùng
      */
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {

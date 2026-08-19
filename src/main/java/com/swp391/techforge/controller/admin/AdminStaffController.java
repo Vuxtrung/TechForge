@@ -41,7 +41,18 @@ public class AdminStaffController {
     }
 
     /**
-     * Hiển thị danh sách nhân viên
+     * Hiển thị trang danh sách nhân viên (Staff) dành cho Quản trị viên.
+     * Lọc riêng các tài khoản có role là STAFF_SALES (3) hoặc STAFF_WARRANTY (4).
+     * Có hỗ trợ tìm kiếm, sắp xếp và phân trang tương tự trang người dùng.
+     * 
+     * @param keyword
+     * @param roleId
+     * @param status
+     * @param sort
+     * @param page
+     * @param size 
+     * @param model
+     * @return
      */
     @GetMapping
     public String list(
@@ -80,7 +91,11 @@ public class AdminStaffController {
     }
 
     /**
-     * Hiển thị form thêm nhân viên
+     * Hiển thị giao diện Form thêm nhân viên mới.
+     * Load sẵn danh sách các Role hợp lệ để chọn (chỉ bao gồm các role Staff).
+     * 
+     * @param model Đối tượng đẩy dữ liệu ra view
+     * @return Template form thêm nhân viên
      */
     @GetMapping("/add")
     public String showAddForm(Model model) {
@@ -90,7 +105,15 @@ public class AdminStaffController {
     }
 
     /**
-     * Xử lý thêm nhân viên mới
+     * Xử lý dữ liệu khi Admin submit form thêm nhân viên mới.
+     * Kiểm tra tính hợp lệ của dữ liệu (email trùng, role không đúng...).
+     * Nếu hợp lệ thì tiến hành mã hóa mật khẩu và tạo tài khoản nhân viên mới vào DB.
+     * 
+     * @param request
+     * @param bindingResult 
+     * @param model 
+     * @param redirectAttributes
+     * @return
      */
     @PostMapping("/add")
     public String processAddStaff(

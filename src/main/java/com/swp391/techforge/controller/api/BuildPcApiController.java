@@ -32,6 +32,16 @@ public class BuildPcApiController {
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * API lấy danh sách linh kiện thuộc một danh mục cụ thể (Ví dụ: CPU, VGA).
+     * Phục vụ cho việc load danh sách sản phẩm khi người dùng click chọn trên giao diện Build PC.
+     * 
+     * @param categoryName Tên danh mục cần lấy sản phẩm (CPU, Mainboard...)
+     * @param page Số trang hiện tại (mặc định 0)
+     * @param size Số lượng sản phẩm mỗi trang (mặc định 20)
+     * @param sort Cú pháp sắp xếp (mặc định theo giá tăng dần)
+     * @return Danh sách các sản phẩm đã được map sang DTO (BuildPcProductDto)
+     */
     @GetMapping("/components")
     public ResponseEntity<List<BuildPcProductDto>> 
             getComponents(
@@ -63,6 +73,14 @@ public class BuildPcApiController {
         return ResponseEntity.ok(dtoList);
     }
 
+    /**
+     * API kiểm tra tính tương thích của hệ thống máy tính.
+     * Nhận vào ID của các linh kiện người dùng đã chọn, lấy thông tin chi tiết từ cơ sở dữ liệu
+     * và đưa qua PcCompatibilityService để chạy thuật toán kiểm tra.
+     * 
+     * @param request Chứa ID của CPU, Mainboard, RAM, VGA, PSU
+     * @return CompatibilityReport Báo cáo lỗi/cảnh báo và điện năng tiêu thụ dự kiến (JSON)
+     */
     @PostMapping("/validate")
     public ResponseEntity<CompatibilityReport> validateBuild(@RequestBody BuildPcValidateRequest request) {
         Product cpu = request.getCpuId() != null ? getProductSafely(request.getCpuId()) : null;
@@ -75,6 +93,13 @@ public class BuildPcApiController {
         return ResponseEntity.ok(report);
     }
 
+    /**
+     * Hàm phụ trợ: Lấy thông tin sản phẩm một cách an toàn.
+     * Bắt lỗi nếu sản phẩm không tồn tại để tránh sập hệ thống (ném ra exception).
+     * 
+     * @param id ID của sản phẩm
+     * @return Product hoặc null nếu không tìm thấy
+     */
     private Product getProductSafely(Long id) {
         try {
             return productService.getById(id);

@@ -22,7 +22,16 @@ public class UserService {
     }
 
     /**
-     * Tìm kiếm người dùng với bộ lọc, tìm kiếm, sắp xếp và phân trang
+     * Tìm kiếm người dùng với bộ lọc, tìm kiếm, sắp xếp và phân trang.
+     * Sử dụng cho việc lấy danh sách người dùng hiển thị trên trang Quản trị.
+     * 
+     * @param keyword Từ khóa tìm kiếm theo tên, email hoặc SĐT
+     * @param roleId Lọc theo nhóm quyền (nếu null lấy tất cả)
+     * @param status Trạng thái tài khoản (ACTIVE, LOCKED)
+     * @param page Trang số mấy
+     * @param size Số bản ghi mỗi trang
+     * @param sort Đối tượng Sort chỉ định chiều và trường cần sắp xếp
+     * @return Trang kết quả chứa danh sách người dùng
      */
     @Transactional(readOnly = true)
     public Page<User> search(String keyword, Integer roleId, String status,
@@ -66,7 +75,10 @@ public class UserService {
     }
 
     /**
-     * Lấy người dùng theo email
+     * Lấy người dùng theo email. Thường dùng trong chức năng Đăng nhập.
+     * 
+     * @param email Địa chỉ email của người dùng
+     * @return Đối tượng Optional bọc User
      */
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
@@ -74,7 +86,11 @@ public class UserService {
     }
 
     /**
-     * Khóa tài khoản người dùng
+     * Khóa tài khoản người dùng, chuyển trạng thái sang LOCKED.
+     * Người dùng này sẽ không thể đăng nhập. Ngăn chặn việc khóa Admin.
+     * 
+     * @param userId ID người dùng
+     * @return User sau khi khóa
      */
     @Transactional
     public User lockUser(Long userId) {
@@ -87,7 +103,10 @@ public class UserService {
     }
 
     /**
-     * Mở khóa tài khoản người dùng
+     * Mở khóa tài khoản người dùng, chuyển trạng thái lại thành ACTIVE.
+     * 
+     * @param userId ID người dùng
+     * @return User sau khi mở khóa
      */
     @Transactional
     public User unlockUser(Long userId) {
@@ -107,7 +126,10 @@ public class UserService {
     }
 
     /**
-     * Lưu hoặc cập nhật người dùng
+     * Lưu hoặc cập nhật người dùng vào CSDL.
+     * 
+     * @param user Đối tượng người dùng
+     * @return User đã lưu
      */
     @Transactional
     public User save(User user) {
