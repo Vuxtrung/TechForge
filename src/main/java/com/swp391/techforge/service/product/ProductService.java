@@ -2,10 +2,13 @@ package com.swp391.techforge.service.product;
 
 import com.swp391.techforge.dto.product.ProductFilterOptions;
 import com.swp391.techforge.dto.product.ProductFilterRequest;
+import com.swp391.techforge.dto.product.ComponentSpecRequest;
 import com.swp391.techforge.entity.Category;
 import com.swp391.techforge.entity.Product;
 import com.swp391.techforge.entity.ProductImage;
+import com.swp391.techforge.entity.component.*;
 import com.swp391.techforge.repository.category.CategoryRepository;
+import com.swp391.techforge.repository.component.*;
 import com.swp391.techforge.repository.product.ProductImageRepository;
 import com.swp391.techforge.repository.product.ProductRepository;
 import org.springframework.data.domain.Page;
@@ -18,6 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.swp391.techforge.entity.ProductSpecification;
 import com.swp391.techforge.repository.product.ProductSpecificationRepository;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -36,17 +42,41 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
     private final CloudinaryService cloudinaryService;
     private final ProductSpecificationRepository productSpecificationRepository;
+    private final CpuRepository cpuRepository;
+    private final MainboardRepository mainboardRepository;
+    private final RamRepository ramRepository;
+    private final GpuRepository gpuRepository;
+    private final PsuRepository psuRepository;
+    private final CaseComponentRepository caseRepository;
+    private final CoolerRepository coolerRepository;
+    private final StorageRepository storageRepository;
 
     public ProductService(ProductRepository productRepository,
             CategoryRepository categoryRepository,
             ProductImageRepository productImageRepository,
             ProductSpecificationRepository productSpecificationRepository,
-            CloudinaryService cloudinaryService) {
+            CloudinaryService cloudinaryService,
+            CpuRepository cpuRepository,
+            MainboardRepository mainboardRepository,
+            RamRepository ramRepository,
+            GpuRepository gpuRepository,
+            PsuRepository psuRepository,
+            CaseComponentRepository caseRepository,
+            CoolerRepository coolerRepository,
+            StorageRepository storageRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.productImageRepository = productImageRepository;
         this.productSpecificationRepository = productSpecificationRepository;
         this.cloudinaryService = cloudinaryService;
+        this.cpuRepository = cpuRepository;
+        this.mainboardRepository = mainboardRepository;
+        this.ramRepository = ramRepository;
+        this.gpuRepository = gpuRepository;
+        this.psuRepository = psuRepository;
+        this.caseRepository = caseRepository;
+        this.coolerRepository = coolerRepository;
+        this.storageRepository = storageRepository;
     }
 
     @Transactional(readOnly = true)
@@ -108,22 +138,21 @@ public class ProductService {
     }
 
     @Transactional
-    public Product create(Product product, MultipartFile imageFile,
-            List<String> specKeys, List<String> specValues) {
+    public Product create(Product product, MultipartFile imageFile, ComponentSpecRequest specRequest) {
         validateName(product.getName(), null);
-        product.setCategory(resolveCategory(product.getCategoryId()));
+        Category category = resolveCategory(product.getCategoryId());
+        product.setCategory(category);
         Product saved = productRepository.save(product);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             uploadAndAttachImage(saved, imageFile, true);
         }
-        saveSpecifications(saved, specKeys, specValues);
+        saveSpecOrComponent(saved, category, specRequest);
         return saved;
     }
 
     @Transactional
-    public Product update(Long id, Product incoming, MultipartFile imageFile,
-            List<String> specKeys, List<String> specValues) {
+    public Product update(Long id, Product incoming, MultipartFile imageFile, ComponentSpecRequest specRequest) {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
 
@@ -135,7 +164,8 @@ public class ProductService {
         existing.setBasePrice(incoming.getBasePrice());
         existing.setStockQuantity(incoming.getStockQuantity());
         existing.setStatus(incoming.getStatus());
-        existing.setCategory(resolveCategory(incoming.getCategoryId()));
+        Category category = resolveCategory(incoming.getCategoryId());
+        existing.setCategory(category);
         existing.setUpdatedAt(LocalDateTime.now());
 
         if (imageFile != null && !imageFile.isEmpty()) {
@@ -145,7 +175,7 @@ public class ProductService {
             uploadAndAttachImage(existing, imageFile, true);
         }
         Product saved = productRepository.save(existing);
-        saveSpecifications(saved, specKeys, specValues);
+        saveSpecOrComponent(saved, category, specRequest);
         return saved;
     }
 
@@ -172,23 +202,185 @@ public class ProductService {
         }
     }
 
-    private void saveSpecifications(Product product, List<String> specKeys, List<String> specValues) {
+    // Tách theo category: PC_PRODUCT -> product_specifications (8 key cố định);
+    // PC_COMPONENT -> đúng bảng linh kiện tương ứng componentType. Luôn xoá dữ
+    // liệu spec cũ (cả 2 nguồn) trước khi lưu, để đổi category không để sót
+    // rác từ loại cũ.
+    private void saveSpecOrComponent(Product product, Category category, ComponentSpecRequest req) {
         productSpecificationRepository.deleteAllByProduct_ProductId(product.getProductId());
-        if (specKeys == null || specValues == null) {
+        deleteExistingComponentRows(product.getProductId());
+
+        if (req == null) {
             return;
         }
-        for (int i = 0; i < specKeys.size(); i++) {
-            String key = specKeys.get(i) == null ? "" : specKeys.get(i).trim();
-            String value = specValues.get(i) == null ? "" : specValues.get(i).trim();
-            if (key.isEmpty() || value.isEmpty()) {
-                continue;
-            }
-            ProductSpecification spec = new ProductSpecification();
-            spec.setProduct(product);
-            spec.setSpecKey(key);
-            spec.setSpecValue(value);
-            productSpecificationRepository.save(spec);
+
+        if (category.getType() == Category.CategoryType.PC_PRODUCT) {
+            savePcProductSpecs(product, req);
+            return;
         }
+
+        Category.ComponentType componentType = category.getComponentType();
+        if (componentType == null) {
+            return;
+        }
+
+        switch (componentType) {
+            case CPU -> saveCpu(product, req);
+            case MAINBOARD -> saveMainboard(product, req);
+            case RAM -> saveRam(product, req);
+            case GPU -> saveGpu(product, req);
+            case PSU -> savePsu(product, req);
+            case CASE_TYPE -> saveCase(product, req);
+            case COOLER -> saveCooler(product, req);
+            case STORAGE -> saveStorage(product, req);
+            case NONE -> { /* không cần lưu gì thêm */ }
+        }
+    }
+
+    // Xoá sạch row linh kiện cũ ở TẤT CẢ 8 bảng cho product này (an toàn khi
+    // admin đổi category từ loại linh kiện này sang loại khác) - mỗi bảng chỉ
+    // có tối đa 1 row nên xoá theo productId là đủ, không cần biết loại cũ.
+    private void deleteExistingComponentRows(Long productId) {
+        cpuRepository.deleteByProductId(productId);
+        mainboardRepository.deleteByProductId(productId);
+        ramRepository.deleteByProductId(productId);
+        gpuRepository.deleteByProductId(productId);
+        psuRepository.deleteByProductId(productId);
+        caseRepository.deleteByProductId(productId);
+        coolerRepository.deleteByProductId(productId);
+        storageRepository.deleteByProductId(productId);
+    }
+
+    private void savePcProductSpecs(Product product, ComponentSpecRequest req) {
+        addSpecIfPresent(product, "CPU", req.getPcCpu());
+        addSpecIfPresent(product, "Mainboard", req.getPcMainboard());
+        addSpecIfPresent(product, "RAM", req.getPcRam());
+        addSpecIfPresent(product, "VGA", req.getPcVga());
+        addSpecIfPresent(product, "Ổ cứng", req.getPcStorage());
+        addSpecIfPresent(product, "Nguồn", req.getPcPsu());
+        addSpecIfPresent(product, "Tản nhiệt", req.getPcCooler());
+        addSpecIfPresent(product, "Case", req.getPcCase());
+    }
+
+    private void addSpecIfPresent(Product product, String key, String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return;
+        }
+        ProductSpecification spec = new ProductSpecification();
+        spec.setProduct(product);
+        spec.setSpecKey(key);
+        spec.setSpecValue(value.trim());
+        productSpecificationRepository.save(spec);
+    }
+
+    private void saveCpu(Product product, ComponentSpecRequest req) {
+        if (req.getSocket() == null || req.getSocket().isBlank()) {
+            throw new IllegalArgumentException("Vui lòng nhập Socket cho CPU.");
+        }
+        Cpu cpu = new Cpu();
+        cpu.setProduct(product);
+        cpu.setSocket(req.getSocket().trim());
+        cpu.setCores(req.getCores());
+        cpu.setThreads(req.getThreads());
+        cpu.setBaseClockGhz(req.getBaseClockGhz());
+        cpu.setBoostClockGhz(req.getBoostClockGhz());
+        cpu.setTdpWatt(req.getTdpWatt());
+        cpu.setHasIgpu(Boolean.TRUE.equals(req.getHasIgpu()));
+        cpuRepository.save(cpu);
+    }
+
+    private void saveMainboard(Product product, ComponentSpecRequest req) {
+        if (req.getSocket() == null || req.getSocket().isBlank()) {
+            throw new IllegalArgumentException("Vui lòng nhập Socket cho Mainboard.");
+        }
+        if (req.getMbRamType() == null || req.getMbFormFactor() == null) {
+            throw new IllegalArgumentException("Vui lòng chọn RAM Type và Form Factor cho Mainboard.");
+        }
+        Mainboard mb = new Mainboard();
+        mb.setProduct(product);
+        mb.setSocket(req.getSocket().trim());
+        mb.setChipset(req.getChipset());
+        mb.setRamType(Mainboard.RamType.valueOf(req.getMbRamType()));
+        mb.setRamSlots(req.getRamSlots());
+        mb.setMaxRamGb(req.getMaxRamGb());
+        mb.setFormFactor(Mainboard.FormFactor.valueOf(req.getMbFormFactor()));
+        mb.setM2Slots(req.getM2Slots());
+        mainboardRepository.save(mb);
+    }
+
+    private void saveRam(Product product, ComponentSpecRequest req) {
+        if (req.getRamType() == null || req.getSpeedMhz() == null || req.getRamCapacityGb() == null) {
+            throw new IllegalArgumentException("Vui lòng nhập đầy đủ Loại RAM, Bus và Dung lượng.");
+        }
+        Ram ram = new Ram();
+        ram.setProduct(product);
+        ram.setRamType(Ram.RamType.valueOf(req.getRamType()));
+        ram.setSpeedMhz(req.getSpeedMhz());
+        ram.setCapacityGb(req.getRamCapacityGb());
+        ram.setModules(req.getModules() != null ? req.getModules() : 1);
+        ramRepository.save(ram);
+    }
+
+    private void saveGpu(Product product, ComponentSpecRequest req) {
+        Gpu gpu = new Gpu();
+        gpu.setProduct(product);
+        gpu.setVramGb(req.getVramGb());
+        gpu.setLengthMm(req.getLengthMm());
+        gpu.setPowerConnector(req.getPowerConnector());
+        gpu.setRecommendedPsuWatt(req.getRecommendedPsuWatt());
+        gpu.setSlotWidth(req.getSlotWidth() != null ? req.getSlotWidth() : 2);
+        gpuRepository.save(gpu);
+    }
+
+    private void savePsu(Product product, ComponentSpecRequest req) {
+        if (req.getWattage() == null) {
+            throw new IllegalArgumentException("Vui lòng nhập công suất (Wattage) cho PSU.");
+        }
+        Psu psu = new Psu();
+        psu.setProduct(product);
+        psu.setWattage(req.getWattage());
+        psu.setEfficiencyRating(req.getEfficiencyRating());
+        psu.setModular(req.getModular() != null ? Psu.Modular.valueOf(req.getModular()) : Psu.Modular.FULL);
+        psu.setFormFactor(req.getPsuFormFactor() != null ? req.getPsuFormFactor() : "ATX");
+        psuRepository.save(psu);
+    }
+
+    private void saveCase(Product product, ComponentSpecRequest req) {
+        if (req.getCaseFormFactorSupport() == null || req.getCaseFormFactorSupport().isEmpty()) {
+            throw new IllegalArgumentException("Vui lòng chọn ít nhất 1 Form Factor mà Case hỗ trợ.");
+        }
+        CaseComponent c = new CaseComponent();
+        c.setProduct(product);
+        c.setFormFactorSupport(String.join(",", req.getCaseFormFactorSupport()));
+        c.setMaxGpuLengthMm(req.getMaxGpuLengthMm());
+        c.setMaxCoolerHeightMm(req.getMaxCoolerHeightMm());
+        c.setMaxRadiatorMm(req.getMaxRadiatorMm());
+        caseRepository.save(c);
+    }
+
+    private void saveCooler(Product product, ComponentSpecRequest req) {
+        if (req.getCoolerType() == null) {
+            throw new IllegalArgumentException("Vui lòng chọn Loại tản nhiệt (Khí/AIO).");
+        }
+        Cooler cooler = new Cooler();
+        cooler.setProduct(product);
+        cooler.setCoolerType(Cooler.CoolerType.valueOf(req.getCoolerType()));
+        cooler.setHeightMm(req.getHeightMm());
+        cooler.setRadiatorSizeMm(req.getRadiatorSizeMm());
+        cooler.setSocketSupport(req.getSocketSupport());
+        coolerRepository.save(cooler);
+    }
+
+    private void saveStorage(Product product, ComponentSpecRequest req) {
+        if (req.getStorageType() == null || req.getStorageCapacityGb() == null) {
+            throw new IllegalArgumentException("Vui lòng chọn Loại ổ cứng và Dung lượng.");
+        }
+        Storage storage = new Storage();
+        storage.setProduct(product);
+        storage.setStorageType(Storage.StorageType.valueOf(req.getStorageType()));
+        storage.setStorageInterface(req.getStorageInterface());
+        storage.setCapacityGb(req.getStorageCapacityGb());
+        storageRepository.save(storage);
     }
 
     @Transactional

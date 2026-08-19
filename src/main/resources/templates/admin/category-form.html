@@ -139,6 +139,34 @@
                     </div>
                   </div>
 
+                  <!-- Component type: chỉ có ý nghĩa khi Type = Linh kiện.
+                       Xác định category này ứng với bảng linh kiện nào (CPU/RAM/...)
+                       để form thêm sản phẩm sau này biết hiện đúng field spec. -->
+                  <div class="row" id="componentTypeRow">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-semibold"
+                        >Loại Linh Kiện <span class="text-danger">*</span></label
+                      >
+                      <select th:field="*{componentType}" class="form-select"
+                        th:classappend="${#fields.hasErrors('componentType')} ? 'is-invalid'">
+                        <option value="CPU">CPU</option>
+                        <option value="MAINBOARD">Mainboard</option>
+                        <option value="RAM">RAM</option>
+                        <option value="GPU">GPU (Card màn hình)</option>
+                        <option value="PSU">PSU (Nguồn)</option>
+                        <option value="CASE_TYPE">Vỏ Case</option>
+                        <option value="COOLER">Tản nhiệt</option>
+                        <option value="STORAGE">Ổ cứng</option>
+                        <option value="NONE">Khác / Không xác định</option>
+                      </select>
+                      <div class="form-text">
+                        Quyết định form thêm sản phẩm sau này sẽ hiện thông số
+                        gì (socket, ram type, wattage...) cho danh mục này.
+                      </div>
+                      <div class="invalid-feedback" th:if="${#fields.hasErrors('componentType')}" th:errors="*{componentType}"></div>
+                    </div>
+                  </div>
+
                   <!-- Active toggle -->
                   <div class="form-check form-switch mb-4">
                     <input
@@ -182,5 +210,26 @@
     </main>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+      // Chỉ hiện dropdown "Loại Linh Kiện" khi Type = PC_COMPONENT (Linh kiện).
+      // Với PC_PRODUCT (PC dựng sẵn), componentType luôn ép về NONE ở Service,
+      // nên ẩn field đi cho gọn, khỏi gây hiểu nhầm cho admin.
+      (function () {
+        const typeSelect = document.querySelector('select[name="type"]');
+        const componentRow = document.getElementById("componentTypeRow");
+
+        function toggleComponentRow() {
+          if (typeSelect.value === "PC_COMPONENT") {
+            componentRow.style.display = "";
+          } else {
+            componentRow.style.display = "none";
+          }
+        }
+
+        typeSelect.addEventListener("change", toggleComponentRow);
+        toggleComponentRow(); // set đúng trạng thái ban đầu khi load trang (kể cả màn Sửa)
+      })();
+    </script>
   </body>
 </html>

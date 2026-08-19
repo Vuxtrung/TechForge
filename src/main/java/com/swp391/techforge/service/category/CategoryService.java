@@ -55,6 +55,13 @@ public class CategoryService {
         return categoryRepository.findAllByActiveTrueOrderByNameAsc();
     }
 
+    // Chỉ lấy danh mục GỐC (không có cha) đang active - dùng cho dropdown "Danh Mục Cha"
+    // để giới hạn cây chỉ tối đa 2 cấp (gốc -> con), không cho chọn con làm cha tiếp
+    @Transactional(readOnly = true)
+    public List<Category> findRootActive() {
+        return categoryRepository.findAllByParentIsNullAndActiveTrueOrderByNameAsc();
+    }
+
     // Lấy 1 category theo ID - Dùng cho form sửa
     @Transactional(readOnly = true)
     public Category getById(Long id) {
@@ -68,6 +75,7 @@ public class CategoryService {
     public Category create(Category category) {
         validateName(category.getName(), null);
         category.setParent(resolveParent(category.getParentId(), null));
+        normalizeComponentType(category);
         return categoryRepository.save(category);
     }
 
@@ -81,9 +89,11 @@ public class CategoryService {
         existing.setName(incoming.getName());
         existing.setDescription(incoming.getDescription());
         existing.setType(incoming.getType());
+        existing.setComponentType(incoming.getComponentType());
         existing.setActive(incoming.isActive());
         existing.setParent(resolveParent(incoming.getParentId(), id));
         existing.setUpdatedAt(LocalDateTime.now());
+        normalizeComponentType(existing);
 
         return categoryRepository.save(existing);
     }
@@ -117,7 +127,7 @@ public class CategoryService {
         if (productCount > 0) {
             throw new IllegalArgumentException("Không thể xóa danh mục đang có sản phẩm.");
         }
-        
+
         categoryRepository.delete(category);
     }
 
@@ -130,6 +140,17 @@ public class CategoryService {
                 categoryRepository.save(child);
             }
             cascadeDeactivate(child.getCategoryId());
+        }
+    }
+
+    // PC dựng sẵn (PC_PRODUCT) không dùng bảng linh kiện (dùng product_specifications
+    // như trước) -> luôn ép componentType = NONE để tránh admin chọn nhầm, khiến
+    // Product form/Service hiểu sai và cố lưu vào bảng linh kiện không liên quan.
+    private void normalizeComponentType(Category category) {
+        if (category.getType() == Category.CategoryType.PC_PRODUCT) {
+            category.setComponentType(Category.ComponentType.NONE);
+        } else if (category.getComponentType() == null) {
+            category.setComponentType(Category.ComponentType.NONE);
         }
     }
 

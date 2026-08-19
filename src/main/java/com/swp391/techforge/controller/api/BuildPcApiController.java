@@ -4,7 +4,21 @@ import com.swp391.techforge.dto.BuildPcProductDto;
 import com.swp391.techforge.dto.BuildPcValidateRequest;
 import com.swp391.techforge.dto.CompatibilityReport;
 import com.swp391.techforge.entity.Product;
-import com.swp391.techforge.service.buildpc.PcCompatibilityService;
+import com.swp391.techforge.entity.component.CaseComponent;
+import com.swp391.techforge.entity.component.Cooler;
+import com.swp391.techforge.entity.component.Cpu;
+import com.swp391.techforge.entity.component.Gpu;
+import com.swp391.techforge.entity.component.Mainboard;
+import com.swp391.techforge.entity.component.Psu;
+import com.swp391.techforge.entity.component.Ram;
+import com.swp391.techforge.repository.component.CaseComponentRepository;
+import com.swp391.techforge.repository.component.CoolerRepository;
+import com.swp391.techforge.repository.component.CpuRepository;
+import com.swp391.techforge.repository.component.GpuRepository;
+import com.swp391.techforge.repository.component.MainboardRepository;
+import com.swp391.techforge.repository.component.PsuRepository;
+import com.swp391.techforge.repository.component.RamRepository;
+import com.swp391.techforge.service.buildpc.CompatibilityService;
 import com.swp391.techforge.service.product.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,13 +37,36 @@ import java.util.stream.Collectors;
 public class BuildPcApiController {
 
     private final ProductService productService;
-    private final PcCompatibilityService compatibilityService;
+    private final CompatibilityService compatibilityService;
     private final CategoryRepository categoryRepository;
+    private final CpuRepository cpuRepository;
+    private final MainboardRepository mainboardRepository;
+    private final RamRepository ramRepository;
+    private final GpuRepository gpuRepository;
+    private final PsuRepository psuRepository;
+    private final CaseComponentRepository caseComponentRepository;
+    private final CoolerRepository coolerRepository;
 
-    public BuildPcApiController(ProductService productService, PcCompatibilityService compatibilityService, CategoryRepository categoryRepository) {
+    public BuildPcApiController(ProductService productService,
+            CompatibilityService compatibilityService,
+            CategoryRepository categoryRepository,
+            CpuRepository cpuRepository,
+            MainboardRepository mainboardRepository,
+            RamRepository ramRepository,
+            GpuRepository gpuRepository,
+            PsuRepository psuRepository,
+            CaseComponentRepository caseComponentRepository,
+            CoolerRepository coolerRepository) {
         this.productService = productService;
         this.compatibilityService = compatibilityService;
         this.categoryRepository = categoryRepository;
+        this.cpuRepository = cpuRepository;
+        this.mainboardRepository = mainboardRepository;
+        this.ramRepository = ramRepository;
+        this.gpuRepository = gpuRepository;
+        this.psuRepository = psuRepository;
+        this.caseComponentRepository = caseComponentRepository;
+        this.coolerRepository = coolerRepository;
     }
 
     @GetMapping("/components")
@@ -65,21 +102,21 @@ public class BuildPcApiController {
 
     @PostMapping("/validate")
     public ResponseEntity<CompatibilityReport> validateBuild(@RequestBody BuildPcValidateRequest request) {
-        Product cpu = request.getCpuId() != null ? getProductSafely(request.getCpuId()) : null;
-        Product mainboard = request.getMainboardId() != null ? getProductSafely(request.getMainboardId()) : null;
-        Product ram = request.getRamId() != null ? getProductSafely(request.getRamId()) : null;
-        Product vga = request.getVgaId() != null ? getProductSafely(request.getVgaId()) : null;
-        Product psu = request.getPsuId() != null ? getProductSafely(request.getPsuId()) : null;
+        Cpu cpu = request.getCpuId() != null ? cpuRepository.findById(request.getCpuId()).orElse(null) : null;
+        Mainboard mainboard = request.getMainboardId() != null
+                ? mainboardRepository.findById(request.getMainboardId()).orElse(null) : null;
+        Ram ram = request.getRamId() != null ? ramRepository.findById(request.getRamId()).orElse(null) : null;
+        Gpu gpu = request.getVgaId() != null ? gpuRepository.findById(request.getVgaId()).orElse(null) : null;
+        Psu psu = request.getPsuId() != null ? psuRepository.findById(request.getPsuId()).orElse(null) : null;
+        CaseComponent caseComponent = request.getCaseId() != null
+                ? caseComponentRepository.findById(request.getCaseId()).orElse(null) : null;
+        Cooler cooler = request.getCoolerId() != null
+                ? coolerRepository.findById(request.getCoolerId()).orElse(null) : null;
+        // Lưu ý: storageId không tham gia compatibility check (chưa có rule nào
+        // liên quan tới ổ cứng), nên không cần load ở đây.
 
-        CompatibilityReport report = compatibilityService.checkCompatibility(cpu, mainboard, ram, vga, psu);
+        CompatibilityReport report = compatibilityService.checkFullBuild(
+                cpu, mainboard, ram, gpu, psu, caseComponent, cooler);
         return ResponseEntity.ok(report);
-    }
-
-    private Product getProductSafely(Long id) {
-        try {
-            return productService.getById(id);
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

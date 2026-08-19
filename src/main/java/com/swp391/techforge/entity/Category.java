@@ -38,6 +38,15 @@ public class Category {
     @Column(name = "type", nullable = false, length = 20)
     private CategoryType type;
 
+    // Chỉ có ý nghĩa khi type = PC_COMPONENT: xác định category này ứng với
+    // bảng linh kiện nào (cpus/mainboards/rams/...) để Product form/Service
+    // biết hiện field spec nào và lưu vào đâu. Mặc định NONE cho category
+    // không phải linh kiện rời (VD: PC dựng sẵn).
+    @NotNull(message = "Vui lòng chọn loại linh kiện")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "component_type", nullable = false, length = 20)
+    private ComponentType componentType = ComponentType.NONE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
@@ -75,6 +84,18 @@ public class Category {
     public enum CategoryType {
         PC_PRODUCT,
         PC_COMPONENT
+    }
+
+    public enum ComponentType {
+        CPU,
+        MAINBOARD,
+        RAM,
+        GPU,
+        PSU,
+        CASE_TYPE,
+        COOLER,
+        STORAGE,
+        NONE
     }
 
 }
