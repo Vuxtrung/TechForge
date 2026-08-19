@@ -117,7 +117,7 @@ public class CategoryService {
         if (productCount > 0) {
             throw new IllegalArgumentException("Không thể xóa danh mục đang có sản phẩm.");
         }
-
+        
         categoryRepository.delete(category);
     }
 
