@@ -111,7 +111,7 @@ public class RegisterController {
                 }
 
                 session.removeAttribute(SESSION_REGISTER_REQUEST);
-                redirectAttributes.addFlashAttribute("registeredEmail", pending.getEmail());
+                redirectAttributes.addFlashAttribute("autofilledEmail", pending.getEmail());
                 redirectAttributes.addFlashAttribute("successMessage",
                         "Đăng ký thành công! Vui lòng đăng nhập bằng email của bạn.");
                 return "redirect:/login";
