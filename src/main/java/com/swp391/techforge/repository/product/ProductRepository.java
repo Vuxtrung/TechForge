@@ -47,6 +47,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                 @Param("maxPrice") BigDecimal maxPrice,
                                 Pageable pageable);
 
+                @Query("""
+                                                SELECT p FROM Product p
+                                                WHERE CAST(p.status AS string) = 'ACTIVE'
+                                                        AND p.productId IN :productIds
+                                                """)
+                Page<Product> searchPublicByProductIds(@Param("productIds") List<Long> productIds, Pageable pageable);
+
     // Danh sách thương hiệu duy nhất, dùng cho checkbox filter bên sidebar
     @Query("""
             SELECT DISTINCT p.brand FROM Product p
