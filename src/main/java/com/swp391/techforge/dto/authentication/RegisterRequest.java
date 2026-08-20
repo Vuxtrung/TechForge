@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class RegisterRequest {
+public class RegisterRequest implements Serializable {
 
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
