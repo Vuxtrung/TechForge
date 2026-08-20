@@ -502,26 +502,25 @@ CREATE TABLE `rams` (
 -- Table structure for table `reviews`
 --
 
-DROP TABLE IF EXISTS `reviews`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `reviews` (
-  `review_id` bigint NOT NULL AUTO_INCREMENT,
-  `product_id` bigint NOT NULL,
-  `user_id` bigint NOT NULL,
-  `order_item_id` bigint DEFAULT NULL,
-  `rating` tinyint NOT NULL,
-  `comment` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('PENDING','APPROVED','HIDDEN') COLLATE utf8mb4_unicode_ci DEFAULT 'PENDING',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS `techforge_db`.`reviews` (
+  `review_id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `user_id` BIGINT NOT NULL,
+  `order_item_id` BIGINT NOT NULL,
+  `rating` TINYINT NOT NULL,
+  `comment` TEXT NULL DEFAULT NULL,
+  `status` ENUM('SHOW', 'HIDDEN') NOT NULL DEFAULT 'SHOW',
+  `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`review_id`),
-  KEY `product_id` (`product_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`),
-  CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
-  CONSTRAINT `reviews_chk_1` CHECK ((`rating` between 1 and 5))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+  UNIQUE INDEX `uk_reviews_order_item` (`order_item_id` ASC) VISIBLE,
+  INDEX `reviews_ibfk_1` (`product_id` ASC) VISIBLE,
+  INDEX `reviews_ibfk_2` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `techforge`.`products` (`product_id`),
+  CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `techforge`.`users` (`user_id`),
+  CONSTRAINT `reviews_ibfk_3` FOREIGN KEY (`order_item_id`) REFERENCES `techforge`.`order_items` (`order_item_id`),
+  CONSTRAINT `reviews_chk_1` CHECK ((`rating` BETWEEN 1 AND 5))
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 
 --
