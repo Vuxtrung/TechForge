@@ -37,6 +37,7 @@ public class DataInitializer implements CommandLineRunner {
     private final CaseComponentRepository caseComponentRepository;
     private final CoolerRepository coolerRepository;
     private final StorageRepository storageRepository;
+    private final com.swp391.techforge.repository.blog.BlogRepository blogRepository;
 
     public DataInitializer(UserRepository userRepository,
                            RoleRepository roleRepository,
@@ -50,7 +51,8 @@ public class DataInitializer implements CommandLineRunner {
                            PsuRepository psuRepository,
                            CaseComponentRepository caseComponentRepository,
                            CoolerRepository coolerRepository,
-                           StorageRepository storageRepository) {
+                           StorageRepository storageRepository,
+                           com.swp391.techforge.repository.blog.BlogRepository blogRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.categoryRepository = categoryRepository;
@@ -64,6 +66,7 @@ public class DataInitializer implements CommandLineRunner {
         this.caseComponentRepository = caseComponentRepository;
         this.coolerRepository = coolerRepository;
         this.storageRepository = storageRepository;
+        this.blogRepository = blogRepository;
     }
 
     @Override
@@ -105,6 +108,7 @@ public class DataInitializer implements CommandLineRunner {
         userRepository.save(customerUser);
 
         seedCategoriesAndProducts();
+        seedSampleBlogs(adminUser);
     }
 
     private void createRoleIfNotFound(Integer roleId, String roleName) {
@@ -345,5 +349,80 @@ public class DataInitializer implements CommandLineRunner {
         c.setMaxCoolerHeightMm(maxCoolerHeightMm);
         c.setMaxRadiatorMm(maxRadiatorMm);
         caseComponentRepository.save(c);
+    }
+
+    private void seedSampleBlogs(User adminUser) {
+        if (blogRepository.count() > 0) {
+            return;
+        }
+
+        com.swp391.techforge.entity.Blog b1 = new com.swp391.techforge.entity.Blog();
+        b1.setTitle("Top 5 Cấu Hình PC Gaming Đáng Mua Nhất 2026 Phân Khúc Từ 15 Đến 40 Triệu");
+        b1.setSlug("top-5-cau-hinh-pc-gaming-dang-mua-nhat-2026");
+        b1.setCategory("Hướng Dẫn Build PC");
+        b1.setSummary("Tổng hợp 5 bộ cấu hình PC Gaming tối ưu hiệu năng trên giá thành (P/P) tốt nhất năm 2026, chiến mượt mọi tựa game AAA từ Full HD đến 4K.");
+        b1.setContent("<p>Năm 2026 chứng kiến sự bùng nổ của các thế hệ vi xử lý và card đồ họa mới. Để giúp các game thủ dễ dàng lựa chọn cấu hình phù hợp với túi tiền, TechForge xin gửi đến bạn bảng phân tích chi tiết 5 cấu hình hot nhất:</p>"
+                + "<h3>1. Cấu hình Esports 15 Triệu: Core i5 + RTX 4060</h3>"
+                + "<p>Đây là cấu hình hoàn hảo cho các tựa game như LMHT, CS2, Valorant và GTA V ở độ phân giải 1080p với mức FPS trên 144.</p>"
+                + "<h3>2. Cấu hình AAA 25 Triệu: Ryzen 5 7600X + RTX 4070 Super</h3>"
+                + "<p>Trang bị chuẩn RAM DDR5 tốc độ cao và kiến trúc Zen 4 mạnh mẽ, giúp bạn trải nghiệm Cyberpunk 2077 và Black Myth: Wukong mượt mà ở mức thiết lập đồ họa cao.</p>"
+                + "<h3>3. Cấu hình Đồ Họa & Streamer 40 Triệu: Core i7 14700K + RTX 4080</h3>"
+                + "<p>Đa nhiệm vượt trội với 20 nhân 28 luồng, render 3D, dựng phim 4K và livestream mượt mà không bị tụt khung hình.</p>");
+        b1.setThumbnailUrl("https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800");
+        b1.setStatus(com.swp391.techforge.entity.BlogStatus.PUBLISHED);
+        b1.setAuthor(adminUser);
+        b1.setViewsCount(1540);
+        blogRepository.save(b1);
+
+        com.swp391.techforge.entity.Blog b2 = new com.swp391.techforge.entity.Blog();
+        b2.setTitle("Đánh Giá Chi Tiết Intel Core i9-14900K vs AMD Ryzen 9 7950X3D: Ai Là Vua Gaming?");
+        b2.setSlug("danh-gia-intel-core-i9-14900k-vs-amd-ryzen-9-7950x3d");
+        b2.setCategory("Đánh Giá Phần Cứng");
+        b2.setSummary("So sánh điểm benchmark chi tiết, nhiệt độ, mức tiêu thụ điện năng và trải nghiệm chơi game thực tế giữa hai con chip CPU đầu bảng hiện nay.");
+        b2.setContent("<p>Cuộc chiến giữa đội Xanh (Intel) và đội Đỏ (AMD) chưa bao giờ hạ nhiệt. Hôm nay hãy cùng TechForge so sánh trực tiếp hiệu năng giữa <strong>Core i9-14900K</strong> và <strong>Ryzen 9 7950X3D</strong>.</p>"
+                + "<h3>Hiệu năng chơi game</h3>"
+                + "<p>Nhờ công nghệ 3D V-Cache đột phá, Ryzen 9 7950X3D cho mức FPS trung bình nhỉnh hơn khoảng 5-8% trong các tựa game nặng về cache như Microsoft Flight Simulator và Baldur's Gate 3.</p>"
+                + "<h3>Nhiệt độ và điện năng tiêu thụ</h3>"
+                + "<p>AMD vượt trội về khả năng tiết kiệm điện với TDP chỉ 120W, trong khi Intel i9 có thể ăn tới 253W+ khi mở toàn bộ turbo limit.</p>");
+        b2.setThumbnailUrl("https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800");
+        b2.setStatus(com.swp391.techforge.entity.BlogStatus.PUBLISHED);
+        b2.setAuthor(adminUser);
+        b2.setViewsCount(2380);
+        blogRepository.save(b2);
+
+        com.swp391.techforge.entity.Blog b3 = new com.swp391.techforge.entity.Blog();
+        b3.setTitle("Hướng Dẫn Tự Lắp Ráp PC Gaming Chuẩn Từng Bước Cho Người Mới Bắt Đầu");
+        b3.setSlug("huong-dan-tu-lap-rap-pc-gaming-chuan-tung-step");
+        b3.setCategory("Hướng Dẫn Build PC");
+        b3.setSummary("Cẩm nang tự lắp ráp linh kiện máy tính tại nhà không sợ chập cháy, từ cách lắp CPU, tra keo tản nhiệt đến đi dây nguồn gọn gàng.");
+        b3.setContent("<p>Tự tay lắp ráp một cỗ máy PC mang lại trải nghiệm vô cùng thú vị và tự hào. Dưới đây là các bước quan trọng bạn cần nắm rõ:</p>"
+                + "<ol>"
+                + "<li><strong>Bước 1: Chuẩn bị Mainboard và lắp CPU</strong> - Chú ý góc tam giác vàng trên CPU để đặt đúng chiều socket.</li>"
+                + "<li><strong>Bước 2: Lắp RAM và ổ cứng SSD M.2</strong> - Nhớ cắm RAM vào khe 2 và 4 để kích hoạt Dual Channel.</li>"
+                + "<li><strong>Bước 3: Lắp nguồn và mainboard vào vỏ case</strong> - Vặn chặt các chân ốc standoff trước khi siết vít.</li>"
+                + "<li><strong>Bước 4: Cắm card đồ họa và kết nối dây nguồn PCIe/12VHPWR.</strong></li>"
+                + "</ol>");
+        b3.setThumbnailUrl("https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800");
+        b3.setStatus(com.swp391.techforge.entity.BlogStatus.PUBLISHED);
+        b3.setAuthor(adminUser);
+        b3.setViewsCount(3410);
+        blogRepository.save(b3);
+
+        com.swp391.techforge.entity.Blog b4 = new com.swp391.techforge.entity.Blog();
+        b4.setTitle("Chương Trình Khuyến Mãi Mùa Hè TechForge: Giảm Giá Linh Kiện Đến 50%");
+        b4.setSlug("chuong-trinh-khuyen-mai-mua-he-techforge-2026");
+        b4.setCategory("Khuyến Mãi & Sự Kiện");
+        b4.setSummary("Săn voucher giảm giá hấp dẫn, tặng kèm bàn phím cơ gaming và hỗ trợ trả góp 0% lãi suất khi mua trọn bộ PC tại TechForge.");
+        b4.setContent("<p>Chào đón mùa hè 2026, TechForge trân trọng mang đến chương trình tri ân khách hàng đặc biệt với hàng loạt ưu đãi khủng:</p>"
+                + "<ul>"
+                + "<li>Giảm ngay 2.000.000đ khi build trọn bộ PC từ 20 triệu đồng.</li>"
+                + "<li>Tặng kèm chuột gaming không dây và lót chuột RGB cao cấp.</li>"
+                + "<li>Bảo hành 1 đổi 1 tận nơi trong 30 ngày đầu tiên.</li>"
+                + "</ul>");
+        b4.setThumbnailUrl("https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800");
+        b4.setStatus(com.swp391.techforge.entity.BlogStatus.PUBLISHED);
+        b4.setAuthor(adminUser);
+        b4.setViewsCount(890);
+        blogRepository.save(b4);
     }
 }

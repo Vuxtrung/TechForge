@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title th:text="${pageTitle != null ? pageTitle + ' - TechForge Blog' : 'Chi Tiết Bài Viết - TechForge'}">Chi Tiết Bài Viết</title>
+  </head>
+
+  <body class="bg-light">
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="py-4">
+      <div class="container">
+        
+        <!-- Breadcrumbs -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb fs-8">
+            <li class="breadcrumb-item"><a th:href="@{/}" class="text-decoration-none text-muted"><i class="bi bi-house-door me-1"></i>Trang chủ</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/blogs}" class="text-decoration-none text-muted">Tin Tức Công Nghệ</a></li>
+            <li class="breadcrumb-item" th:if="${blog.category != null}">
+              <a th:href="@{/blogs(category=${blog.category})}" class="text-decoration-none text-muted" th:text="${blog.category}">Tin Công Nghệ</a>
+            </li>
+            <li class="breadcrumb-item active text-danger fw-bold text-truncate" style="max-width: 300px;" aria-current="page" th:text="${blog.title}">Tiêu đề</li>
+          </ol>
+        </nav>
+
+        <!-- Bố Cục Chi Tiết Bài Viết: Nội Dung (8 Cột) + Sidebar (4 Cột) -->
+        <div class="row g-4">
+          
+          <!-- Cột Bài Viết Chính -->
+          <div class="col-lg-8">
+            <article class="card border-0 shadow-sm rounded-3 p-4 p-md-5 bg-white mb-4">
+              
+              <!-- Tag Danh mục -->
+              <div class="mb-3">
+                <a th:href="@{/blogs(category=${blog.category})}" class="badge bg-danger text-white text-decoration-none fs-8 px-3 py-2">
+                  <i class="bi bi-tag-fill me-1"></i><span th:text="${blog.category != null ? blog.category : 'Tin Tức'}">Tin Công Nghệ</span>
+                </a>
+              </div>
+
+              <!-- Tiêu đề bài viết H1 -->
+              <h1 class="fw-black text-dark fs-3 mb-3" th:text="${blog.title}">
+                Đánh giá chi tiết Intel Core i9-14900K: Quái vật hiệu năng cho game thủ và đồ họa
+              </h1>
+
+              <!-- Tác giả, Ngày đăng & Lượt xem -->
+              <div class="d-flex flex-wrap align-items-center gap-3 text-muted fs-8 pb-3 mb-4 border-bottom">
+                <div class="d-flex align-items-center gap-1">
+                  <i class="bi bi-person-circle text-danger fs-6"></i>
+                  <span class="fw-semibold text-dark" th:text="${blog.author != null ? blog.author.fullName : 'TechForge Team'}">Admin</span>
+                </div>
+                <div>•</div>
+                <div>
+                  <i class="bi bi-calendar3 me-1"></i>
+                  <span th:text="${#temporals.format(blog.createdAt, 'dd/MM/yyyy HH:mm')}">20/08/2026</span>
+                </div>
+                <div>•</div>
+                <div>
+                  <i class="bi bi-eye me-1"></i>
+                  <span th:text="${blog.viewsCount}">1,520</span> lượt xem
+                </div>
+              </div>
+
+              <!-- Khung Tóm tắt nổi bật (Lead Paragraph) -->
+              <div class="bg-light p-3 rounded-3 border-start border-4 border-danger mb-4 fst-italic text-dark fs-7" th:text="${blog.summary}">
+                Tóm tắt nội dung bài viết công nghệ...
+              </div>
+
+              <!-- Ảnh đại diện bài viết -->
+              <div class="text-center mb-4" th:if="${blog.thumbnailUrl != null and !blog.thumbnailUrl.isEmpty()}">
+                <img th:src="${blog.thumbnailUrl}" class="img-fluid rounded-3 shadow-sm w-100" style="max-height: 420px; object-fit: cover;" alt="Blog Banner" onerror="this.src='/images/default-blog.jpg';" />
+              </div>
+
+              <!-- Nội dung bài viết chi tiết -->
+              <div class="blog-article-content text-dark fs-7 lh-lg mb-5" th:utext="${blog.content}">
+                <p>Nội dung chi tiết bài viết đang được tải...</p>
+              </div>
+
+              <!-- Thẻ chia sẻ & Tác giả -->
+              <div class="card bg-light border-0 p-3 rounded-3 mt-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="bg-danger text-white rounded-circle p-2 fs-6 lh-1">TF</div>
+                    <div>
+                      <div class="fw-bold text-dark fs-8">Bài viết được biên tập bởi TechForge Editorial</div>
+                      <div class="text-muted fs-8">Chuyên trang tin tức, đánh giá phần cứng & tư vấn cấu hình PC.</div>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a th:href="@{/blogs}" class="btn btn-outline-secondary btn-sm fs-8 rounded-pill">
+                      <i class="bi bi-arrow-left me-1"></i> Xem thêm bài viết
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </article>
+
+            <!-- Khối Bài Viết Liên Quan (Related Posts) -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4" th:if="${relatedBlogs != null and !relatedBlogs.isEmpty()}">
+              <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                <i class="bi bi-grid-fill text-danger me-2"></i> Bài Viết Cùng Chủ Đề
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-6" th:each="related : ${relatedBlogs}">
+                  <div class="d-flex gap-3 align-items-center p-2 rounded hover-bg-light border">
+                    <img th:src="${related.thumbnailUrl != null ? related.thumbnailUrl : '/images/default-blog.jpg'}" 
+                         class="rounded object-fit-cover shadow-sm" 
+                         style="width: 80px; height: 60px;" 
+                         alt="Related Thumbnail"
+                         onerror="this.src='/images/default-blog.jpg';" />
+                    <div>
+                      <a th:href="@{'/blogs/' + ${related.id}}" class="text-dark fw-bold fs-8 text-decoration-none hover-text-danger line-clamp-2" th:text="${related.title}">
+                        Tiêu đề bài viết liên quan
+                      </a>
+                      <span class="text-muted fs-8 d-block mt-1">
+                        <i class="bi bi-calendar3 me-1"></i><span th:text="${#temporals.format(related.createdAt, 'dd/MM/yyyy')}">20/08/2026</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Cột Sidebar Bên Phải (4 Cột) -->
+          <div class="col-lg-4">
+            
+            <!-- Box Bài Viết Thịnh Hành (Trending) -->
+            <div class="card border-0 shadow-sm rounded-3 p-3 bg-white mb-4">
+              <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                <i class="bi bi-fire text-danger me-2"></i> Bài Viết Xem Nhiều Nhất
+              </h6>
+              <div class="d-flex flex-column gap-3">
+                <div th:each="trend, stat : ${trendingBlogs}" class="d-flex gap-2 align-items-start pb-2 border-bottom">
+                  <span class="badge rounded-circle bg-danger text-white fs-8 p-2 lh-1 text-center" style="width: 24px; height: 24px;" th:text="${stat.count}">1</span>
+                  <div class="flex-grow-1">
+                    <a th:href="@{'/blogs/' + ${trend.id}}" class="text-dark fw-semibold fs-8 text-decoration-none hover-text-danger line-clamp-2" th:text="${trend.title}">
+                      Tiêu đề bài viết nổi bật
+                    </a>
+                    <div class="text-muted fs-8 mt-1">
+                      <i class="bi bi-eye me-1"></i><span th:text="${trend.viewsCount}">5,200</span> lượt xem
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Banner Build PC Call-to-Action -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 text-white text-center mb-4" style="background: linear-gradient(135deg, #1f2937, #dc2626);">
+              <i class="bi bi-display fs-1 text-warning mb-2"></i>
+              <h5 class="fw-bold mb-2">Build Dàn PC Của Bạn</h5>
+              <p class="fs-8 text-white-50 mb-3">Chọn linh kiện CPU, RAM, VGA phù hợp ngân sách với công cụ tự động kiểm tra tương thích từ TechForge.</p>
+              <a th:href="@{/buildpc}" class="btn btn-warning fw-bold btn-sm py-2 px-4 rounded-pill text-dark shadow-sm">
+                Tự Build PC Ngay <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <style>
+      .blog-article-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1.25rem 0;
+      }
+      .blog-article-content h2, .blog-article-content h3 {
+        font-weight: 700;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .blog-article-content p {
+        margin-bottom: 1rem;
+      }
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .hover-text-danger:hover {
+        color: #dc3545 !important;
+      }
+      .hover-bg-light:hover {
+        background-color: #f8f9fa;
+      }
+    </style>
+  </body>
+</html>
