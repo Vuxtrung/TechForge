@@ -59,6 +59,7 @@
                                     <th scope="col" class="text-center">Đơn Giá</th>
                                     <th scope="col" class="text-center">Số Lượng</th>
                                     <th scope="col" class="text-end">Thành Tiền</th>
+                                    <th scope="col" class="text-center" th:if="${order.status.name() == 'DELIVERED'}">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,6 +68,51 @@
                                     <td class="text-center fw-semibold" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
                                     <td class="text-center fw-bold" th:text="${item.quantity}">1</td>
                                     <td class="text-end fw-bold text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
+                                    <td class="text-center" th:if="${order.status.name() == 'DELIVERED'}">
+                                        <button th:if="${!item.isReviewed}" type="button" class="btn btn-outline-warning btn-sm"
+                                                data-bs-toggle="modal" th:data-bs-target="'#reviewModal' + ${item.orderItemId}">
+                                            Đánh giá
+                                        </button>
+                                        <span th:if="${item.isReviewed}" class="badge bg-success">Đã đánh giá</span>
+                                        
+                                        <!-- Review Modal -->
+                                        <div th:if="${!item.isReviewed}" class="modal fade text-start" th:id="'reviewModal' + ${item.orderItemId}" tabindex="-1">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <form th:action="@{/customer/reviews/add}" method="post">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title fw-bold">Đánh giá Sản phẩm</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <input type="hidden" name="orderItemId" th:value="${item.orderItemId}">
+                                                            <input type="hidden" name="orderId" th:value="${order.orderId}">
+                                                            <p class="fs-7 mb-3">Sản phẩm: <strong th:text="${item.productName}"></strong></p>
+                                                            
+                                                            <div class="mb-3">
+                                                                <label class="form-label fs-7 fw-semibold">Chất lượng sản phẩm</label>
+                                                                <select name="rating" class="form-select" required>
+                                                                    <option value="5" selected>⭐⭐⭐⭐⭐ Tuyệt vời</option>
+                                                                    <option value="4">⭐⭐⭐⭐ Tốt</option>
+                                                                    <option value="3">⭐⭐⭐ Bình thường</option>
+                                                                    <option value="2">⭐⭐ Tệ</option>
+                                                                    <option value="1">⭐ Rất tệ</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label fs-7 fw-semibold">Nhận xét của bạn</label>
+                                                                <textarea name="comment" class="form-control fs-7" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm này..." required maxlength="1000"></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+                                                            <button type="submit" class="btn btn-warning btn-sm fw-bold">Gửi đánh giá</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
