@@ -72,17 +72,6 @@
                         </button>
                     </div>
 
-                    <!-- Logout success -->
-                    <div th:if="${param.logout}" class="alert alert-success alert-dismissible fade show fs-7 shadow-sm"
-                        role="alert">
-
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        Bạn đã đăng xuất thành công.
-
-                        <button type="button" class="btn-close" data-bs-dismiss="alert">
-                        </button>
-                    </div>
-
                     <!-- Login form -->
                     <form th:action="@{/login}" method="post">
 
@@ -100,7 +89,8 @@
                                 </span>
 
                                 <input type="email" id="email" name="username" class="form-control fs-7"
-                                    placeholder="Nhập email của bạn" autocomplete="email" required>
+                                    placeholder="Nhập email của bạn" autocomplete="email"
+                                    th:value="${autofilledEmail}" required>
 
                             </div>
 

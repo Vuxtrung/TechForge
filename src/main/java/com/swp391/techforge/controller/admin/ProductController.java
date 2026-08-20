@@ -1,5 +1,6 @@
 package com.swp391.techforge.controller.admin;
 
+import com.swp391.techforge.dto.product.ComponentSpecRequest;
 import com.swp391.techforge.entity.Product;
 import com.swp391.techforge.service.category.CategoryService;
 import com.swp391.techforge.service.product.ProductService;
@@ -12,7 +13,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -69,15 +69,14 @@ public class ProductController {
     public String create(@Valid @ModelAttribute("product") Product product,
             BindingResult result, Model model,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-            @RequestParam(value = "specKey", required = false) List<String> specKeys,
-            @RequestParam(value = "specValue", required = false) List<String> specValues,
+            @ModelAttribute("spec") ComponentSpecRequest specRequest,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
         try {
-            productService.create(product, imageFile, specKeys, specValues);
+            productService.create(product, imageFile, specRequest);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.findAllActive());
@@ -92,15 +91,14 @@ public class ProductController {
             @Valid @ModelAttribute("product") Product product,
             BindingResult result, Model model,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-            @RequestParam(value = "specKey", required = false) List<String> specKeys,
-            @RequestParam(value = "specValue", required = false) List<String> specValues,
+            @ModelAttribute("spec") ComponentSpecRequest specRequest,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
         try {
-            productService.update(id, product, imageFile, specKeys, specValues);
+            productService.update(id, product, imageFile, specRequest);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.findAllActive());

@@ -165,6 +165,7 @@ public class ForgotPasswordController {
         session.removeAttribute(SESSION_EMAIL);
         session.removeAttribute(SESSION_OTP_VERIFIED);
 
+        redirectAttributes.addFlashAttribute("autofilledEmail", email);
         redirectAttributes.addFlashAttribute("successMessage", "Đặt lại mật khẩu thành công, vui lòng đăng nhập.");
         return "redirect:/login";
     }
