@@ -54,6 +54,11 @@ public class Order {
     @JoinColumn(name = "voucher_id")
     private Voucher voucher;
 
+    // Lưu lại số tiền đã giảm TẠI THỜI ĐIỂM đặt hàng, để lịch sử đơn hàng
+    // không bị sai nếu sau này Admin sửa/xóa voucher gốc.
+    @Column(name = "discount_amount", precision = 15, scale = 2)
+    private BigDecimal discountAmount = BigDecimal.ZERO;
+
     @Column(name = "cancel_reason")
     private String cancelReason;
 
@@ -168,6 +173,14 @@ public class Order {
 
     public void setVoucher(Voucher voucher) {
         this.voucher = voucher;
+    }
+
+    public BigDecimal getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(BigDecimal discountAmount) {
+        this.discountAmount = discountAmount;
     }
 
     public String getCancelReason() {

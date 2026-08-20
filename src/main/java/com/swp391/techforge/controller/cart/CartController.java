@@ -2,13 +2,19 @@ package com.swp391.techforge.controller.cart;
 
 import com.swp391.techforge.dto.cart.CartItemDTO;
 import com.swp391.techforge.entity.Product;
+import com.swp391.techforge.entity.User;
+import com.swp391.techforge.entity.Voucher;
+import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.repository.product.ProductRepository;
+import com.swp391.techforge.service.order.VoucherService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +25,18 @@ public class CartController {
 
     private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
     private static final String VOUCHER_SESSION_KEY = "APPLIED_VOUCHER_DISCOUNT";
+    private static final String VOUCHER_CODE_SESSION_KEY = "APPLIED_VOUCHER_CODE";
 
     private final ProductRepository productRepository;
+    private final VoucherService voucherService;
+    private final UserRepository userRepository;
 
-    public CartController(ProductRepository productRepository) {
+    public CartController(ProductRepository productRepository,
+                           VoucherService voucherService,
+                           UserRepository userRepository) {
         this.productRepository = productRepository;
+        this.voucherService = voucherService;
+        this.userRepository = userRepository;
     }
 
     // 1. Màn hình Xem Giỏ hàng (View Cart)
@@ -178,27 +191,46 @@ public class CartController {
     }
 
     // 5. Áp dụng Voucher giảm giá (Apply Voucher)
+    // Dùng chung VoucherService với CheckoutController — voucher được kiểm tra
+    // thật với DB (BR-V02..BR-V06) thay vì so khớp chuỗi cứng như trước đây.
     @PostMapping("/apply-voucher")
     public String applyVoucher(@RequestParam("voucherCode") String voucherCode,
                                HttpSession session,
+                               Principal principal,
                                RedirectAttributes redirectAttributes) {
 
-        if (voucherCode != null && !voucherCode.trim().isEmpty()) {
-            String code = voucherCode.trim().toUpperCase();
-            
-            // Giả lập kiểm tra Voucher cơ bản
-            if (code.equals("TECHFORGE10")) {
-                // Giảm 10% tổng hóa đơn (ví dụ giả lập giảm 500,000đ)
-                session.setAttribute(VOUCHER_SESSION_KEY, 500000.0);
-                session.setAttribute("APPLIED_VOUCHER_CODE", code);
-                redirectAttributes.addFlashAttribute("voucherSuccessMessage", "Áp dụng mã TECHFORGE10 giảm 500.000đ thành công!");
-            } else if (code.equals("DISCOUNT50K")) {
-                session.setAttribute(VOUCHER_SESSION_KEY, 50000.0);
-                session.setAttribute("APPLIED_VOUCHER_CODE", code);
-                redirectAttributes.addFlashAttribute("voucherSuccessMessage", "Áp dụng mã DISCOUNT50K giảm 50.000đ thành công!");
+        List<CartItemDTO> cartItems = getCartFromSession(session);
+        if (cartItems.isEmpty()) {
+            redirectAttributes.addFlashAttribute("voucherErrorMessage", "Giỏ hàng của bạn đang trống!");
+            return "redirect:/cart";
+        }
+
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (CartItemDTO item : cartItems) {
+            subtotal = subtotal.add(BigDecimal.valueOf(item.getTotalPrice()));
+        }
+
+        User user = null;
+        if (principal != null) {
+            user = userRepository.findByEmail(principal.getName()).orElse(null);
+        }
+
+        try {
+            Voucher voucher = voucherService.validateForCheckout(voucherCode, subtotal, user);
+            if (voucher == null) {
+                session.removeAttribute(VOUCHER_SESSION_KEY);
+                session.removeAttribute(VOUCHER_CODE_SESSION_KEY);
             } else {
-                redirectAttributes.addFlashAttribute("voucherErrorMessage", "Mã giảm giá không hợp lệ hoặc đã hết hạn!");
+                BigDecimal discount = voucherService.calculateDiscount(voucher, subtotal);
+                session.setAttribute(VOUCHER_SESSION_KEY, discount.doubleValue());
+                session.setAttribute(VOUCHER_CODE_SESSION_KEY, voucher.getCode());
+                redirectAttributes.addFlashAttribute("voucherSuccessMessage",
+                        "Áp dụng mã \"" + voucher.getCode() + "\" thành công!");
             }
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            session.removeAttribute(VOUCHER_SESSION_KEY);
+            session.removeAttribute(VOUCHER_CODE_SESSION_KEY);
+            redirectAttributes.addFlashAttribute("voucherErrorMessage", ex.getMessage());
         }
 
         return "redirect:/cart";

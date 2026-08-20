@@ -4,10 +4,12 @@ import com.swp391.techforge.dto.cart.CartItemDTO;
 import com.swp391.techforge.dto.order.CheckoutRequest;
 import com.swp391.techforge.entity.*;
 import com.swp391.techforge.repository.authentication.UserRepository;
+import com.swp391.techforge.repository.order.OrderRepository;
 import com.swp391.techforge.repository.order.PaymentRepository;
 import com.swp391.techforge.repository.product.ProductRepository;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.service.order.VNPayService;
+import com.swp391.techforge.service.order.VoucherService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -33,17 +35,23 @@ public class CheckoutController {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final VoucherService voucherService;
+    private final OrderRepository orderRepository;
 
     public CheckoutController(OrderService orderService,
                               VNPayService vnPayService,
                               PaymentRepository paymentRepository,
                               UserRepository userRepository,
-                              ProductRepository productRepository) {
+                              ProductRepository productRepository,
+                              VoucherService voucherService,
+                              OrderRepository orderRepository) {
         this.orderService = orderService;
         this.vnPayService = vnPayService;
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.voucherService = voucherService;
+        this.orderRepository = orderRepository;
     }
 
     @GetMapping
@@ -88,6 +96,53 @@ public class CheckoutController {
         model.addAttribute("voucherDiscount", voucherDiscount);
         model.addAttribute("checkoutRequest", request);
         return "checkout";
+    }
+
+    // Áp dụng / kiểm tra voucher ngay tại trang checkout (không AJAX — submit lại
+    // form về endpoint riêng bằng formaction, rồi quay lại /checkout để hiển thị
+    // kết quả thật, dùng chung logic validate với OrderService.createOrder()).
+    @PostMapping("/apply-voucher")
+    public String applyVoucher(@RequestParam("voucherCode") String voucherCode,
+                               HttpSession session,
+                               Principal principal,
+                               RedirectAttributes redirectAttributes) {
+
+        @SuppressWarnings("unchecked")
+        List<CartItemDTO> cartItems = (List<CartItemDTO>) session.getAttribute(CART_SESSION_KEY);
+        if (cartItems == null || cartItems.isEmpty()) {
+            redirectAttributes.addFlashAttribute("voucherErrorMessage", "Giỏ hàng của bạn đang trống!");
+            return "redirect:/checkout";
+        }
+
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (CartItemDTO item : cartItems) {
+            subtotal = subtotal.add(BigDecimal.valueOf(item.getTotalPrice()));
+        }
+
+        User user = null;
+        if (principal != null) {
+            user = userRepository.findByEmail(principal.getName()).orElse(null);
+        }
+
+        try {
+            Voucher voucher = voucherService.validateForCheckout(voucherCode, subtotal, user);
+            if (voucher == null) {
+                session.removeAttribute("APPLIED_VOUCHER_CODE");
+                session.removeAttribute("APPLIED_VOUCHER_DISCOUNT");
+            } else {
+                BigDecimal discount = voucherService.calculateDiscount(voucher, subtotal);
+                session.setAttribute("APPLIED_VOUCHER_CODE", voucher.getCode());
+                session.setAttribute("APPLIED_VOUCHER_DISCOUNT", discount.doubleValue());
+                redirectAttributes.addFlashAttribute("voucherSuccessMessage",
+                        "Áp dụng mã \"" + voucher.getCode() + "\" thành công!");
+            }
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            session.removeAttribute("APPLIED_VOUCHER_CODE");
+            session.removeAttribute("APPLIED_VOUCHER_DISCOUNT");
+            redirectAttributes.addFlashAttribute("voucherErrorMessage", ex.getMessage());
+        }
+
+        return "redirect:/checkout";
     }
 
     @PostMapping("/process")
@@ -158,7 +213,13 @@ public class CheckoutController {
                         payment.setPaidAt(LocalDateTime.now());
                         paymentRepository.save(payment);
                     }
-                    orderService.getOrderById(orderId); // refresh
+                    // BR-V09: VNPay thanh toán thành công tại đây -> đây là mốc
+                    // ghi nhận lượt dùng voucher (createOrder() cố ý bỏ qua bước này
+                    // cho phương thức VNPAY, xem OrderService#createOrder).
+                    if (order.getVoucher() != null) {
+                        voucherService.recordUsage(order.getVoucher(), order.getUser(), order);
+                    }
+                    orderRepository.save(order);
                     return "redirect:/orders/success/" + order.getOrderId();
                 } else {
                     order.setStatus(OrderStatus.CANCELLED);
@@ -168,6 +229,10 @@ public class CheckoutController {
                         payment.setStatus(PaymentStatus.FAILED);
                         paymentRepository.save(payment);
                     }
+                    orderRepository.save(order);
+                    // Đơn không thành công -> hoàn lại tồn kho đã trừ lúc tạo đơn
+                    // (giống cancelOrder(), tránh kho bị "khóa oan" cho đơn không đi đến đâu).
+                    orderService.restoreStock(order.getOrderId());
                     redirectAttributes.addFlashAttribute("errorMessage", "Thanh toán VNPay không thành công!");
                     return "redirect:/orders/" + order.getOrderId();
                 }
