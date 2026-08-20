@@ -64,14 +64,7 @@
                     <div class="text-danger fs-8 mt-1" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label fs-7 fw-semibold">Điểm tích lũy</label>
-                    <div class="form-control bg-light text-dark d-flex align-items-center gap-2">
-                        <i class="bi bi-gem text-warning"></i>
-                        <span th:text="${#numbers.formatInteger(user.loyaltyPoints, 0, 'COMMA')} + ' điểm'">0
-                            điểm</span>
-                    </div>
-                </div>
+
 
                 <div class="col-12">
                     <label class="form-label fs-7 fw-semibold">Địa chỉ <span class="text-danger">*</span></label>

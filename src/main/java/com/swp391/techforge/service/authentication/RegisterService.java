@@ -61,7 +61,6 @@ public class RegisterService {
         user.setAddress(request.getAddress());
 
         // default status = ACTIVE
-        // default loyaltyPoints = 0
 
         userRepository.save(user);
     }

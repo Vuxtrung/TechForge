@@ -78,15 +78,29 @@
 
     <!-- Card Header -->
     <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">
-                <i class="bi bi-people"></i> Quản lý Người dùng
-            </h5>
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                <h5 class="mb-0">
+                    <i class="bi bi-people"></i> <span th:text="${activeTab == 'staff' ? 'Quản lý Nhân viên' : 'Quản lý Người dùng'}"></span>
+                </h5>
+                <a th:if="${activeTab == 'staff'}" th:href="@{/admin/staff/add}" class="btn btn-light btn-sm text-dark fw-bold">
+                    <i class="bi bi-plus-circle"></i> Thêm Nhân viên
+                </a>
+            </div>
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'staff' ? 'active text-dark fw-bold' : 'text-white'}" th:href="@{/admin/users(tab='staff')}">Nhân viên</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${activeTab == 'user' ? 'active text-dark fw-bold' : 'text-white'}" th:href="@{/admin/users(tab='user')}">Người dùng</a>
+                </li>
+            </ul>
         </div>
 
         <!-- Filter Section -->
         <div class="card-body">
             <form method="get" action="/admin/users" class="filter-section">
+                <input type="hidden" name="tab" th:value="${activeTab}"/>
                 <div class="row g-3">
                     <!-- Search Box -->
                     <div class="col-md-3">
@@ -101,12 +115,12 @@
                     <!-- Filter by Role -->
                     <div class="col-md-2">
                         <select name="roleId" class="form-select form-select-sm">
-                            <option value="">-- Tất cả Phòng ban --</option>
-                            <option value="1" th:selected="${roleId == 1}">GUEST</option>
-                            <option value="2" th:selected="${roleId == 2}">CUSTOMER</option>
-                            <option value="3" th:selected="${roleId == 3}">STAFF_SALES</option>
-                            <option value="4" th:selected="${roleId == 4}">STAFF_WARRANTY</option>
-                            <option value="5" th:selected="${roleId == 5}">ADMIN</option>
+                            <option value="">-- Tất cả Vai trò --</option>
+                            <option th:each="role : ${availableRoles}"
+                                    th:value="${role.roleId}"
+                                    th:text="${role.roleName}"
+                                    th:selected="${role.roleId == roleId}">
+                            </option>
                         </select>
                     </div>
 
@@ -134,7 +148,7 @@
                         <button type="submit" class="btn btn-dark btn-sm w-100">
                             <i class="bi bi-search"></i> Tìm kiếm
                         </button>
-                        <a href="/admin/users" class="btn btn-secondary btn-sm w-100 mt-2">
+                        <a th:href="@{/admin/users(tab=${activeTab})}" class="btn btn-secondary btn-sm w-100 mt-2">
                             <i class="bi bi-arrow-clockwise"></i> Đặt lại
                         </a>
                     </div>
@@ -156,7 +170,7 @@
                     <tr>
                         <th>#</th>
                         <th>
-                            <a th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'fullName,' + (sort == 'fullName,asc' ? 'desc' : 'asc')}, page=0)}">
+                            <a th:href="@{/admin/users(tab=${activeTab}, keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'fullName,' + (sort == 'fullName,asc' ? 'desc' : 'asc')}, page=0)}">
                                 Tên người dùng
                                 <i class="bi" th:classappend="${sort.startsWith('fullName,desc')} ? 'bi-sort-down' : 'bi-sort-up'"></i>
                             </a>
@@ -165,18 +179,13 @@
                         <th>Số điện thoại</th>
                         <th>Phòng ban</th>
                         <th>
-                            <a th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'status,' + (sort == 'status,asc' ? 'desc' : 'asc')}, page=0)}">
+                            <a th:href="@{/admin/users(tab=${activeTab}, keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'status,' + (sort == 'status,asc' ? 'desc' : 'asc')}, page=0)}">
                                 Trạng thái
                                 <i class="bi" th:classappend="${sort.startsWith('status,desc')} ? 'bi-sort-down' : 'bi-sort-up'"></i>
                             </a>
                         </th>
-                        <th>
-                            <a th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${'createdAt,' + (sort == 'createdAt,asc' ? 'desc' : 'asc')}, page=0)}">
-                                Ngày tạo
-                                <i class="bi" th:classappend="${sort.startsWith('createdAt,desc')} ? 'bi-sort-down' : 'bi-sort-up'"></i>
-                            </a>
-                        </th>
-                        <th>Điểm thành viên</th>
+
+                        <th th:if="${activeTab == 'user'}">Điểm thành viên</th>
                         <th>Hành động</th>
                     </tr>
                     </thead>
@@ -201,10 +210,7 @@
                                 <i class="bi bi-lock-fill"></i> Bị khóa
                             </span>
                         </td>
-                        <td>
-                            <small th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}"></small>
-                        </td>
-                        <td th:text="${user.loyaltyPoints}"></td>
+
                         <td>
                             <div class="btn-group" role="group">
                                 <a th:href="@{/admin/users/{id}(id=${user.userId})}" 
@@ -248,7 +254,7 @@
                     <!-- Previous -->
                     <li class="page-item" th:classappend="${!userPage.hasPrevious()} ? 'disabled'">
                         <a class="page-link" th:if="${userPage.hasPrevious()}"
-                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number - 1}, size=${size})}"
+                           th:href="@{/admin/users(tab=${activeTab}, keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number - 1}, size=${size})}"
                            aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
@@ -259,7 +265,7 @@
                     <th:block th:each="i : ${#numbers.sequence(0, userPage.totalPages - 1)}">
                         <li class="page-item" th:classappend="${i == userPage.number} ? 'active'">
                             <a class="page-link" th:if="${i != userPage.number}"
-                               th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${i}, size=${size})}"
+                               th:href="@{/admin/users(tab=${activeTab}, keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${i}, size=${size})}"
                                th:text="${i + 1}"></a>
                             <span class="page-link" th:if="${i == userPage.number}" th:text="${i + 1}"></span>
                         </li>
@@ -268,7 +274,7 @@
                     <!-- Next -->
                     <li class="page-item" th:classappend="${!userPage.hasNext()} ? 'disabled'">
                         <a class="page-link" th:if="${userPage.hasNext()}"
-                           th:href="@{/admin/users(keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number + 1}, size=${size})}"
+                           th:href="@{/admin/users(tab=${activeTab}, keyword=${keyword}, roleId=${roleId}, status=${status}, sort=${sort}, page=${userPage.number + 1}, size=${size})}"
                            aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
