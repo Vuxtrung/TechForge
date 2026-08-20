@@ -54,13 +54,16 @@ public class ProductController {
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("product", new Product());
+        model.addAttribute("spec", new ComponentSpecRequest());
         model.addAttribute("categories", categoryService.findAllActive());
         return "admin/product-form";
     }
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getById(id));
+        Product product = productService.getById(id);
+        model.addAttribute("product", product);
+        model.addAttribute("spec", productService.getSpecRequestForEdit(product));
         model.addAttribute("categories", categoryService.findAllActive());
         return "admin/product-form";
     }
@@ -72,6 +75,7 @@ public class ProductController {
             @ModelAttribute("spec") ComponentSpecRequest specRequest,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
@@ -79,6 +83,7 @@ public class ProductController {
             productService.create(product, imageFile, specRequest);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
@@ -94,6 +99,7 @@ public class ProductController {
             @ModelAttribute("spec") ComponentSpecRequest specRequest,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
@@ -101,6 +107,7 @@ public class ProductController {
             productService.update(id, product, imageFile, specRequest);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }

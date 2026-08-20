@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -135,6 +136,99 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
         product.setCategoryId(product.getCategory() != null ? product.getCategory().getCategoryId() : null);
         return product;
+    }
+
+    // Dựng lại ComponentSpecRequest từ dữ liệu đã lưu (product_specifications
+    // hoặc bảng linh kiện tương ứng), dùng để pre-fill form khi vào trang Sửa.
+    @Transactional(readOnly = true)
+    public ComponentSpecRequest getSpecRequestForEdit(Product product) {
+        ComponentSpecRequest req = new ComponentSpecRequest();
+        Category category = product.getCategory();
+        if (category == null) {
+            return req;
+        }
+
+        if (category.getType() == Category.CategoryType.PC_PRODUCT) {
+            Map<String, String> specs = new LinkedHashMap<>();
+            for (ProductSpecification s : productSpecificationRepository.findAllByProduct_ProductId(product.getProductId())) {
+                specs.put(s.getSpecKey(), s.getSpecValue());
+            }
+            req.setPcCpu(specs.get("CPU"));
+            req.setPcMainboard(specs.get("Mainboard"));
+            req.setPcRam(specs.get("RAM"));
+            req.setPcVga(specs.get("VGA"));
+            req.setPcStorage(specs.get("Ổ cứng"));
+            req.setPcPsu(specs.get("Nguồn"));
+            req.setPcCooler(specs.get("Tản nhiệt"));
+            req.setPcCase(specs.get("Case"));
+            return req;
+        }
+
+        Category.ComponentType componentType = category.getComponentType();
+        if (componentType == null) {
+            return req;
+        }
+
+        switch (componentType) {
+            case CPU -> cpuRepository.findById(product.getProductId()).ifPresent(c -> {
+                req.setSocket(c.getSocket());
+                req.setCores(c.getCores());
+                req.setThreads(c.getThreads());
+                req.setBaseClockGhz(c.getBaseClockGhz());
+                req.setBoostClockGhz(c.getBoostClockGhz());
+                req.setTdpWatt(c.getTdpWatt());
+                req.setHasIgpu(c.getHasIgpu());
+            });
+            case MAINBOARD -> mainboardRepository.findById(product.getProductId()).ifPresent(mb -> {
+                req.setSocket(mb.getSocket());
+                req.setChipset(mb.getChipset());
+                req.setMbRamType(mb.getRamType() != null ? mb.getRamType().name() : null);
+                req.setRamSlots(mb.getRamSlots());
+                req.setMaxRamGb(mb.getMaxRamGb());
+                req.setMbFormFactor(mb.getFormFactor() != null ? mb.getFormFactor().name() : null);
+                req.setM2Slots(mb.getM2Slots());
+            });
+            case RAM -> ramRepository.findById(product.getProductId()).ifPresent(ram -> {
+                req.setRamType(ram.getRamType() != null ? ram.getRamType().name() : null);
+                req.setSpeedMhz(ram.getSpeedMhz());
+                req.setRamCapacityGb(ram.getCapacityGb());
+                req.setModules(ram.getModules());
+            });
+            case GPU -> gpuRepository.findById(product.getProductId()).ifPresent(gpu -> {
+                req.setVramGb(gpu.getVramGb());
+                req.setLengthMm(gpu.getLengthMm());
+                req.setPowerConnector(gpu.getPowerConnector());
+                req.setRecommendedPsuWatt(gpu.getRecommendedPsuWatt());
+                req.setSlotWidth(gpu.getSlotWidth());
+            });
+            case PSU -> psuRepository.findById(product.getProductId()).ifPresent(psu -> {
+                req.setWattage(psu.getWattage());
+                req.setEfficiencyRating(psu.getEfficiencyRating());
+                req.setModular(psu.getModular() != null ? psu.getModular().name() : null);
+                req.setPsuFormFactor(psu.getFormFactor());
+            });
+            case CASE_TYPE -> caseRepository.findById(product.getProductId()).ifPresent(c -> {
+                req.setCaseFormFactorSupport(c.getFormFactorSupport() != null
+                        ? new ArrayList<>(List.of(c.getFormFactorSupport().split(",")))
+                        : new ArrayList<>());
+                req.setMaxGpuLengthMm(c.getMaxGpuLengthMm());
+                req.setMaxCoolerHeightMm(c.getMaxCoolerHeightMm());
+                req.setMaxRadiatorMm(c.getMaxRadiatorMm());
+            });
+            case COOLER -> coolerRepository.findById(product.getProductId()).ifPresent(c -> {
+                req.setCoolerType(c.getCoolerType() != null ? c.getCoolerType().name() : null);
+                req.setHeightMm(c.getHeightMm());
+                req.setRadiatorSizeMm(c.getRadiatorSizeMm());
+                req.setSocketSupport(c.getSocketSupport());
+            });
+            case STORAGE -> storageRepository.findById(product.getProductId()).ifPresent(s -> {
+                req.setStorageType(s.getStorageType() != null ? s.getStorageType().name() : null);
+                req.setStorageInterface(s.getStorageInterface());
+                req.setStorageCapacityGb(s.getCapacityGb());
+            });
+            case NONE -> { /* không có gì để nạp */ }
+        }
+        return req;
     }
 
     @Transactional
@@ -262,21 +356,81 @@ public class ProductService {
         addSpecIfPresent(product, "Case", req.getPcCase());
     }
 
+    private static final int PC_SPEC_VALUE_MAX_LENGTH = 255; // khớp product_specifications.spec_value VARCHAR(255)
+
     private void addSpecIfPresent(Product product, String key, String value) {
         if (value == null || value.trim().isEmpty()) {
             return;
         }
+        String trimmed = value.trim();
+        if (trimmed.length() > PC_SPEC_VALUE_MAX_LENGTH) {
+            throw new IllegalArgumentException(
+                    "Thông số \"" + key + "\" không được vượt quá " + PC_SPEC_VALUE_MAX_LENGTH + " ký tự.");
+        }
         ProductSpecification spec = new ProductSpecification();
         spec.setProduct(product);
         spec.setSpecKey(key);
-        spec.setSpecValue(value.trim());
+        spec.setSpecValue(trimmed);
         productSpecificationRepository.save(spec);
+    }
+
+    // ==== Helper validate dùng chung cho các bảng linh kiện ====
+
+    // Parse enum an toàn: chuyển IllegalArgumentException kỹ thuật của
+    // Enum.valueOf() (VD: "No enum constant ...") thành thông báo tiếng Việt dễ hiểu.
+    private <E extends Enum<E>> E parseRequiredEnum(Class<E> enumClass, String raw, String fieldLabel) {
+        if (raw == null || raw.isBlank()) {
+            throw new IllegalArgumentException("Vui lòng chọn " + fieldLabel + ".");
+        }
+        try {
+            return Enum.valueOf(enumClass, raw.trim());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Giá trị " + fieldLabel + " không hợp lệ.");
+        }
+    }
+
+    // Parse enum có giá trị mặc định khi bỏ trống (VD: Modular, Form Factor PSU)
+    private <E extends Enum<E>> E parseOptionalEnum(Class<E> enumClass, String raw, E defaultValue, String fieldLabel) {
+        if (raw == null || raw.isBlank()) {
+            return defaultValue;
+        }
+        try {
+            return Enum.valueOf(enumClass, raw.trim());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Giá trị " + fieldLabel + " không hợp lệ.");
+        }
+    }
+
+    // Số nguyên: bắt buộc >= min (min=0 cho phép 0, min=1 bắt buộc dương)
+    private void requireIntMin(Integer value, int min, String fieldLabel) {
+        if (value != null && value < min) {
+            throw new IllegalArgumentException(fieldLabel + " phải >= " + min + ".");
+        }
+    }
+
+    private void requireDecimalPositive(BigDecimal value, String fieldLabel) {
+        if (value != null && value.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException(fieldLabel + " phải lớn hơn 0.");
+        }
+    }
+
+    private void requireLength(String value, int maxLength, String fieldLabel) {
+        if (value != null && value.trim().length() > maxLength) {
+            throw new IllegalArgumentException(fieldLabel + " không được vượt quá " + maxLength + " ký tự.");
+        }
     }
 
     private void saveCpu(Product product, ComponentSpecRequest req) {
         if (req.getSocket() == null || req.getSocket().isBlank()) {
             throw new IllegalArgumentException("Vui lòng nhập Socket cho CPU.");
         }
+        requireLength(req.getSocket(), 30, "Socket");
+        requireIntMin(req.getCores(), 1, "Số nhân (Cores)");
+        requireIntMin(req.getThreads(), 1, "Số luồng (Threads)");
+        requireDecimalPositive(req.getBaseClockGhz(), "Xung nhịp cơ bản");
+        requireDecimalPositive(req.getBoostClockGhz(), "Xung nhịp boost");
+        requireIntMin(req.getTdpWatt(), 0, "TDP");
+
         Cpu cpu = new Cpu();
         cpu.setProduct(product);
         cpu.setSocket(req.getSocket().trim());
@@ -293,28 +447,40 @@ public class ProductService {
         if (req.getSocket() == null || req.getSocket().isBlank()) {
             throw new IllegalArgumentException("Vui lòng nhập Socket cho Mainboard.");
         }
-        if (req.getMbRamType() == null || req.getMbFormFactor() == null) {
-            throw new IllegalArgumentException("Vui lòng chọn RAM Type và Form Factor cho Mainboard.");
-        }
+        requireLength(req.getSocket(), 30, "Socket");
+        requireLength(req.getChipset(), 30, "Chipset");
+        requireIntMin(req.getRamSlots(), 1, "Số khe RAM");
+        requireIntMin(req.getMaxRamGb(), 1, "RAM tối đa");
+        requireIntMin(req.getM2Slots(), 0, "Số khe M.2");
+
+        Mainboard.RamType ramType = parseRequiredEnum(Mainboard.RamType.class, req.getMbRamType(), "Loại RAM cho Mainboard");
+        Mainboard.FormFactor formFactor = parseRequiredEnum(Mainboard.FormFactor.class, req.getMbFormFactor(), "Form Factor cho Mainboard");
+
         Mainboard mb = new Mainboard();
         mb.setProduct(product);
         mb.setSocket(req.getSocket().trim());
         mb.setChipset(req.getChipset());
-        mb.setRamType(Mainboard.RamType.valueOf(req.getMbRamType()));
+        mb.setRamType(ramType);
         mb.setRamSlots(req.getRamSlots());
         mb.setMaxRamGb(req.getMaxRamGb());
-        mb.setFormFactor(Mainboard.FormFactor.valueOf(req.getMbFormFactor()));
+        mb.setFormFactor(formFactor);
         mb.setM2Slots(req.getM2Slots());
         mainboardRepository.save(mb);
     }
 
     private void saveRam(Product product, ComponentSpecRequest req) {
-        if (req.getRamType() == null || req.getSpeedMhz() == null || req.getRamCapacityGb() == null) {
-            throw new IllegalArgumentException("Vui lòng nhập đầy đủ Loại RAM, Bus và Dung lượng.");
+        if (req.getSpeedMhz() == null || req.getRamCapacityGb() == null) {
+            throw new IllegalArgumentException("Vui lòng nhập đầy đủ Bus và Dung lượng cho RAM.");
         }
+        requireIntMin(req.getSpeedMhz(), 1, "Bus (MHz)");
+        requireIntMin(req.getRamCapacityGb(), 1, "Dung lượng RAM");
+        requireIntMin(req.getModules(), 1, "Số thanh RAM (Modules)");
+
+        Ram.RamType ramType = parseRequiredEnum(Ram.RamType.class, req.getRamType(), "Loại RAM");
+
         Ram ram = new Ram();
         ram.setProduct(product);
-        ram.setRamType(Ram.RamType.valueOf(req.getRamType()));
+        ram.setRamType(ramType);
         ram.setSpeedMhz(req.getSpeedMhz());
         ram.setCapacityGb(req.getRamCapacityGb());
         ram.setModules(req.getModules() != null ? req.getModules() : 1);
@@ -322,6 +488,12 @@ public class ProductService {
     }
 
     private void saveGpu(Product product, ComponentSpecRequest req) {
+        requireIntMin(req.getVramGb(), 0, "VRAM");
+        requireIntMin(req.getLengthMm(), 0, "Chiều dài GPU");
+        requireIntMin(req.getRecommendedPsuWatt(), 0, "PSU khuyến nghị");
+        requireIntMin(req.getSlotWidth(), 1, "Độ dày (số khe slot)");
+        requireLength(req.getPowerConnector(), 50, "Đầu cấp nguồn");
+
         Gpu gpu = new Gpu();
         gpu.setProduct(product);
         gpu.setVramGb(req.getVramGb());
@@ -336,12 +508,19 @@ public class ProductService {
         if (req.getWattage() == null) {
             throw new IllegalArgumentException("Vui lòng nhập công suất (Wattage) cho PSU.");
         }
+        requireIntMin(req.getWattage(), 1, "Công suất (Wattage)");
+        requireLength(req.getEfficiencyRating(), 30, "Chuẩn hiệu suất");
+        requireLength(req.getPsuFormFactor(), 20, "Form Factor PSU");
+
+        Psu.Modular modular = parseOptionalEnum(Psu.Modular.class, req.getModular(), Psu.Modular.FULL, "Modular");
+
         Psu psu = new Psu();
         psu.setProduct(product);
         psu.setWattage(req.getWattage());
         psu.setEfficiencyRating(req.getEfficiencyRating());
-        psu.setModular(req.getModular() != null ? Psu.Modular.valueOf(req.getModular()) : Psu.Modular.FULL);
-        psu.setFormFactor(req.getPsuFormFactor() != null ? req.getPsuFormFactor() : "ATX");
+        psu.setModular(modular);
+        psu.setFormFactor(req.getPsuFormFactor() != null && !req.getPsuFormFactor().isBlank()
+                ? req.getPsuFormFactor().trim() : "ATX");
         psuRepository.save(psu);
     }
 
@@ -349,6 +528,10 @@ public class ProductService {
         if (req.getCaseFormFactorSupport() == null || req.getCaseFormFactorSupport().isEmpty()) {
             throw new IllegalArgumentException("Vui lòng chọn ít nhất 1 Form Factor mà Case hỗ trợ.");
         }
+        requireIntMin(req.getMaxGpuLengthMm(), 0, "GPU dài tối đa");
+        requireIntMin(req.getMaxCoolerHeightMm(), 0, "Tản khí cao tối đa");
+        requireIntMin(req.getMaxRadiatorMm(), 0, "Radiator tối đa");
+
         CaseComponent c = new CaseComponent();
         c.setProduct(product);
         c.setFormFactorSupport(String.join(",", req.getCaseFormFactorSupport()));
@@ -359,12 +542,15 @@ public class ProductService {
     }
 
     private void saveCooler(Product product, ComponentSpecRequest req) {
-        if (req.getCoolerType() == null) {
-            throw new IllegalArgumentException("Vui lòng chọn Loại tản nhiệt (Khí/AIO).");
-        }
+        requireIntMin(req.getHeightMm(), 0, "Chiều cao tản khí");
+        requireIntMin(req.getRadiatorSizeMm(), 0, "Kích thước Radiator");
+        requireLength(req.getSocketSupport(), 200, "Socket hỗ trợ");
+
+        Cooler.CoolerType coolerType = parseRequiredEnum(Cooler.CoolerType.class, req.getCoolerType(), "Loại tản nhiệt (Khí/AIO)");
+
         Cooler cooler = new Cooler();
         cooler.setProduct(product);
-        cooler.setCoolerType(Cooler.CoolerType.valueOf(req.getCoolerType()));
+        cooler.setCoolerType(coolerType);
         cooler.setHeightMm(req.getHeightMm());
         cooler.setRadiatorSizeMm(req.getRadiatorSizeMm());
         cooler.setSocketSupport(req.getSocketSupport());
@@ -372,12 +558,17 @@ public class ProductService {
     }
 
     private void saveStorage(Product product, ComponentSpecRequest req) {
-        if (req.getStorageType() == null || req.getStorageCapacityGb() == null) {
-            throw new IllegalArgumentException("Vui lòng chọn Loại ổ cứng và Dung lượng.");
+        if (req.getStorageCapacityGb() == null) {
+            throw new IllegalArgumentException("Vui lòng nhập Dung lượng cho ổ cứng.");
         }
+        requireIntMin(req.getStorageCapacityGb(), 1, "Dung lượng ổ cứng");
+        requireLength(req.getStorageInterface(), 30, "Chuẩn giao tiếp");
+
+        Storage.StorageType storageType = parseRequiredEnum(Storage.StorageType.class, req.getStorageType(), "Loại ổ cứng");
+
         Storage storage = new Storage();
         storage.setProduct(product);
-        storage.setStorageType(Storage.StorageType.valueOf(req.getStorageType()));
+        storage.setStorageType(storageType);
         storage.setStorageInterface(req.getStorageInterface());
         storage.setCapacityGb(req.getStorageCapacityGb());
         storageRepository.save(storage);
