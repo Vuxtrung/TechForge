@@ -38,6 +38,11 @@ public class Voucher {
     @Column(name = "usage_limit")
     private Integer usageLimit;
 
+    // BR-V06: giới hạn số lượt mỗi khách hàng được dùng CHÍNH voucher này.
+    // Mặc định 1 nếu Admin không nhập.
+    @Column(name = "max_usage_per_customer")
+    private Integer maxUsagePerCustomer = 1;
+
     @Column(name = "is_active")
     private Boolean isActive = true;
 
@@ -114,6 +119,14 @@ public class Voucher {
 
     public void setUsageLimit(Integer usageLimit) {
         this.usageLimit = usageLimit;
+    }
+
+    public Integer getMaxUsagePerCustomer() {
+        return maxUsagePerCustomer;
+    }
+
+    public void setMaxUsagePerCustomer(Integer maxUsagePerCustomer) {
+        this.maxUsagePerCustomer = maxUsagePerCustomer;
     }
 
     public Boolean getIsActive() {

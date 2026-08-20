@@ -25,6 +25,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
 
+        <div th:if="${voucherSuccessMessage}" class="alert alert-success alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${voucherSuccessMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${voucherErrorMessage}" class="alert alert-warning alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${voucherErrorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
         <form th:action="@{/checkout/process}" method="post" th:object="${checkoutRequest}">
             <div class="row g-4">
                 <!-- CỘT TRÁI: FORM NHẬP CHI TIẾT GIAO HÀNG (10 INPUT FIELDS) -->
@@ -162,7 +171,8 @@
                             <label for="voucherCode" class="form-label fs-7 fw-semibold">Mã giảm giá (Nếu có)</label>
                             <div class="input-group input-group-sm">
                                 <input type="text" class="form-control text-uppercase" id="voucherCode" th:field="*{voucherCode}" placeholder="Mã giảm giá (VD: TECHFORGE10)">
-                                <button type="button" class="btn btn-outline-danger fw-bold" onclick="alert('Mã giảm giá đã được áp dụng vào đơn hàng!')">Áp dụng</button>
+                                <button type="submit" th:formaction="@{/checkout/apply-voucher}" formnovalidate
+                                    class="btn btn-outline-danger fw-bold">Áp dụng</button>
                             </div>
                         </div>
 
