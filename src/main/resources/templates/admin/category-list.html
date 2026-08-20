@@ -204,6 +204,13 @@
                       th:if="${cat.type.name() == 'PC_COMPONENT'}"
                       >Linh kiện</span
                     >
+                    <div
+                      class="fs-8 text-muted mt-1"
+                      th:if="${cat.type.name() == 'PC_COMPONENT'}"
+                      th:text="${cat.componentType.name()}"
+                    >
+                      CPU
+                    </div>
                   </td>
                   <td>
                     <span

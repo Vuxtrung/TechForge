@@ -111,6 +111,7 @@
                             <form th:action="@{/products}" method="get" id="sortForm">
                                 <input type="hidden" name="keyword" th:value="${filter.keyword}">
                                 <input type="hidden" name="categoryId" th:value="${filter.categoryId}">
+                                <input type="hidden" name="type" th:value="${filter.type}">
                                 <input type="hidden" name="brand" th:value="${filter.brand}">
                                 <input type="hidden" name="minPrice" th:value="${filter.minPrice}">
                                 <input type="hidden" name="maxPrice" th:value="${filter.maxPrice}">
@@ -141,19 +142,19 @@
                             <ul class="pagination justify-content-center pagination-sm mb-0">
                                 <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${productPage.number - 1})}">
+                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, type=${filter.type}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${productPage.number - 1})}">
                                         <i class="bi bi-chevron-left"></i>
                                     </a>
                                 </li>
                                 <li class="page-item" th:each="i : ${#numbers.sequence(0, productPage.totalPages - 1)}"
                                     th:classappend="${i == productPage.number} ? 'active'">
                                     <a class="page-link"
-                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${i})}"
+                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, type=${filter.type}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${i})}"
                                        th:text="${i + 1}">1</a>
                                 </li>
                                 <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
                                     <a class="page-link"
-                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${productPage.number + 1})}">
+                                       th:href="@{/products(keyword=${filter.keyword}, categoryId=${filter.categoryId}, type=${filter.type}, brand=${filter.brand}, minPrice=${filter.minPrice}, maxPrice=${filter.maxPrice}, sort=${filter.sort}, page=${productPage.number + 1})}">
                                         <i class="bi bi-chevron-right"></i>
                                     </a>
                                 </li>
