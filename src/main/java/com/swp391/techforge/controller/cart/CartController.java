@@ -19,7 +19,6 @@ public class CartController {
 
     private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
     private static final String VOUCHER_SESSION_KEY = "APPLIED_VOUCHER_DISCOUNT";
-    private static final String POINTS_SESSION_KEY = "USED_LOYALTY_POINTS";
 
     private final ProductRepository productRepository;
 
@@ -50,20 +49,15 @@ public class CartController {
         Double voucherDiscount = (Double) session.getAttribute(VOUCHER_SESSION_KEY);
         if (voucherDiscount == null) voucherDiscount = 0.0;
 
-        Double pointsDiscount = (Double) session.getAttribute(POINTS_SESSION_KEY);
-        if (pointsDiscount == null) pointsDiscount = 0.0;
-
         // Tính tổng tiền thanh toán cuối cùng
-        double grandTotal = subtotal - voucherDiscount - pointsDiscount;
+        double grandTotal = subtotal - voucherDiscount;
         if (grandTotal < 0) grandTotal = 0.0;
 
         // Đưa dữ liệu sang file HTML Thymeleaf
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("subtotal", subtotal);
         model.addAttribute("voucherDiscount", voucherDiscount);
-        model.addAttribute("pointsDiscount", pointsDiscount);
         model.addAttribute("grandTotal", grandTotal);
-        model.addAttribute("userLoyaltyPoints", 150); // Điểm thưởng mẫu của khách
 
         return "cart";
     }
@@ -205,23 +199,6 @@ public class CartController {
             } else {
                 redirectAttributes.addFlashAttribute("voucherErrorMessage", "Mã giảm giá không hợp lệ hoặc đã hết hạn!");
             }
-        }
-
-        return "redirect:/cart";
-    }
-
-    // 6. Đổi điểm thưởng (Use Loyalty Points)
-    @PostMapping("/use-points")
-    public String useLoyaltyPoints(@RequestParam(value = "usePoints", defaultValue = "false") Boolean usePoints,
-                                   HttpSession session,
-                                   RedirectAttributes redirectAttributes) {
-
-        if (Boolean.TRUE.equals(usePoints)) {
-            // Giả lập đổi 100 điểm thưởng = 100,000đ
-            session.setAttribute(POINTS_SESSION_KEY, 100000.0);
-            redirectAttributes.addFlashAttribute("pointsMessage", "Đã đổi 100 điểm thưởng giảm 100.000đ!");
-        } else {
-            session.removeAttribute(POINTS_SESSION_KEY);
         }
 
         return "redirect:/cart";

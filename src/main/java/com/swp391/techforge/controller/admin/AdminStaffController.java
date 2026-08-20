@@ -40,47 +40,14 @@ public class AdminStaffController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Hiển thị danh sách nhân viên
-     */
-    @GetMapping
-    public String list(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer roleId,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "fullName,asc") String sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model) {
 
-        if (size < 1) {
-            size = 1;
-        }
-
-        String[] sortParts = sort.split(",");
-        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
-                ? Sort.Direction.DESC
-                : Sort.Direction.ASC;
-
-        List<Integer> targetRoleIds = roleId != null ? List.of(roleId) : STAFF_ROLE_IDS;
-
-        Page<User> staffPage = userService.searchByRoles(keyword, targetRoleIds, status, page, size,
-                Sort.by(direction, sortParts[0]));
-
-        model.addAttribute("staffPage", staffPage);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("roleId", roleId);
-        model.addAttribute("status", status);
-        model.addAttribute("sort", sort);
-        model.addAttribute("size", size);
-        model.addAttribute("userStatuses", UserStatus.values());
-        model.addAttribute("staffRoles", roleRepository.findAllById(STAFF_ROLE_IDS));
-
-        return "admin/staff-list";
-    }
 
     /**
-     * Hiển thị form thêm nhân viên
+     * Hiển thị giao diện Form thêm nhân viên mới.
+     * Load sẵn danh sách các Role hợp lệ để chọn (chỉ bao gồm các role Staff).
+     * 
+     * @param model Đối tượng đẩy dữ liệu ra view
+     * @return Template form thêm nhân viên
      */
     @GetMapping("/add")
     public String showAddForm(Model model) {
@@ -90,7 +57,15 @@ public class AdminStaffController {
     }
 
     /**
-     * Xử lý thêm nhân viên mới
+     * Xử lý dữ liệu khi Admin submit form thêm nhân viên mới.
+     * Kiểm tra tính hợp lệ của dữ liệu (email trùng, role không đúng...).
+     * Nếu hợp lệ thì tiến hành mã hóa mật khẩu và tạo tài khoản nhân viên mới vào DB.
+     * 
+     * @param request
+     * @param bindingResult 
+     * @param model 
+     * @param redirectAttributes
+     * @return
      */
     @PostMapping("/add")
     public String processAddStaff(
@@ -128,6 +103,6 @@ public class AdminStaffController {
         redirectAttributes.addFlashAttribute("message", "Thêm nhân viên thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
 
-        return "redirect:/admin/staff";
+        return "redirect:/admin/users?tab=staff";
     }
 }

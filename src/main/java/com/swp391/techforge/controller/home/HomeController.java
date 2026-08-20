@@ -40,7 +40,14 @@ public class HomeController {
     public String redirectHome() {
         return "redirect:/";
     }
-
+    
+    /**
+     * Hiển thị giao diện công cụ "Tự ráp máy tính" (Build PC).
+     * Mọi tương tác chọn linh kiện và kiểm tra lỗi sẽ được xử lý bằng JS thông qua API.
+     * 
+     * @param model Đối tượng chứa dữ liệu đẩy ra view
+     * @return Tên template trang buildpc
+     */
     @GetMapping("/buildpc")
     public String buildpc(Model model) {
         model.addAttribute("pageTitle", "Tự Build PC");

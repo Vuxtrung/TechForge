@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title th:text="${formTitle != null ? formTitle + ' - TechForge' : 'Soạn Thảo Blog - TechForge'}">Soạn Thảo Blog</title>
+  </head>
+
+  <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body d-flex">
+      <!-- Sidebar Quản Trị -->
+      <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+      
+      <!-- Nội dung chính -->
+      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+        <div class="container-fluid">
+          
+          <!-- Thanh điều hướng Breadcrumb -->
+          <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb fs-8">
+              <li class="breadcrumb-item"><a th:href="@{/admin/blogs}" class="text-decoration-none text-muted">Quản Lý Blog</a></li>
+              <li class="breadcrumb-item active text-danger fw-bold" aria-current="page" th:text="${formTitle}">Thêm Mới Bài Viết</li>
+            </ol>
+          </nav>
+
+          <!-- Thông báo lỗi chung -->
+          <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+
+          <!-- Form Thêm mới / Cập nhật / Xem chi tiết dùng chung -->
+          <form th:action="${isEditMode} ? @{'/admin/blogs/' + ${blog.id} + '/edit'} : @{/admin/blogs/new}"
+                th:object="${blogRequest}"
+                method="post"
+                class="row g-4">
+            
+            <input type="hidden" th:if="${isEditMode}" th:field="*{id}" />
+
+            <!-- Cột Trái: Nội Dung Bài Viết Chính (8 Cột) -->
+            <div class="col-lg-8">
+              <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+                
+                <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-4">
+                  <h5 class="fw-bold text-dark mb-0">
+                    <i class="bi bi-file-earmark-text text-danger me-2"></i>
+                    <span th:text="${formTitle}">Thông Tin Bài Viết</span>
+                  </h5>
+                  <span th:if="${isEditMode}" class="badge bg-secondary-subtle text-secondary border">
+                    ID: #<span th:text="${blog.id}">1</span>
+                  </span>
+                </div>
+
+                <!-- Tiêu đề bài viết -->
+                <div class="mb-3">
+                  <label for="title" class="form-label fw-bold fs-7 text-dark">
+                    Tiêu đề bài viết <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" id="title" class="form-control form-control-lg fs-6 fw-semibold" 
+                         th:field="*{title}" 
+                         placeholder="Nhập tiêu đề bài viết (VD: Đánh giá chi tiết CPU Intel Core i9-14900K)..." 
+                         th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''" />
+                  <div class="invalid-feedback fs-8" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Lỗi tiêu đề</div>
+                </div>
+
+                <!-- Đường dẫn tĩnh (Slug) -->
+                <div class="mb-3">
+                  <label for="slug" class="form-label fw-semibold fs-8 text-muted">
+                    Đường dẫn tĩnh (Slug URL SEO)
+                  </label>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-light text-muted">/blogs/detail/</span>
+                    <input type="text" id="slug" class="form-control fs-8" 
+                           th:field="*{slug}" 
+                           placeholder="Tự động sinh chuẩn SEO nếu để trống..." />
+                  </div>
+                  <div class="form-text fs-8 text-muted">Đường dẫn thân thiện với công cụ tìm kiếm Google (không dấu, ngăn cách bằng dấu gạch ngang).</div>
+                </div>
+
+                <!-- Tóm tắt ngắn bài viết -->
+                <div class="mb-3">
+                  <label for="summary" class="form-label fw-bold fs-7 text-dark">
+                    Tóm tắt ngắn (Excerpt / Meta Description) <span class="text-danger">*</span>
+                  </label>
+                  <textarea id="summary" class="form-control fs-7" rows="3" 
+                            th:field="*{summary}" 
+                            placeholder="Mô tả tóm tắt ngắn về bài viết xuất hiện ở danh sách và thẻ chia sẻ mạng xã hội..." 
+                            th:classappend="${#fields.hasErrors('summary')} ? 'is-invalid' : ''"></textarea>
+                  <div class="invalid-feedback fs-8" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}">Lỗi tóm tắt</div>
+                </div>
+
+                <!-- Nội dung chi tiết bài viết -->
+                <div class="mb-3">
+                  <label for="content" class="form-label fw-bold fs-7 text-dark">
+                    Nội dung bài viết chi tiết <span class="text-danger">*</span>
+                  </label>
+                  <textarea id="content" class="form-control font-monospace fs-7" rows="14" 
+                            th:field="*{content}" 
+                            placeholder="Nhập nội dung bài viết chi tiết (Hỗ trợ định dạng văn bản, thẻ HTML như <h3>, <p>, <ul>, <li>, <img>, <blockquote>)..." 
+                            th:classappend="${#fields.hasErrors('content')} ? 'is-invalid' : ''"></textarea>
+                  <div class="invalid-feedback fs-8" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">Lỗi nội dung</div>
+                  <div class="form-text fs-8 text-muted">
+                    <i class="bi bi-info-circle me-1"></i> Có thể chèn hình ảnh minh họa bằng thẻ: <code>&lt;img src="link_anh" class="img-fluid rounded my-3" alt="mô tả"&gt;</code>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Cột Phải: Cài Đặt Xuất Bản & Ảnh Đại Diện & Thông Tin Quản Trị (4 Cột) -->
+            <div class="col-lg-4">
+              
+              <!-- Card Cài đặt Xuất bản & Trạng thái -->
+              <div class="card border-0 shadow-sm rounded-3 p-4 bg-white mb-4">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                  <i class="bi bi-gear text-danger me-2"></i> Xuất Bản & Trạng Thái
+                </h6>
+
+                <!-- Trạng thái -->
+                <div class="mb-3">
+                  <label for="status" class="form-label fw-semibold fs-8 text-dark">Trạng thái duyệt</label>
+                  <select id="status" class="form-select form-select-sm" th:field="*{status}">
+                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.displayName}"></option>
+                  </select>
+                </div>
+
+                <!-- Danh mục bài viết -->
+                <div class="mb-3">
+                  <label for="category" class="form-label fw-semibold fs-8 text-dark">
+                    Danh mục tin tức <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" id="category" class="form-control form-control-sm" list="categoryOptions" 
+                         th:field="*{category}" 
+                         placeholder="Chọn hoặc nhập danh mục mới..." 
+                         th:classappend="${#fields.hasErrors('category')} ? 'is-invalid' : ''" />
+                  <datalist id="categoryOptions">
+                    <option value="Tin Công Nghệ">Tin Công Nghệ</option>
+                    <option value="Đánh Giá Phần Cứng">Đánh Giá Phần Cứng</option>
+                    <option value="Hướng Dẫn Build PC">Hướng Dẫn Build PC</option>
+                    <option value="Thủ Thuật & Game">Thủ Thuật & Game</option>
+                    <option value="Khuyến Mãi & Sự Kiện">Khuyến Mãi & Sự Kiện</option>
+                    <option th:each="cat : ${categories}" th:value="${cat}"></option>
+                  </datalist>
+                  <div class="invalid-feedback fs-8" th:if="${#fields.hasErrors('category')}" th:errors="*{category}">Vui lòng chọn danh mục</div>
+                </div>
+
+                <!-- Ảnh đại diện Thumbnail URL -->
+                <div class="mb-3">
+                  <label for="thumbnailUrl" class="form-label fw-semibold fs-8 text-dark">Ảnh đại diện (URL)</label>
+                  <input type="url" id="thumbnailUrl" class="form-control form-control-sm" 
+                         th:field="*{thumbnailUrl}" 
+                         placeholder="https://example.com/image.jpg"
+                         oninput="document.getElementById('previewThumb').src = this.value || '/images/default-blog.jpg'" />
+                  <div class="mt-2 text-center border rounded p-2 bg-light">
+                    <div class="fs-8 text-muted mb-1">Xem trước ảnh bìa:</div>
+                    <img id="previewThumb" 
+                         th:src="${blogRequest.thumbnailUrl != null and !blogRequest.thumbnailUrl.isEmpty()} ? ${blogRequest.thumbnailUrl} : '/images/default-blog.jpg'" 
+                         class="rounded border shadow-sm img-fluid" 
+                         style="max-height: 140px; object-fit: cover;" 
+                         alt="Preview Thumbnail"
+                         onerror="this.src='/images/default-blog.jpg';" />
+                  </div>
+                </div>
+
+                <!-- Nút Lưu / Cập nhật -->
+                <div class="d-grid gap-2 mt-4 pt-2 border-top">
+                  <button type="submit" class="btn btn-danger fw-bold py-2 shadow-sm">
+                    <i class="bi bi-cloud-arrow-up me-1"></i>
+                    <span th:text="${isEditMode} ? 'Lưu Thay Đổi Bài Viết' : 'Đăng / Lưu Bài Viết'">Lưu Bài Viết</span>
+                  </button>
+                  <a th:href="@{/admin/blogs}" class="btn btn-outline-secondary btn-sm py-2">
+                    <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
+                  </a>
+                </div>
+
+              </div>
+
+              <!-- Card Thông Tin Chi Tiết / Lịch Sử (Chỉ hiển thị khi Xem Chi Tiết / Edit) -->
+              <div th:if="${isEditMode}" class="card border-0 shadow-sm rounded-3 p-4 bg-white">
+                <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                  <i class="bi bi-info-circle text-danger me-2"></i> Lịch Sử & Thống Kê
+                </h6>
+                <ul class="list-unstyled fs-8 mb-3">
+                  <li class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Tác giả:</span>
+                    <strong class="text-dark" th:text="${blog.author != null ? blog.author.fullName : 'Hệ Thống'}">Admin</strong>
+                  </li>
+                  <li class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Lượt xem thực tế:</span>
+                    <strong class="text-primary" th:text="${blog.viewsCount} + ' lượt'">0 lượt</strong>
+                  </li>
+                  <li class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Ngày tạo:</span>
+                    <span class="text-dark" th:text="${#temporals.format(blog.createdAt, 'dd/MM/yyyy HH:mm')}">20/08/2026</span>
+                  </li>
+                  <li class="d-flex justify-content-between py-1 border-bottom">
+                    <span class="text-muted">Cập nhật lần cuối:</span>
+                    <span class="text-dark" th:text="${#temporals.format(blog.updatedAt, 'dd/MM/yyyy HH:mm')}">20/08/2026</span>
+                  </li>
+                  <li class="d-flex justify-content-between py-1" th:if="${blog.publishedAt != null}">
+                    <span class="text-muted">Ngày xuất bản:</span>
+                    <span class="text-success fw-semibold" th:text="${#temporals.format(blog.publishedAt, 'dd/MM/yyyy HH:mm')}">20/08/2026</span>
+                  </li>
+                </ul>
+
+                <a th:href="@{'/blogs/' + ${blog.id}}" target="_blank" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
+                  <i class="bi bi-box-arrow-up-right me-1"></i> Xem bài viết trên trang khách
+                </a>
+              </div>
+
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

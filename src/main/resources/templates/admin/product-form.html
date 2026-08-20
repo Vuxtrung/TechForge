@@ -594,7 +594,14 @@
                     function showBlock(id) {
                       blockIds.forEach(function (bid) {
                         const el = document.getElementById(bid);
-                        if (el) el.style.display = bid === id ? "" : "none";
+                        if (el) {
+                          const isVisible = (bid === id);
+                          el.style.display = isVisible ? "" : "none";
+                          const inputs = el.querySelectorAll("input, select, textarea");
+                          inputs.forEach(input => {
+                              input.disabled = !isVisible;
+                          });
+                        }
                       });
                     }
 

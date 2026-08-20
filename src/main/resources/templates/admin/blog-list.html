@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title>Quản Lý Bài Viết & Tin Tức - TechForge</title>
+  </head>
+
+  <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body d-flex">
+      <!-- Sidebar Quản Trị -->
+      <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+      
+      <!-- Nội dung chính -->
+      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+        <div class="container-fluid">
+          <div class="bg-white rounded-3 shadow-sm border p-4">
+            
+            <!-- Tiêu đề trang + Nút Thêm mới -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 border-bottom pb-3 gap-2">
+              <div>
+                <h4 class="text-dark fw-bold mb-1">
+                  <i class="bi bi-newspaper text-danger me-2"></i> Quản Lý Blog & Tin Tức
+                </h4>
+                <p class="text-muted fs-8 mb-0">Quản lý các bài viết công nghệ, đánh giá linh kiện, bài viết hướng dẫn và tin khuyến mãi</p>
+              </div>
+              <a th:href="@{/admin/blogs/new}" class="btn btn-danger fw-semibold px-3 py-2 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Soạn Bài Viết Mới
+              </a>
+            </div>
+
+            <!-- Flash thông báo -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+              <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+              <span th:text="${successMessage}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+              <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+              <span th:text="${errorMessage}"></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Thanh Công Cụ Tìm Kiếm, Lọc và Sắp Xếp -->
+            <form th:action="@{/admin/blogs}" method="get" class="card bg-light border-0 p-3 mb-4 rounded-3">
+              <div class="row g-3 align-items-end">
+                <!-- Tìm kiếm theo từ khóa -->
+                <div class="col-md-4">
+                  <label class="form-label fs-8 fw-semibold text-muted mb-1">
+                    <i class="bi bi-search me-1"></i> Tìm kiếm bài viết
+                  </label>
+                  <input type="search" name="keyword" th:value="${keyword}" class="form-control form-control-sm" placeholder="Tìm theo tiêu đề, mô tả hoặc nội dung..." />
+                </div>
+
+                <!-- Lọc theo danh mục -->
+                <div class="col-md-3">
+                  <label class="form-label fs-8 fw-semibold text-muted mb-1">
+                    <i class="bi bi-tags me-1"></i> Danh mục
+                  </label>
+                  <select name="category" class="form-select form-select-sm">
+                    <option value="">-- Tất cả danh mục --</option>
+                    <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}" th:selected="${currentCategory == cat}"></option>
+                  </select>
+                </div>
+
+                <!-- Lọc theo trạng thái -->
+                <div class="col-md-2">
+                  <label class="form-label fs-8 fw-semibold text-muted mb-1">
+                    <i class="bi bi-flag me-1"></i> Trạng thái
+                  </label>
+                  <select name="status" class="form-select form-select-sm">
+                    <option value="">-- Tất cả trạng thái --</option>
+                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.displayName}" th:selected="${currentStatus == st}"></option>
+                  </select>
+                </div>
+
+                <!-- Sắp xếp theo -->
+                <div class="col-md-2">
+                  <label class="form-label fs-8 fw-semibold text-muted mb-1">
+                    <i class="bi bi-arrow-down-up me-1"></i> Sắp xếp
+                  </label>
+                  <select name="sortBy" class="form-select form-select-sm">
+                    <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                    <option value="viewsCount" th:selected="${sortBy == 'viewsCount'}">Lượt xem</option>
+                    <option value="title" th:selected="${sortBy == 'title'}">Tiêu đề (A-Z)</option>
+                  </select>
+                </div>
+
+                <!-- Nút thao tác lọc -->
+                <div class="col-md-1 d-flex gap-1">
+                  <button type="submit" class="btn btn-dark btn-sm w-100 fw-semibold" title="Áp dụng lọc">
+                    <i class="bi bi-funnel"></i> Lọc
+                  </button>
+                  <a th:href="@{/admin/blogs}" class="btn btn-outline-secondary btn-sm" title="Đặt lại bộ lọc">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                  </a>
+                </div>
+              </div>
+            </form>
+
+            <!-- Bảng Danh Sách Bài Viết -->
+            <div class="table-responsive">
+              <table class="table table-hover align-middle border mb-0">
+                <thead class="table-dark">
+                  <tr class="fs-8 text-uppercase">
+                    <th style="width: 50px;" class="text-center">#</th>
+                    <th style="width: 100px;">Ảnh bìa</th>
+                    <th>Tiêu đề & Tóm tắt</th>
+                    <th style="width: 160px;">Danh mục</th>
+                    <th style="width: 130px;">Tác giả</th>
+                    <th style="width: 90px;" class="text-center">Lượt xem</th>
+                    <th style="width: 130px;" class="text-center">Trạng thái</th>
+                    <th style="width: 120px;" class="text-center">Ngày đăng</th>
+                    <th style="width: 180px;" class="text-center">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="item, stat : ${blogPage.content}">
+                    <td class="text-center fw-bold text-muted" th:text="${blogPage.number * blogPage.size + stat.count}">1</td>
+                    <td>
+                      <img th:src="${item.thumbnailUrl != null ? item.thumbnailUrl : '/images/default-blog.jpg'}" 
+                           class="rounded border shadow-sm" 
+                           style="width: 80px; height: 50px; object-fit: cover;" 
+                           alt="Thumbnail"
+                           onerror="this.src='/images/default-blog.jpg';" />
+                    </td>
+                    <td>
+                      <div class="fw-bold text-dark fs-7 mb-1" th:text="${item.title}">Tiêu đề bài viết</div>
+                      <div class="text-muted fs-8 text-truncate" style="max-width: 380px;" th:text="${item.summary}">Tóm tắt ngắn bài viết</div>
+                      <div class="mt-1">
+                        <a th:href="@{'/blogs/' + ${item.id}}" target="_blank" class="text-decoration-none fs-8 text-primary">
+                          <i class="bi bi-box-arrow-up-right me-1"></i>Xem trang khách
+                        </a>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-dark border fw-normal fs-8" th:text="${item.category != null ? item.category : 'Chưa phân loại'}">Tin Công Nghệ</span>
+                    </td>
+                    <td>
+                      <div class="fs-8 fw-semibold text-dark" th:text="${item.author != null ? item.author.fullName : 'Hệ Thống'}">Admin</div>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge bg-info-subtle text-info-emphasis border fw-semibold fs-8" th:text="${item.viewsCount}">0</span>
+                    </td>
+                    <td class="text-center">
+                      <span class="badge fs-8 fw-semibold" th:classappend="${item.status.badgeClass}" th:text="${item.status.displayName}">Đã xuất bản</span>
+                    </td>
+                    <td class="text-center text-muted fs-8" th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm')}">20/08/2026</td>
+                    <td class="text-center">
+                      <div class="d-flex align-items-center justify-content-center gap-1">
+                        
+                        <!-- Nút duyệt xuất bản nhanh nếu đang nháp hoặc bị từ chối -->
+                        <form th:if="${item.status.name() != 'PUBLISHED'}" th:action="@{'/admin/blogs/' + ${item.id} + '/status'}" method="post" class="d-inline">
+                          <input type="hidden" name="status" value="PUBLISHED" />
+                          <button type="submit" class="btn btn-outline-success btn-sm p-1" title="Duyệt và xuất bản bài viết">
+                            <i class="bi bi-check-lg"></i>
+                          </button>
+                        </form>
+
+                        <!-- Nút từ chối bài viết nếu đang xuất bản -->
+                        <form th:if="${item.status.name() == 'PUBLISHED'}" th:action="@{'/admin/blogs/' + ${item.id} + '/status'}" method="post" class="d-inline">
+                          <input type="hidden" name="status" value="REJECTED" />
+                          <button type="submit" class="btn btn-outline-warning btn-sm p-1" title="Từ chối / Tạm dừng bài viết" onclick="return confirm('Bạn có chắc muốn từ chối xuất bản bài viết này?');">
+                            <i class="bi bi-x-circle"></i>
+                          </button>
+                        </form>
+
+                        <!-- Nút Chi tiết & Sửa (Shared Form) -->
+                        <a th:href="@{'/admin/blogs/' + ${item.id}}" class="btn btn-outline-primary btn-sm p-1" title="Xem chi tiết & Chỉnh sửa">
+                          <i class="bi bi-pencil-square"></i>
+                        </a>
+
+                        <!-- Nút Xóa bài viết -->
+                        <form th:action="@{'/admin/blogs/' + ${item.id} + '/delete'}" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn bài viết này?');">
+                          <button type="submit" class="btn btn-outline-danger btn-sm p-1" title="Xóa bài viết">
+                            <i class="bi bi-trash3"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Khi không có dữ liệu -->
+                  <tr th:if="${blogPage.empty}">
+                    <td colspan="9" class="text-center py-5 text-muted">
+                      <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                      <span class="fs-7">Không tìm thấy bài viết nào phù hợp với bộ lọc.</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Phân Trang (Pagination) -->
+            <div th:if="${blogPage.totalPages > 1}" class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+              <div class="text-muted fs-8">
+                Hiển thị trang <strong th:text="${blogPage.number + 1}"></strong> / <strong th:text="${blogPage.totalPages}"></strong> 
+                (Tổng số <strong th:text="${blogPage.totalElements}"></strong> bài viết)
+              </div>
+              <nav aria-label="Blog pagination">
+                <ul class="pagination pagination-sm mb-0">
+                  <li class="page-item" th:classappend="${!blogPage.hasPrevious()} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/blogs(page=${blogPage.number - 1}, keyword=${keyword}, category=${currentCategory}, status=${currentStatus}, sortBy=${sortBy}, sortDir=${sortDir})}">
+                      <i class="bi bi-chevron-left"></i>
+                    </a>
+                  </li>
+                  
+                  <li class="page-item" th:each="i : ${#numbers.sequence(0, blogPage.totalPages - 1)}"
+                      th:classappend="${i == blogPage.number} ? 'active'">
+                    <a class="page-link" th:text="${i + 1}" 
+                       th:href="@{/admin/blogs(page=${i}, keyword=${keyword}, category=${currentCategory}, status=${currentStatus}, sortBy=${sortBy}, sortDir=${sortDir})}">1</a>
+                  </li>
+                  
+                  <li class="page-item" th:classappend="${!blogPage.hasNext()} ? 'disabled'">
+                    <a class="page-link" th:href="@{/admin/blogs(page=${blogPage.number + 1}, keyword=${keyword}, category=${currentCategory}, status=${currentStatus}, sortBy=${sortBy}, sortDir=${sortDir})}">
+                      <i class="bi bi-chevron-right"></i>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

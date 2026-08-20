@@ -43,9 +43,6 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
 
-    @Column(name = "loyalty_points", nullable = false)
-    private Integer loyaltyPoints = 0;
-
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

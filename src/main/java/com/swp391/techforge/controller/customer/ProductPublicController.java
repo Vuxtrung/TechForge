@@ -22,9 +22,11 @@ import java.util.List;
 public class ProductPublicController {
 
     private final ProductService productService;
+    private final com.swp391.techforge.service.product.ReviewService reviewService;
 
-    public ProductPublicController(ProductService productService) {
+    public ProductPublicController(ProductService productService, com.swp391.techforge.service.product.ReviewService reviewService) {
         this.productService = productService;
+        this.reviewService = reviewService;
     }
 
     // Spring tự bind toàn bộ query param (keyword, categoryId, brand, minPrice,
@@ -60,8 +62,13 @@ public class ProductPublicController {
                     .toList();
         }
 
+        List<com.swp391.techforge.entity.Review> reviews = reviewService.getReviewsByProductId(id);
+        Double averageRating = reviewService.getAverageRatingByProductId(id);
+
         model.addAttribute("product", product);
         model.addAttribute("relatedProducts", relatedProducts);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("averageRating", averageRating);
         return "customer/product-detail";
     }
 }

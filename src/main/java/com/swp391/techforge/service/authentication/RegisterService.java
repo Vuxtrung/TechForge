@@ -27,9 +27,7 @@ public class RegisterService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional
-    public void register(RegisterRequest request) {
-
+    public void validate(RegisterRequest request) {
         // 1. Check email đã tồn tại
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email đã được sử dụng");
@@ -39,6 +37,13 @@ public class RegisterService {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new IllegalArgumentException("Mật khẩu nhập lại không khớp");
         }
+    }
+
+    @Transactional
+    public void register(RegisterRequest request) {
+
+        // Kiểm tra lại lần nữa (phòng trường hợp email đã bị người khác đăng ký trong lúc chờ xác thực OTP)
+        validate(request);
 
         // 3. Lấy role CUSTOMER
         Role customerRole = roleRepository.findByRoleName("CUSTOMER")
@@ -55,8 +60,7 @@ public class RegisterService {
         user.setPhone(request.getPhone());
         user.setAddress(request.getAddress());
 
-        // User.java đã có default
-        // ACTIVE và loyaltyPoints = 0
+        // default status = ACTIVE
 
         userRepository.save(user);
     }

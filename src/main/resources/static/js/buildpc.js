@@ -275,54 +275,24 @@ function addToCartAll() {
     const products = Object.values(selectedComponents);
     if (products.length === 0) return;
     
-
     const btn = document.getElementById('btnAddToCart');
     const originalText = btn.innerHTML;
     btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ĐANG THÊM...`;
     btn.disabled = true;
 
-    
-    let addedCount = 0;
-    let errorCount = 0;
-    
-    Promise.all(products.map(p => 
-        fetch('/cart/api/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                'productId': p.productId,
-                'productName': p.name,
-                'price': p.basePrice,
-                'imageUrl': p.primaryImageUrl || '',
-                'quantity': 1
-            })
-        })
-    ))
-    .then(responses => {
-        // Parse all JSON responses to get the final cart size
-        Promise.all(responses.map(res => res.json()))
-            .then(dataArray => {
-                if (dataArray.length > 0) {
-                    const lastData = dataArray[dataArray.length - 1];
-                    const badge = document.getElementById("cartBadgeCount");
-                    if (badge && lastData.cartSize !== undefined) {
-                        badge.innerText = lastData.cartSize;
-                    }
-                }
-            })
-            .catch(e => console.error("Could not parse cart response", e));
-            
-        alert("Đã thêm toàn bộ linh kiện vào giỏ hàng thành công!");
+    // Gọi hàm addToCartAjax dùng chung của hệ thống (trong header.html) cho từng linh kiện
+    products.forEach(p => {
+        if (typeof addToCartAjax === 'function') {
+            addToCartAjax(p.productId, p.name, p.basePrice, p.primaryImageUrl || '', 1);
+        }
+    });
 
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Đã thêm cấu hình thành công!"); // Fallback if API fails
-    })
-    .finally(() => {
+    // Sau khi ném hết các request đi, chờ 1 chút cho đẹp UI rồi chuyển hướng
+    setTimeout(() => {
         btn.innerHTML = originalText;
         btn.disabled = false;
-    });
+        
+        // Vẫn giữ lại tính năng chuyển hướng đến giỏ hàng
+        window.location.href = '/cart';
+    }, 1000);
 }

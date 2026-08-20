@@ -32,8 +32,8 @@ public class ContactController {
 
     @GetMapping("/contact")
     public String showContactPage(Model model) {
-        model.addAttribute("contactRequest", new ContactRequest());
-        return "contact";
+        // model.addAttribute("contactRequest", new ContactRequest());
+        return "redirect:/";
     }
 
     @PostMapping("/contact")

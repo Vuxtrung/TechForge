@@ -8,14 +8,7 @@
     <ul class="nav nav-pills flex-column mb-auto mt-3">
         
         <li class="nav-item mb-2">
-            <a th:href="@{/admin/staff}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
-                <i class="bi bi-person-badge me-2 fs-5"></i>
-                Quản lý nhân viên
-            </a>
-        </li>
-        
-        <li class="nav-item mb-2">
-            <a th:href="@{/admin/users}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
+            <a th:href="@{/admin/users(tab='staff')}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
                 <i class="bi bi-people me-2 fs-5"></i>
                 Quản lý người dùng
             </a>
@@ -44,18 +37,18 @@
         </li>
         
         <li class="nav-item mb-2">
-            <a href="#" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
+            <a th:href="@{/admin/reviews}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
+                <i class="bi bi-star-half me-2 fs-5"></i>
+                Quản lý Đánh giá
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a th:href="@{/admin/blogs}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
                 <i class="bi bi-newspaper me-2 fs-5"></i>
                 Quản lý Blog & Tin tức
             </a>
         </li>
-
-         <li class="nav-item mb-2">
-            <a th:href="@{/admin/contacts}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
-                <i class="bi bi-envelope-paper me-2 fs-5"></i>
-                Liên hệ từ người dùng
-            </a>
-        </li>
+        
     </ul>
     <style>
         .hover-bg-secondary:hover {

@@ -29,6 +29,9 @@ public class OrderItem {
     @Column(name = "unit_price", nullable = false, precision = 15, scale = 2)
     private BigDecimal unitPrice;
 
+    @Column(name = "is_reviewed", nullable = false)
+    private Boolean isReviewed = false;
+
     public OrderItem() {
     }
 
@@ -78,6 +81,14 @@ public class OrderItem {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public Boolean getIsReviewed() {
+        return isReviewed;
+    }
+
+    public void setIsReviewed(Boolean isReviewed) {
+        this.isReviewed = isReviewed;
     }
 
     public BigDecimal getTotalPrice() {
