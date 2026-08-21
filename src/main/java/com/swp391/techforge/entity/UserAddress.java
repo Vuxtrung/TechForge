@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "user_addresses")
 @Getter
@@ -17,7 +15,7 @@ public class UserAddress {
     @Column(name = "address_id")
     private Long addressId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -37,34 +35,9 @@ public class UserAddress {
     private String addressLine;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "address_type", nullable = false)
-    private AddressType addressType = AddressType.HOME;
+    @Column(name = "type", nullable = false)
+    private AddressType type = AddressType.HOME;
 
     @Column(name = "is_default", nullable = false)
-    private Boolean isDefault = false;
-
-    @Column(
-        name = "default_user_id",
-        insertable = false,
-        updatable = false
-    )
-    private Long defaultUserId;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        createdAt = now;
-        updatedAt = now;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    private boolean isDefault = false;
 }

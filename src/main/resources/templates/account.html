@@ -42,8 +42,8 @@
                         <div class="flex-shrink-0">
                             <!-- Có avatar -->
                             <img th:if="${user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)}"
-                                th:src="${user.avatarUrl}" th:alt="${user.fullName}"
-                                class="rounded-circle object-fit-cover" style="width: 65px; height: 65px;">
+                                 th:src="${user.avatarUrl}" th:alt="${user.fullName}"
+                                 class="rounded-circle object-fit-cover" style="width: 65px; height: 65px;">
 
                             <!-- Không có avatar -->
                             <div th:unless="${user.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)}" class="rounded-circle bg-danger-subtle text-danger
@@ -69,51 +69,42 @@
                     <div class="list-group list-group-flush">
 
                         <!-- Thông tin tài khoản -->
-                        <a th:href="@{/account(view='info')}" class="list-group-item list-group-item-action
-                                  border-0 rounded-2 px-2 py-3">
+                        <a th:href="@{/account(view='info')}" class="list-group-item list-group-item-action border-0 rounded-2 px-2 py-3">
                             <i class="bi bi-person-circle text-danger me-2"></i>
-                            <span class="fs-7 fw-semibold">
-                                Thông tin tài khoản
-                            </span>
+                            <span class="fs-7 fw-semibold">Thông tin tài khoản</span>
                         </a>
 
+                        <a th:href="@{/account(view='addresses')}" class="list-group-item list-group-item-action border-0 rounded-2 px-2 py-3">
+                            <i class="bi bi-geo-alt text-success me-2"></i>
+                            <span class="fs-7 fw-semibold">Địa chỉ nhận hàng</span>
+                        </a>
 
                         <!-- Quản lý đơn hàng -->
                         <a th:href="@{/account(view='orders')}"
-                            th:if="${user.role == null or user.role.roleName == 'CUSTOMER'}"
-                            class="list-group-item list-group-item-action
+                           th:if="${user.role == null or user.role.roleName == 'CUSTOMER'}"
+                           class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
                             <i class="bi bi-box-seam text-primary me-2"></i>
-                            <span class="fs-7 fw-semibold">
-                                Quản lý đơn hàng
-                            </span>
+                            <span class="fs-7 fw-semibold">Quản lý đơn hàng</span>
                         </a>
 
                         <!-- Thay đổi mật khẩu -->
-                        <a th:href="@{/account(view='password')}" class="list-group-item list-group-item-action
-                                  border-0 rounded-2 px-2 py-3">
+                        <a th:href="@{/account(view='password')}" class="list-group-item list-group-item-action border-0 rounded-2 px-2 py-3">
                             <i class="bi bi-shield-lock text-warning me-2"></i>
-                            <span class="fs-7 fw-semibold">
-                                Thay đổi mật khẩu
-                            </span>
+                            <span class="fs-7 fw-semibold">Thay đổi mật khẩu</span>
                         </a>
 
 
                         <!-- Staff / Admin dashboard -->
                         <a th:if="${user.role != null and user.role.roleName == 'ADMIN'}"
-                            th:href="@{/admin/products}" class="list-group-item list-group-item-action
+                           th:href="@{/admin/products}" class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
-
                             <i class="bi bi-speedometer2 text-success me-2"></i>
-
-                            <span class="fs-7 fw-semibold">
-                                Quản trị hệ thống
-                            </span>
-
+                            <span class="fs-7 fw-semibold">Quản trị hệ thống</span>
                         </a>
 
                         <a th:if="${user.role != null and (user.role.roleName == 'STAFF_SALES' or user.role.roleName == 'STAFF_WARRANTY')}"
-                            th:href="@{/staff/dashboard}" class="list-group-item list-group-item-action
+                           th:href="@{/staff/dashboard}" class="list-group-item list-group-item-action
                                   border-0 rounded-2 px-2 py-3">
                             <i class="bi bi-speedometer2 text-success me-2"></i>
                             <span class="fs-7 fw-semibold">Dashboard nhân viên</span>
@@ -124,12 +115,8 @@
                             <button type="submit" class="list-group-item list-group-item-action
                                            border-0 rounded-2 px-2 py-3
                                            text-danger w-100 text-start">
-
                                 <i class="bi bi-box-arrow-right me-2"></i>
-
-                                <span class="fs-7 fw-semibold">
-                                    Đăng xuất
-                                </span>
+                                <span class="fs-7 fw-semibold">Đăng xuất</span>
                             </button>
                         </form>
                     </div>
@@ -145,7 +132,7 @@
 
                     <!-- Error Messages -->
                     <div th:if="${successMessage}" class="alert alert-success d-flex align-items-center py-2"
-                        role="alert">
+                         role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i>
                         <span th:text="${successMessage}"></span>
                     </div>
@@ -170,6 +157,9 @@
                     <div th:switch="${view}">
                         <div th:case="'info'">
                             <div th:replace="~{account/info :: content}"></div>
+                        </div>
+                        <div th:case="'addresses'">
+                            <div th:replace="~{account/addresses :: content}"></div>
                         </div>
                         <div th:case="'orders'">
                             <div th:replace="~{account/orders :: content}"></div>

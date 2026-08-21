@@ -1,9 +1,13 @@
 package com.swp391.techforge.controller.authentication;
 
+import com.swp391.techforge.dto.account.AccountAddressRequest;
 import com.swp391.techforge.dto.account.AccountInfoRequest;
 import com.swp391.techforge.dto.account.ChangePasswordRequest;
+import com.swp391.techforge.entity.AddressType;
 import com.swp391.techforge.entity.Order;
 import com.swp391.techforge.entity.User;
+import com.swp391.techforge.entity.UserAddress;
+import com.swp391.techforge.repository.authentication.UserAddressRepository;
 import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.service.product.CloudinaryService;
@@ -11,6 +15,7 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -24,48 +29,66 @@ import java.util.Set;
 @RequestMapping("/account")
 public class AccountController {
 
-    private static final Set<String> ALLOWED_VIEWS = Set.of("info", "orders", "password");
+    private static final Set<String> ALLOWED_VIEWS = Set.of("info", "addresses", "orders", "password");
 
     private final UserRepository userRepository;
+    private final UserAddressRepository userAddressRepository;
     private final CloudinaryService cloudinaryService;
     private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
 
-    public AccountController(
-            UserRepository userRepository,
-            CloudinaryService cloudinaryService,
-            OrderService orderService,
+    public AccountController(UserRepository userRepository, UserAddressRepository userAddressRepository,
+            CloudinaryService cloudinaryService, OrderService orderService,
             PasswordEncoder passwordEncoder) {
-
         this.userRepository = userRepository;
+        this.userAddressRepository = userAddressRepository;
         this.cloudinaryService = cloudinaryService;
         this.orderService = orderService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Hiển thị trang quản lý tài khoản chính.
-     * Tùy thuộc vào tham số 'view' truyền vào URL, trang sẽ load nội dung tương ứng (thông tin, đơn hàng, mật khẩu).
-     * 
-     * @param view Chế độ xem (info, orders, password)
-     * @param authentication Thông tin xác thực người dùng hiện tại
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template HTML của trang tài khoản
-     */
     @GetMapping
-    public String account(
-            @RequestParam(value = "view", defaultValue = "none") String view,
-            Authentication authentication,
-            Model model) {
+    public String account(@RequestParam(value = "view", defaultValue = "none") String view,
+            @RequestParam(value = "addressId", required = false) Long addressId,
+            @RequestParam(value = "mode", required = false) String mode,
+            Authentication authentication, Model model) {
 
-        String email = authentication.getName();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Không tìm thấy tài khoản với email: " + email));
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
         model.addAttribute("user", user);
         model.addAttribute("view", ALLOWED_VIEWS.contains(view) ? view : null);
+
+        if ("addresses".equals(view)) {
+            List<UserAddress> addresses = userAddressRepository
+                    .findByUserUserIdOrderByIsDefaultDescAddressIdDesc(user.getUserId());
+            model.addAttribute("addresses", addresses);
+
+            if (!model.containsAttribute("addressRequest")) {
+                AccountAddressRequest request = new AccountAddressRequest();
+                request.setRecipientName(user.getFullName());
+                request.setPhone(user.getPhone());
+                request.setType(AddressType.HOME.name());
+
+                if (addressId != null && ("edit".equals(mode) || "details".equals(mode))) {
+                    userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
+                            .ifPresent(address -> {
+                                request.setRecipientName(address.getRecipientName());
+                                request.setPhone(address.getPhone());
+                                request.setProvince(address.getProvince());
+                                request.setWard(address.getWard());
+                                request.setAddressLine(address.getAddressLine());
+                                request.setType(address.getType().name());
+                                request.setDefault(address.isDefault());
+                            });
+                }
+
+                model.addAttribute("addressRequest", request);
+            }
+
+            model.addAttribute("selectedAddressId", addressId);
+            model.addAttribute("addressMode", mode);
+        }
 
         if ("orders".equals(view)) {
             List<Order> orders = orderService.getCustomerOrders(user, null, null, null, null);
@@ -87,21 +110,105 @@ public class AccountController {
         return "account";
     }
 
-    /**
-     * Xử lý yêu cầu cập nhật thông tin cá nhân (Họ tên, SĐT, Địa chỉ, Ảnh đại diện).
-     * 
-     * @param request Dữ liệu từ form cập nhật thông tin
-     * @param bindingResult Chứa kết quả validate dữ liệu
-     * @param authentication Thông tin xác thực người dùng
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template HTML của trang tài khoản (hiển thị thông báo thành công hoặc lỗi)
-     */
-    @PostMapping("/info")
-    public String updateInfo(
-            @Valid @ModelAttribute("accountInfoRequest") AccountInfoRequest request,
+    @PostMapping("/addresses/save")
+    @Transactional
+    public String saveAddress(
+            @RequestParam(value = "addressId", required = false) Long addressId,
+            @Valid @ModelAttribute("addressRequest") AccountAddressRequest request,
             BindingResult bindingResult,
             Authentication authentication,
             Model model) {
+
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+
+        if (bindingResult.hasErrors()) {
+            prepareAddressView(model, user, addressId, "edit");
+            return "account";
+        }
+
+        UserAddress address;
+
+        if (addressId == null) {
+            address = new UserAddress();
+            address.setUser(user);
+        } else {
+            address = userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy địa chỉ"));
+        }
+
+        address.setRecipientName(request.getRecipientName());
+        address.setPhone(request.getPhone());
+        address.setProvince(request.getProvince());
+        address.setWard(request.getWard());
+        address.setAddressLine(request.getAddressLine());
+        address.setType(AddressType.valueOf(request.getType()));
+
+        if (request.isDefault()) {
+            setDefaultAddress(user.getUserId(), address);
+        } else if (addressId == null
+                && userAddressRepository.findByUserUserIdAndIsDefaultTrue(user.getUserId()).isEmpty()) {
+            address.setDefault(true);
+        }
+
+        userAddressRepository.save(address);
+
+        return "redirect:/account?view=addresses";
+    }
+
+    @SuppressWarnings("null")
+    @PostMapping("/addresses/{addressId}/default")
+    @Transactional
+    public String setDefault(@PathVariable Long addressId, Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+
+        UserAddress address = userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy địa chỉ"));
+
+        setDefaultAddress(user.getUserId(), address);
+        userAddressRepository.save(address);
+
+        return "redirect:/account?view=addresses";
+    }
+
+    @PostMapping("/addresses/{addressId}/delete")
+    @Transactional
+    public String deleteAddress(@PathVariable Long addressId, Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+
+        UserAddress address = userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy địa chỉ"));
+
+        if (address.isDefault()) {
+            return "redirect:/account?view=addresses&error=default";
+        }
+
+        userAddressRepository.delete(address);
+        return "redirect:/account?view=addresses";
+    }
+
+    private void setDefaultAddress(Long userId, UserAddress address) {
+        userAddressRepository.findByUserUserIdAndIsDefaultTrue(userId).ifPresent(current -> {
+            current.setDefault(false);
+            userAddressRepository.save(current);
+        });
+        address.setDefault(true);
+    }
+
+    private void prepareAddressView(Model model, User user, Long addressId, String mode) {
+        model.addAttribute("user", user);
+        model.addAttribute("view", "addresses");
+        model.addAttribute("addresses",
+                userAddressRepository.findByUserUserIdOrderByIsDefaultDescAddressIdDesc(user.getUserId()));
+        model.addAttribute("selectedAddressId", addressId);
+        model.addAttribute("addressMode", mode);
+    }
+
+    @PostMapping("/info")
+    public String updateInfo(@Valid @ModelAttribute("accountInfoRequest") AccountInfoRequest request,
+            BindingResult bindingResult, Authentication authentication, Model model) {
 
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
@@ -143,28 +250,14 @@ public class AccountController {
         return "account";
     }
 
-    /**
-     * Xử lý yêu cầu thay đổi mật khẩu của người dùng.
-     * Kiểm tra mật khẩu cũ phải khớp với CSDL, và mật khẩu mới phải khớp với xác nhận.
-     * 
-     * @param request Dữ liệu từ form đổi mật khẩu
-     * @param bindingResult Chứa kết quả validate dữ liệu
-     * @param authentication Thông tin xác thực người dùng
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template HTML của trang tài khoản
-     */
     @PostMapping("/password")
-    public String changePassword(
-            @Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
-            BindingResult bindingResult,
-            Authentication authentication,
-            Model model) {
+    public String changePassword(@Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
+            BindingResult bindingResult, Authentication authentication, Model model) {
 
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
-        if (!bindingResult.hasErrors()
-                && !request.getNewPassword().equals(request.getConfirmPassword())) {
+        if (!bindingResult.hasErrors() && !request.getNewPassword().equals(request.getConfirmPassword())) {
             bindingResult.rejectValue("confirmPassword", "error.confirmPassword", "Mật khẩu xác nhận không khớp");
         }
 
