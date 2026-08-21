@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -24,6 +25,11 @@ public class ProductController {
     public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
         this.categoryService = categoryService;
+    }
+
+    @InitBinder("spec")
+    public void initBinder(WebDataBinder binder) {
+        binder.setFieldDefaultPrefix("spec.");
     }
 
     @GetMapping
@@ -54,13 +60,16 @@ public class ProductController {
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("product", new Product());
+        model.addAttribute("spec", new ComponentSpecRequest());
         model.addAttribute("categories", categoryService.findAllActive());
         return "admin/product-form";
     }
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productService.getById(id));
+        Product product = productService.getById(id);
+        model.addAttribute("product", product);
+        model.addAttribute("spec", productService.getSpecRequestForEdit(product));
         model.addAttribute("categories", categoryService.findAllActive());
         return "admin/product-form";
     }
@@ -72,6 +81,7 @@ public class ProductController {
             @ModelAttribute("spec") ComponentSpecRequest specRequest,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
@@ -79,6 +89,7 @@ public class ProductController {
             productService.create(product, imageFile, specRequest);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
@@ -94,6 +105,7 @@ public class ProductController {
             @ModelAttribute("spec") ComponentSpecRequest specRequest,
             RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }
@@ -101,6 +113,7 @@ public class ProductController {
             productService.update(id, product, imageFile, specRequest);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute("spec", specRequest);
             model.addAttribute("categories", categoryService.findAllActive());
             return "admin/product-form";
         }

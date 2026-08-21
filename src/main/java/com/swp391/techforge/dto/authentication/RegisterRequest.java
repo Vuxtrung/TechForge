@@ -31,7 +31,13 @@ public class RegisterRequest implements Serializable {
     @NotBlank(message = "Vui lòng nhập lại mật khẩu")
     private String confirmPassword;
 
-    @NotBlank(message = "Địa chỉ không được để trống")
-    @Size(max = 500, message = "Địa chỉ không được vượt quá 500 ký tự")
-    private String address;
+    @NotBlank(message = "Vui lòng chọn tỉnh/thành phố")
+    private String province;
+
+    @NotBlank(message = "Vui lòng chọn phường/xã")
+    private String ward;
+
+    @NotBlank(message = "Địa chỉ chi tiết không được để trống")
+    @Size(max = 255, message = "Địa chỉ chi tiết không được vượt quá 255 ký tự")
+    private String addressLine;
 }

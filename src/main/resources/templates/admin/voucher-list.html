@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{fragments/header :: header-head}">
+    <meta charset="UTF-8" />
+    <title>Quản Lý Voucher</title>
+  </head>
+
+  <body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-body d-flex">
+      <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+      <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
+        <div class="container-fluid">
+        <div class="bg-white rounded-3 shadow-sm border p-4">
+          <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+            <span class="fs-4 text-dark fw-bold">
+              <i class="bi bi-ticket-perforated text-danger"></i> Quản Lý Voucher
+            </span>
+            <a th:href="@{/admin/vouchers/new}" class="btn btn-danger fw-semibold">
+              <i class="bi bi-plus-lg me-1"></i> Thêm Voucher
+            </a>
+          </div>
+
+          <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-1"></i>
+            <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+          <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+
+          <!-- Search / Filter / Sort -->
+          <form th:action="@{/admin/vouchers}" method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-md-4">
+              <label class="form-label fs-8 text-muted mb-1">Tìm theo mã / mô tả</label>
+              <input type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="VD: GIAM10..." />
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label fs-8 text-muted mb-1">Loại giảm giá</label>
+              <select name="discountType" class="form-select">
+                <option value="" th:selected="${discountType == null || discountType == ''}">Tất cả</option>
+                <option value="PERCENT" th:selected="${discountType == 'PERCENT'}">Phần trăm</option>
+                <option value="FIXED_AMOUNT" th:selected="${discountType == 'FIXED_AMOUNT'}">Số tiền cố định</option>
+                <option value="COMBO_GIFT" th:selected="${discountType == 'COMBO_GIFT'}">Tặng quà</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label fs-8 text-muted mb-1">Trạng thái</label>
+              <select name="active" class="form-select">
+                <option value="" th:selected="${active == null || active == ''}">Tất cả</option>
+                <option value="true" th:selected="${active == 'true'}">Đang hoạt động</option>
+                <option value="false" th:selected="${active == 'false'}">Đã vô hiệu hóa</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label class="form-label fs-8 text-muted mb-1">Sắp xếp</label>
+              <select name="sort" class="form-select">
+                <option value="startDate,desc" th:selected="${sort == 'startDate,desc'}">Ngày bắt đầu mới nhất</option>
+                <option value="startDate,asc" th:selected="${sort == 'startDate,asc'}">Ngày bắt đầu cũ nhất</option>
+                <option value="endDate,asc" th:selected="${sort == 'endDate,asc'}">Sắp hết hạn</option>
+                <option value="code,asc" th:selected="${sort == 'code,asc'}">Mã A-Z</option>
+              </select>
+            </div>
+
+            <div class="col-md-2 d-flex gap-2">
+              <button type="submit" class="btn btn-dark flex-fill fw-semibold">
+                <i class="bi bi-funnel me-1"></i> Lọc
+              </button>
+              <a th:href="@{/admin/vouchers}" class="btn btn-outline-secondary" title="Xóa bộ lọc">
+                <i class="bi bi-x-lg"></i>
+              </a>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th style="width: 60px">#</th>
+                  <th>Mã Voucher</th>
+                  <th>Loại</th>
+                  <th class="text-end">Giá Trị Giảm</th>
+                  <th class="text-end">Đơn Tối Thiểu</th>
+                  <th>Hiệu Lực</th>
+                  <th class="text-center">Lượt Dùng</th>
+                  <th class="text-center">Trạng Thái</th>
+                  <th class="text-end">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${voucherPage.empty}">
+                  <td colspan="9" class="text-center text-muted py-4">Không tìm thấy voucher nào phù hợp.</td>
+                </tr>
+                <tr th:each="v, iter : ${voucherPage.content}">
+                  <td th:text="${voucherPage.number * voucherPage.size + iter.index + 1}">1</td>
+                  <td>
+                    <span class="fw-semibold text-dark" th:text="${v.code}">GIAM10</span>
+                    <div class="fs-8 text-muted text-truncate-2" th:text="${v.description}">Mô tả</div>
+                  </td>
+                  <td>
+                    <span class="badge bg-info text-dark" th:if="${v.discountType.name() == 'PERCENT'}">Phần trăm</span>
+                    <span class="badge bg-secondary" th:if="${v.discountType.name() == 'FIXED_AMOUNT'}">Số tiền cố định</span>
+                    <span class="badge bg-warning text-dark" th:if="${v.discountType.name() == 'COMBO_GIFT'}">Tặng quà</span>
+                  </td>
+                  <td class="text-end">
+                    <span th:if="${v.discountType.name() == 'PERCENT'}" th:text="${v.discountValue} + '%'">10%</span>
+                    <span th:if="${v.discountType.name() == 'FIXED_AMOUNT'}" th:text="${#numbers.formatDecimal(v.discountValue, 0, 'COMMA', 0, 'POINT')} + 'đ'">50.000đ</span>
+                    <span th:if="${v.discountType.name() == 'COMBO_GIFT'}">—</span>
+                  </td>
+                  <td class="text-end" th:text="${v.minOrderValue != null ? #numbers.formatDecimal(v.minOrderValue, 0, 'COMMA', 0, 'POINT') + 'đ' : '—'}">0đ</td>
+                  <td>
+                    <div class="fs-8" th:text="${#temporals.format(v.startDate, 'dd/MM/yyyy')} + ' → ' + ${#temporals.format(v.endDate, 'dd/MM/yyyy')}">01/01 → 01/02</div>
+                  </td>
+                  <td class="text-center">
+                    <span th:text="${v.usageLimit != null ? v.usageLimit : '∞'}">100</span>
+                    <div class="fs-8 text-muted">tối đa</div>
+                    <div class="fs-8 text-muted">(<span th:text="${v.maxUsagePerCustomer}">1</span>/khách)</div>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-success" th:if="${v.isActive}">Đang hoạt động</span>
+                    <span class="badge bg-secondary" th:unless="${v.isActive}">Đã vô hiệu hóa</span>
+                  </td>
+                  <td class="text-end">
+                    <a th:href="@{/admin/vouchers/{id}/edit(id=${v.voucherId})}" class="btn btn-outline-primary btn-sm" title="Xem / Sửa">
+                      <i class="bi bi-pencil-square"></i>
+                    </a>
+                    <form th:action="@{/admin/vouchers/{id}/toggle(id=${v.voucherId})}" method="post" class="d-inline">
+                      <button type="submit" class="btn btn-outline-warning btn-sm js-toggle-voucher"
+                        th:title="${v.isActive ? 'Vô hiệu hóa' : 'Kích hoạt lại'}" th:data-code="${v.code}">
+                        <i class="bi" th:classappend="${v.isActive ? 'bi-toggle-on' : 'bi-toggle-off'}"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <nav th:if="${voucherPage.totalPages > 1}" aria-label="Voucher pagination">
+            <ul class="pagination justify-content-center mb-0">
+              <li class="page-item" th:classappend="${voucherPage.first} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/vouchers(page=${voucherPage.number - 1}, keyword=${keyword}, discountType=${discountType}, active=${active}, sort=${sort})}">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(0, voucherPage.totalPages - 1)}" th:classappend="${i == voucherPage.number} ? 'active'">
+                <a class="page-link" th:href="@{/admin/vouchers(page=${i}, keyword=${keyword}, discountType=${discountType}, active=${active}, sort=${sort})}" th:text="${i + 1}">1</a>
+              </li>
+              <li class="page-item" th:classappend="${voucherPage.last} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/vouchers(page=${voucherPage.number + 1}, keyword=${keyword}, discountType=${discountType}, active=${active}, sort=${sort})}">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        </div>
+      </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="none">
+      document.querySelectorAll('.js-toggle-voucher').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          var code = btn.getAttribute('data-code');
+          if (!confirm('Xác nhận đổi trạng thái voucher "' + code + '"?')) {
+            e.preventDefault();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

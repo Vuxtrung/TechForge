@@ -170,7 +170,7 @@
                     <!-- Stock -->
                     <div class="col-md-4 mb-3">
                       <label class="form-label fw-semibold"
-                        >Số Lượng Tồn Kho
+                        >Số Lượng
                         <span class="text-danger">*</span></label
                       >
                       <input
@@ -254,35 +254,35 @@
                     <div id="specPcProduct" class="row" style="display: none">
                       <div class="col-md-6 mb-2">
                         <label class="form-label">CPU</label>
-                        <input type="text" name="spec.pcCpu" class="form-control" placeholder="VD: Intel Core i9-14900K" />
+                        <input type="text" name="pcCpu" maxlength="255" class="form-control" placeholder="VD: Intel Core i9-14900K" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">Mainboard</label>
-                        <input type="text" name="spec.pcMainboard" class="form-control" />
+                        <input type="text" name="pcMainboard" maxlength="255" class="form-control" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">RAM</label>
-                        <input type="text" name="spec.pcRam" class="form-control" placeholder="VD: 64GB DDR5" />
+                        <input type="text" name="pcRam" maxlength="255" class="form-control" placeholder="VD: 64GB DDR5" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">VGA</label>
-                        <input type="text" name="spec.pcVga" class="form-control" placeholder="VD: RTX 4090 24GB" />
+                        <input type="text" name="pcVga" maxlength="255" class="form-control" placeholder="VD: RTX 4090 24GB" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">Ổ cứng</label>
-                        <input type="text" name="spec.pcStorage" class="form-control" placeholder="VD: 2TB NVMe" />
+                        <input type="text" name="pcStorage" maxlength="255" class="form-control" placeholder="VD: 2TB NVMe" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">Nguồn</label>
-                        <input type="text" name="spec.pcPsu" class="form-control" placeholder="VD: 1000W Gold" />
+                        <input type="text" name="pcPsu" maxlength="255" class="form-control" placeholder="VD: 1000W Gold" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">Tản nhiệt</label>
-                        <input type="text" name="spec.pcCooler" class="form-control" placeholder="VD: AIO 360mm" />
+                        <input type="text" name="pcCooler" maxlength="255" class="form-control" placeholder="VD: AIO 360mm" />
                       </div>
                       <div class="col-md-6 mb-2">
                         <label class="form-label">Case</label>
-                        <input type="text" name="spec.pcCase" class="form-control" />
+                        <input type="text" name="pcCase" maxlength="255" class="form-control" />
                       </div>
                     </div>
 
@@ -290,31 +290,31 @@
                     <div id="specCPU" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Socket <span class="text-danger">*</span></label>
-                        <input type="text" name="spec.socket" class="form-control" placeholder="VD: LGA1700, AM5" />
+                        <input type="text" name="socket" maxlength="30" class="form-control" placeholder="VD: LGA1700, AM5" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Số nhân (Cores)</label>
-                        <input type="number" name="spec.cores" class="form-control" min="1" />
+                        <input type="number" name="cores" class="form-control" min="1" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Số luồng (Threads)</label>
-                        <input type="number" name="spec.threads" class="form-control" min="1" />
+                        <input type="number" name="threads" class="form-control" min="1" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Xung nhịp cơ bản (GHz)</label>
-                        <input type="number" step="0.01" name="spec.baseClockGhz" class="form-control" />
+                        <input type="number" step="0.01" name="baseClockGhz" class="form-control" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Xung nhịp boost (GHz)</label>
-                        <input type="number" step="0.01" name="spec.boostClockGhz" class="form-control" />
+                        <input type="number" step="0.01" name="boostClockGhz" class="form-control" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">TDP (Watt)</label>
-                        <input type="number" name="spec.tdpWatt" class="form-control" min="0" />
+                        <input type="number" name="tdpWatt" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <div class="form-check mt-4">
-                          <input type="checkbox" name="spec.hasIgpu" value="true" class="form-check-input" id="hasIgpu" />
+                          <input type="checkbox" name="hasIgpu" value="true" class="form-check-input" id="hasIgpu" />
                           <label class="form-check-label" for="hasIgpu">Có iGPU tích hợp</label>
                         </div>
                       </div>
@@ -324,30 +324,32 @@
                     <div id="specMAINBOARD" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Socket <span class="text-danger">*</span></label>
-                        <input type="text" name="spec.socket" class="form-control" placeholder="VD: LGA1700, AM5" />
+                        <input type="text" name="socket" maxlength="30" class="form-control" placeholder="VD: LGA1700, AM5" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Chipset</label>
-                        <input type="text" name="spec.chipset" class="form-control" placeholder="VD: Z790, B650" />
+                        <input type="text" name="chipset" maxlength="30" class="form-control" placeholder="VD: Z790, B650" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Loại RAM <span class="text-danger">*</span></label>
-                        <select name="spec.mbRamType" class="form-select">
+                        <select name="mbRamType" class="form-select">
+                          <option value="">-- Chọn --</option>
                           <option value="DDR4">DDR4</option>
                           <option value="DDR5">DDR5</option>
                         </select>
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Số khe RAM</label>
-                        <input type="number" name="spec.ramSlots" class="form-control" min="1" />
+                        <input type="number" name="ramSlots" class="form-control" min="1" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">RAM tối đa (GB)</label>
-                        <input type="number" name="spec.maxRamGb" class="form-control" min="1" />
+                        <input type="number" name="maxRamGb" class="form-control" min="1" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Form Factor <span class="text-danger">*</span></label>
-                        <select name="spec.mbFormFactor" class="form-select">
+                        <select name="mbFormFactor" class="form-select">
+                          <option value="">-- Chọn --</option>
                           <option value="ATX">ATX</option>
                           <option value="MICRO_ATX">Micro-ATX</option>
                           <option value="MINI_ITX">Mini-ITX</option>
@@ -356,7 +358,7 @@
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Số khe M.2</label>
-                        <input type="number" name="spec.m2Slots" class="form-control" min="0" />
+                        <input type="number" name="m2Slots" class="form-control" min="0" />
                       </div>
                     </div>
 
@@ -364,22 +366,23 @@
                     <div id="specRAM" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Loại RAM <span class="text-danger">*</span></label>
-                        <select name="spec.ramType" class="form-select">
+                        <select name="ramType" class="form-select">
+                          <option value="">-- Chọn --</option>
                           <option value="DDR4">DDR4</option>
                           <option value="DDR5">DDR5</option>
                         </select>
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Bus (MHz) <span class="text-danger">*</span></label>
-                        <input type="number" name="spec.speedMhz" class="form-control" min="1" placeholder="VD: 3200" />
+                        <input type="number" name="speedMhz" class="form-control" min="1" placeholder="VD: 3200" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Dung lượng (GB) <span class="text-danger">*</span></label>
-                        <input type="number" name="spec.ramCapacityGb" class="form-control" min="1" placeholder="VD: 32" />
+                        <input type="number" name="ramCapacityGb" class="form-control" min="1" placeholder="VD: 32" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Số thanh (Modules)</label>
-                        <input type="number" name="spec.modules" class="form-control" min="1" value="1" />
+                        <input type="number" name="modules" class="form-control" min="1" value="1" />
                       </div>
                     </div>
 
@@ -387,23 +390,23 @@
                     <div id="specGPU" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">VRAM (GB)</label>
-                        <input type="number" name="spec.vramGb" class="form-control" min="0" />
+                        <input type="number" name="vramGb" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Chiều dài (mm)</label>
-                        <input type="number" name="spec.lengthMm" class="form-control" min="0" />
+                        <input type="number" name="lengthMm" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Đầu cấp nguồn</label>
-                        <input type="text" name="spec.powerConnector" class="form-control" placeholder="VD: 8-pin, 16-pin" />
+                        <input type="text" name="powerConnector" maxlength="50" class="form-control" placeholder="VD: 8-pin, 16-pin" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">PSU khuyến nghị (W)</label>
-                        <input type="number" name="spec.recommendedPsuWatt" class="form-control" min="0" />
+                        <input type="number" name="recommendedPsuWatt" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Độ dày (số khe slot)</label>
-                        <input type="number" name="spec.slotWidth" class="form-control" min="1" value="2" />
+                        <input type="number" name="slotWidth" class="form-control" min="1" value="2" />
                       </div>
                     </div>
 
@@ -411,15 +414,15 @@
                     <div id="specPSU" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Công suất (Watt) <span class="text-danger">*</span></label>
-                        <input type="number" name="spec.wattage" class="form-control" min="1" />
+                        <input type="number" name="wattage" class="form-control" min="1" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Chuẩn hiệu suất</label>
-                        <input type="text" name="spec.efficiencyRating" class="form-control" placeholder="VD: 80 Plus Gold" />
+                        <input type="text" name="efficiencyRating" maxlength="30" class="form-control" placeholder="VD: 80 Plus Gold" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Modular</label>
-                        <select name="spec.modular" class="form-select">
+                        <select name="modular" class="form-select">
                           <option value="FULL">Full</option>
                           <option value="SEMI">Semi</option>
                           <option value="NONE">Non-modular</option>
@@ -427,7 +430,7 @@
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Form Factor</label>
-                        <select name="spec.psuFormFactor" class="form-select">
+                        <select name="psuFormFactor" class="form-select">
                           <option value="ATX">ATX</option>
                           <option value="SFX">SFX</option>
                           <option value="SFX-L">SFX-L</option>
@@ -441,30 +444,30 @@
                         <label class="form-label">Hỗ trợ Form Factor <span class="text-danger">*</span></label>
                         <div class="d-flex gap-3">
                           <div class="form-check">
-                            <input type="checkbox" name="spec.caseFormFactorSupport" value="ATX" class="form-check-input" id="caseAtx" />
+                            <input type="checkbox" name="caseFormFactorSupport" value="ATX" class="form-check-input" id="caseAtx" />
                             <label class="form-check-label" for="caseAtx">ATX</label>
                           </div>
                           <div class="form-check">
-                            <input type="checkbox" name="spec.caseFormFactorSupport" value="MICRO_ATX" class="form-check-input" id="caseMatx" />
+                            <input type="checkbox" name="caseFormFactorSupport" value="MICRO_ATX" class="form-check-input" id="caseMatx" />
                             <label class="form-check-label" for="caseMatx">Micro-ATX</label>
                           </div>
                           <div class="form-check">
-                            <input type="checkbox" name="spec.caseFormFactorSupport" value="MINI_ITX" class="form-check-input" id="caseItx" />
+                            <input type="checkbox" name="caseFormFactorSupport" value="MINI_ITX" class="form-check-input" id="caseItx" />
                             <label class="form-check-label" for="caseItx">Mini-ITX</label>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">GPU dài tối đa (mm)</label>
-                        <input type="number" name="spec.maxGpuLengthMm" class="form-control" min="0" />
+                        <input type="number" name="maxGpuLengthMm" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Tản khí cao tối đa (mm)</label>
-                        <input type="number" name="spec.maxCoolerHeightMm" class="form-control" min="0" />
+                        <input type="number" name="maxCoolerHeightMm" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Radiator tối đa (mm)</label>
-                        <input type="number" name="spec.maxRadiatorMm" class="form-control" min="0" />
+                        <input type="number" name="maxRadiatorMm" class="form-control" min="0" />
                       </div>
                     </div>
 
@@ -472,22 +475,23 @@
                     <div id="specCOOLER" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Loại tản nhiệt <span class="text-danger">*</span></label>
-                        <select name="spec.coolerType" class="form-select">
+                        <select name="coolerType" class="form-select">
+                          <option value="">-- Chọn --</option>
                           <option value="AIR">Khí (Air)</option>
                           <option value="AIO">Nước (AIO)</option>
                         </select>
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Chiều cao - chỉ Tản khí (mm)</label>
-                        <input type="number" name="spec.heightMm" class="form-control" min="0" />
+                        <input type="number" name="heightMm" class="form-control" min="0" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Kích thước Radiator - chỉ AIO (mm)</label>
-                        <input type="number" name="spec.radiatorSizeMm" class="form-control" min="0" placeholder="VD: 240, 360" />
+                        <input type="number" name="radiatorSizeMm" class="form-control" min="0" placeholder="VD: 240, 360" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Socket hỗ trợ</label>
-                        <input type="text" name="spec.socketSupport" class="form-control" placeholder="VD: LGA1700,AM5" />
+                        <input type="text" name="socketSupport" maxlength="200" class="form-control" placeholder="VD: LGA1700,AM5" />
                       </div>
                     </div>
 
@@ -495,7 +499,8 @@
                     <div id="specSTORAGE" class="row" style="display: none">
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Loại ổ cứng <span class="text-danger">*</span></label>
-                        <select name="spec.storageType" class="form-select">
+                        <select name="storageType" class="form-select">
+                          <option value="">-- Chọn --</option>
                           <option value="SSD_NVME">SSD NVMe</option>
                           <option value="SSD_SATA">SSD SATA</option>
                           <option value="HDD">HDD</option>
@@ -503,11 +508,11 @@
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Chuẩn giao tiếp</label>
-                        <input type="text" name="spec.storageInterface" class="form-control" placeholder="VD: PCIe Gen4 x4, SATA III" />
+                        <input type="text" name="storageInterface" maxlength="30" class="form-control" placeholder="VD: PCIe Gen4 x4, SATA III" />
                       </div>
                       <div class="col-md-4 mb-2">
                         <label class="form-label">Dung lượng (GB) <span class="text-danger">*</span></label>
-                        <input type="number" name="spec.storageCapacityGb" class="form-control" min="1" placeholder="VD: 1000" />
+                        <input type="number" name="storageCapacityGb" class="form-control" min="1" placeholder="VD: 1000" />
                       </div>
                     </div>
                   </div>
@@ -558,7 +563,14 @@
                   })();
                 </script>
 
-                <!-- Script: hiện đúng block thông số theo danh mục đã chọn -->
+                <!-- Dữ liệu spec hiện có (dùng khi Sửa sản phẩm) để JS đổ lại vào form -->
+                <script th:inline="javascript">
+                  /*<![CDATA[*/
+                  const specData = /*[[${spec}]]*/ {};
+                  /*]]>*/
+                </script>
+
+                <!-- Script: hiện đúng block thông số theo danh mục đã chọn + pre-fill giá trị cũ khi Sửa -->
                 <script>
                   document.addEventListener("DOMContentLoaded", function () {
                     const categorySelect = document.querySelector(
@@ -582,7 +594,45 @@
                     function showBlock(id) {
                       blockIds.forEach(function (bid) {
                         const el = document.getElementById(bid);
-                        if (el) el.style.display = bid === id ? "" : "none";
+                        if (el) {
+                          const isVisible = (bid === id);
+                          el.style.display = isVisible ? "" : "none";
+                          const inputs = el.querySelectorAll("input, select, textarea");
+                          inputs.forEach(input => {
+                              input.disabled = !isVisible;
+                          });
+                        }
+                      });
+                    }
+
+                    // Đổ dữ liệu specData (nếu có) vào input/select/checkbox tương ứng theo name.
+                    // Chỉ chạy 1 lần lúc load trang Sửa - không đụng vào khi user tự đổi category sau đó.
+                    function fillSpecData() {
+                      if (!specData) return;
+                      Object.keys(specData).forEach(function (key) {
+                        const value = specData[key];
+                        if (value === null || value === undefined) return;
+
+                        if (key === "caseFormFactorSupport") {
+                          if (!Array.isArray(value)) return;
+                          document
+                            .querySelectorAll('input[name="caseFormFactorSupport"]')
+                            .forEach(function (cb) {
+                              cb.checked = value.indexOf(cb.value) !== -1;
+                            });
+                          return;
+                        }
+
+                        const els = document.querySelectorAll(
+                          '[name="' + key + '"]',
+                        );
+                        els.forEach(function (el) {
+                          if (el.type === "checkbox") {
+                            el.checked = value === true || value === "true";
+                          } else {
+                            el.value = value;
+                          }
+                        });
                       });
                     }
 
@@ -614,6 +664,7 @@
                       updateSpecBlock,
                     );
                     updateSpecBlock(); // set đúng trạng thái ban đầu (kể cả khi Sửa sản phẩm)
+                    fillSpecData(); // pre-fill giá trị cũ (no-op khi thêm mới vì specData rỗng)
                   });
                 </script>
 

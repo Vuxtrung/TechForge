@@ -322,25 +322,18 @@ function addComponentsToCart(redirectToCheckout) {
     })
     .catch(err => {
         console.error('Error adding components to cart via bulk API:', err);
-        // Fallback nếu API bulk gặp sự cố
-        Promise.all(products.map(p => 
-            fetch('/cart/api/add', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    productId: p.productId,
-                    productName: p.name,
-                    price: p.basePrice,
-                    imageUrl: p.primaryImageUrl || '',
-                    quantity: 1
-                })
-            })
-        )).finally(() => {
+        // Fallback gọi addToCartAjax hoặc /cart/api/add
+        products.forEach(p => {
+            if (typeof addToCartAjax === 'function') {
+                addToCartAjax(p.productId, p.name, p.basePrice, p.primaryImageUrl || '', 1);
+            }
+        });
+        setTimeout(() => {
             if (redirectToCheckout) {
                 window.location.href = '/checkout';
             } else {
                 window.location.href = '/cart';
             }
-        });
+        }, 800);
     });
 }

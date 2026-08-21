@@ -26,7 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
-    private final VoucherRepository voucherRepository;
+    private final VoucherService voucherService;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -35,7 +35,7 @@ public class OrderService {
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
                         PaymentRepository paymentRepository,
-                        VoucherRepository voucherRepository,
+                        VoucherService voucherService,
                         ProductRepository productRepository,
                         UserRepository userRepository,
                         RoleRepository roleRepository,
@@ -43,44 +43,11 @@ public class OrderService {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.paymentRepository = paymentRepository;
-        this.voucherRepository = voucherRepository;
+        this.voucherService = voucherService;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    public Voucher validateVoucher(String code, BigDecimal subtotal) {
-        if (code == null || code.trim().isEmpty()) return null;
-
-        Optional<Voucher> voucherOpt = voucherRepository.findByCodeIgnoreCaseAndIsActiveTrue(code.trim());
-        if (voucherOpt.isEmpty()) return null;
-
-        Voucher voucher = voucherOpt.get();
-        LocalDateTime now = LocalDateTime.now();
-
-        if (voucher.getStartDate() != null && now.isBefore(voucher.getStartDate())) return null;
-        if (voucher.getEndDate() != null && now.isAfter(voucher.getEndDate())) return null;
-        if (voucher.getUsageLimit() != null && voucher.getUsageLimit() <= 0) return null;
-        if (voucher.getMinOrderValue() != null && subtotal.compareTo(voucher.getMinOrderValue()) < 0) return null;
-
-        return voucher;
-    }
-
-    public BigDecimal calculateVoucherDiscount(Voucher voucher, BigDecimal subtotal) {
-        if (voucher == null || subtotal == null) return BigDecimal.ZERO;
-
-        BigDecimal discount = BigDecimal.ZERO;
-        if (voucher.getDiscountType() == DiscountType.PERCENT) {
-            discount = subtotal.multiply(voucher.getDiscountValue()).divide(BigDecimal.valueOf(100));
-        } else if (voucher.getDiscountType() == DiscountType.FIXED_AMOUNT) {
-            discount = voucher.getDiscountValue();
-        }
-
-        if (discount.compareTo(subtotal) > 0) {
-            discount = subtotal;
-        }
-        return discount;
     }
 
     @Transactional
@@ -108,8 +75,20 @@ public class OrderService {
             }
         }
 
-        Voucher voucher = validateVoucher(request.getVoucherCode(), subtotal);
-        BigDecimal voucherDiscount = calculateVoucherDiscount(voucher, subtotal);
+        User orderUser = user;
+        if (orderUser == null && request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            orderUser = userRepository.findByEmail(request.getEmail().trim()).orElse(null);
+        }
+
+        if (orderUser == null) {
+            throw new IllegalStateException("Vui lòng đăng nhập tài khoản trước khi thực hiện đặt hàng!");
+        }
+
+        // BR-V08: voucher phải được kiểm tra lại đầy đủ (BR-V02..BR-V06, BR-V10)
+        // ngay tại thời điểm tạo đơn, không tin kết quả đã check ở bước preview giỏ hàng.
+        // Dùng orderUser (đã resolve) để BR-V06 (giới hạn theo khách hàng) chính xác.
+        Voucher voucher = voucherService.validateForCheckout(request.getVoucherCode(), subtotal, orderUser);
+        BigDecimal voucherDiscount = voucherService.calculateDiscount(voucher, subtotal);
 
         BigDecimal shippingFee = BigDecimal.valueOf(30000);
         if ("EXPRESS".equalsIgnoreCase(request.getShippingMethod())) {
@@ -119,15 +98,6 @@ public class OrderService {
         BigDecimal grandTotal = subtotal.subtract(voucherDiscount).add(shippingFee);
         if (grandTotal.compareTo(BigDecimal.ZERO) < 0) {
             grandTotal = BigDecimal.ZERO;
-        }
-
-        User orderUser = user;
-        if (orderUser == null && request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
-            orderUser = userRepository.findByEmail(request.getEmail().trim()).orElse(null);
-        }
-
-        if (orderUser == null) {
-            throw new IllegalStateException("Vui lòng đăng nhập tài khoản trước khi thực hiện đặt hàng!");
         }
 
         Order order = new Order();
@@ -143,13 +113,18 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(grandTotal);
         order.setVoucher(voucher);
-
-        if (voucher != null && voucher.getUsageLimit() != null) {
-            voucher.setUsageLimit(voucher.getUsageLimit() - 1);
-            voucherRepository.save(voucher);
-        }
+        order.setDiscountAmount(voucherDiscount);
 
         Order savedOrder = orderRepository.save(order);
+
+        // BR-V09: chỉ ghi nhận lượt dùng voucher SAU KHI thanh toán thành công.
+        // - COD: không có bước xác nhận thanh toán online riêng trong hệ thống hiện tại,
+        //   nên coi "đặt hàng COD thành công" là mốc ghi nhận.
+        // - VNPAY: đơn đang ở trạng thái PENDING chờ thanh toán -> KHÔNG ghi nhận ở đây,
+        //   việc ghi nhận được thực hiện ở CheckoutController#vnpayReturn khi callback báo SUCCESS.
+        if (voucher != null && !"VNPAY".equalsIgnoreCase(request.getPaymentMethod())) {
+            voucherService.recordUsage(voucher, orderUser, savedOrder);
+        }
 
         for (CartItemDTO item : cartItems) {
             OrderItem orderItem = new OrderItem();
@@ -232,6 +207,18 @@ public class OrderService {
     }
 
     @Transactional
+    public Order updateStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng."));
+        try {
+            order.setStatus(OrderStatus.valueOf(status.trim().toUpperCase()));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Trạng thái đơn hàng không hợp lệ.");
+        }
+        return orderRepository.save(order);
+    }
+
+    @Transactional
     public boolean cancelOrder(Long orderId, String reason, User user) {
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) return false;
@@ -245,16 +232,32 @@ public class OrderService {
             order.setStatus(OrderStatus.CANCELLED);
             order.setCancelReason(reason);
             orderRepository.save(order);
-
-            for (OrderItem item : order.getOrderItems()) {
-                if (item.getProduct() != null) {
-                    Product product = item.getProduct();
-                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
-                    productRepository.save(product);
-                }
-            }
+            restoreStock(order.getOrderId());
+            voucherService.releaseUsageForCancelledOrder(order);
             return true;
         }
         return false;
+    }
+
+    // Hoàn lại stockQuantity đã trừ lúc tạo đơn. Dùng chung cho cancelOrder()
+    // và cho trường hợp đơn bị hủy do thanh toán VNPay thất bại (xem
+    // CheckoutController#vnpayReturn), tránh trùng logic ở 2 nơi.
+    // Nhận orderId thay vì Order entity: order.getOrderItems() là lazy, nếu
+    // Order được fetch ở transaction khác (VD trong Controller không
+    // @Transactional) rồi truyền vào đây thì truy cập collection sẽ ném
+    // LazyInitializationException do session gốc đã đóng. Fetch lại theo id
+    // để đảm bảo luôn nằm trong transaction đang mở của chính method này.
+    @Transactional
+    public void restoreStock(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) return;
+
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getProduct() != null) {
+                Product product = item.getProduct();
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                productRepository.save(product);
+            }
+        }
     }
 }

@@ -40,55 +40,7 @@ public class AdminStaffController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Hiển thị trang danh sách nhân viên (Staff) dành cho Quản trị viên.
-     * Lọc riêng các tài khoản có role là STAFF_SALES (3) hoặc STAFF_WARRANTY (4).
-     * Có hỗ trợ tìm kiếm, sắp xếp và phân trang tương tự trang người dùng.
-     * 
-     * @param keyword
-     * @param roleId
-     * @param status
-     * @param sort
-     * @param page
-     * @param size 
-     * @param model
-     * @return
-     */
-    @GetMapping
-    public String list(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer roleId,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "fullName,asc") String sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            Model model) {
 
-        if (size < 1) {
-            size = 1;
-        }
-
-        String[] sortParts = sort.split(",");
-        Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
-                ? Sort.Direction.DESC
-                : Sort.Direction.ASC;
-
-        List<Integer> targetRoleIds = roleId != null ? List.of(roleId) : STAFF_ROLE_IDS;
-
-        Page<User> staffPage = userService.searchByRoles(keyword, targetRoleIds, status, page, size,
-                Sort.by(direction, sortParts[0]));
-
-        model.addAttribute("staffPage", staffPage);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("roleId", roleId);
-        model.addAttribute("status", status);
-        model.addAttribute("sort", sort);
-        model.addAttribute("size", size);
-        model.addAttribute("userStatuses", UserStatus.values());
-        model.addAttribute("staffRoles", roleRepository.findAllById(STAFF_ROLE_IDS));
-
-        return "admin/staff-list";
-    }
 
     /**
      * Hiển thị giao diện Form thêm nhân viên mới.
@@ -151,6 +103,6 @@ public class AdminStaffController {
         redirectAttributes.addFlashAttribute("message", "Thêm nhân viên thành công!");
         redirectAttributes.addFlashAttribute("messageType", "success");
 
-        return "redirect:/admin/staff";
+        return "redirect:/admin/users?tab=staff";
     }
 }

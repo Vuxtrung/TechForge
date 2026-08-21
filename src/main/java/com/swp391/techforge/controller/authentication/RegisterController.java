@@ -28,13 +28,6 @@ public class RegisterController {
         this.otpService = otpService;
     }
 
-    /**
-     * Hiển thị trang đăng ký tài khoản.
-     * Cung cấp một đối tượng RegisterRequest rỗng cho Spring Form binding.
-     * 
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template trang đăng ký (register.html)
-     */
     @GetMapping("/register")
     public String register(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
@@ -48,7 +41,6 @@ public class RegisterController {
             HttpSession session,
             Model model) {
 
-        // Validation lỗi
         if (bindingResult.hasErrors()) {
             return "register";
         }
@@ -62,18 +54,13 @@ public class RegisterController {
 
         boolean sent = otpService.generateAndSend(request.getEmail(), OtpPurpose.REGISTER);
         if (!sent) {
-            model.addAttribute("registerError",
-                    "Bạn vừa yêu cầu gửi OTP, vui lòng đợi ít phút rồi thử lại.");
+            model.addAttribute("registerError", "Bạn vừa yêu cầu gửi OTP, vui lòng đợi ít phút rồi thử lại.");
             return "register";
         }
-
-        // Lưu tạm thông tin đăng ký vào session, chỉ tạo tài khoản sau khi OTP đúng
         session.setAttribute(SESSION_REGISTER_REQUEST, request);
-
         return "redirect:/register/verify";
     }
 
-    // ===== BƯỚC 2: NHẬP OTP =====
     @GetMapping("/register/verify")
     public String showVerifyOtpForm(HttpSession session, Model model) {
         RegisterRequest pending = (RegisterRequest) session.getAttribute(SESSION_REGISTER_REQUEST);
@@ -110,6 +97,11 @@ public class RegisterController {
                 try {
                     registerService.register(pending);
                 } catch (IllegalArgumentException e) {
+                    session.removeAttribute(SESSION_REGISTER_REQUEST);
+                    model.addAttribute("registerError", e.getMessage());
+                    model.addAttribute("registerRequest", pending);
+                    return "register";
+                } catch (IllegalStateException e) {
                     session.removeAttribute(SESSION_REGISTER_REQUEST);
                     model.addAttribute("registerError", e.getMessage());
                     model.addAttribute("registerRequest", pending);

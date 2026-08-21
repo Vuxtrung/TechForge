@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -21,7 +23,7 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(name = "full_name", nullable = false, length = 100)
+    @Column(name = "full_name", nullable = false, unique = false, length = 100)
     private String fullName;
 
     @Column(name = "email", nullable = false, unique = true, length = 150)
@@ -32,7 +34,7 @@ public class User {
 
     @Column(name = "phone", length = 20)
     private String phone;
-
+    // Không dùng field address này khi đăng ký, đã thay bằng UserAddress
     @Column(name = "address", length = 500)
     private String address;
 
@@ -51,6 +53,9 @@ public class User {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserAddress> addresses = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

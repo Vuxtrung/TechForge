@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -93,6 +94,20 @@ public class StaffOrderController {
         Order order = orderService.getOrderById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng."));
         model.addAttribute("order", order);
+        model.addAttribute("orderStatuses", OrderStatus.values());
         return "staff/order-detail";
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/orders/{id}/status")
+    public String updateOrderStatus(@PathVariable Long id,
+            @RequestParam String status,
+            RedirectAttributes redirectAttributes) {
+        try {
+            orderService.updateStatus(id, status);
+            redirectAttributes.addFlashAttribute("successMessage", "Cập nhật trạng thái đơn hàng thành công.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/staff/orders/" + id;
     }
 }
