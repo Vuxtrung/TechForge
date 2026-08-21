@@ -35,6 +35,7 @@ public class SecurityConfig {
 
 						.requestMatchers("/account/**", "/checkout/**").authenticated()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
+						.requestMatchers("/staff/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
 						.anyRequest().permitAll()
 				)
 
@@ -61,8 +62,13 @@ public class SecurityConfig {
 		return (request, response, authentication) -> {
 			boolean isAdmin = authentication.getAuthorities().stream()
 					.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+			boolean isStaff = authentication.getAuthorities().stream()
+					.anyMatch(a -> a.getAuthority().equals("ROLE_STAFF_SALES")
+							|| a.getAuthority().equals("ROLE_STAFF_WARRANTY"));
 			if (isAdmin) {
 				response.sendRedirect("/admin/products");
+			} else if (isStaff) {
+				response.sendRedirect("/staff/dashboard");
 			} else {
 				response.sendRedirect("/");
 			}
