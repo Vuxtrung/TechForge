@@ -232,6 +232,18 @@ public class OrderService {
     }
 
     @Transactional
+    public Order updateStatus(Long orderId, String status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng."));
+        try {
+            order.setStatus(OrderStatus.valueOf(status.trim().toUpperCase()));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Trạng thái đơn hàng không hợp lệ.");
+        }
+        return orderRepository.save(order);
+    }
+
+    @Transactional
     public boolean cancelOrder(Long orderId, String reason, User user) {
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isEmpty()) return false;
