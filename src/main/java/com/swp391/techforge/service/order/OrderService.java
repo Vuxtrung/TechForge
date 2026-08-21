@@ -181,6 +181,9 @@ public class OrderService {
     }
 
     public List<Order> getCustomerOrders(User user, OrderStatus status, LocalDateTime startDate, LocalDateTime endDate, String search) {
+        if (user == null) {
+            return List.of();
+        }
         return orderRepository.filterCustomerOrders(user, status, startDate, endDate, search);
     }
 
@@ -230,6 +233,20 @@ public class OrderService {
     public Optional<Order> getOrderById(Long orderId) {
         return orderRepository.findById(orderId);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<Order> getOrderByIdForUser(Long orderId, User user) {
+        return orderRepository.findById(orderId)
+                .filter(order -> order.getUser() != null && user != null
+                        && order.getUser().getUserId().equals(user.getUserId()));
+    }
+
+        @Transactional(readOnly = true)
+        public Optional<OrderItem> getOrderItemByIdForUser(Long orderItemId, User user) {
+        return orderItemRepository.findById(orderItemId)
+            .filter(item -> item.getOrder() != null && item.getOrder().getUser() != null
+                && user != null && item.getOrder().getUser().getUserId().equals(user.getUserId()));
+        }
 
     @Transactional
     public Order updateStatus(Long orderId, String status) {

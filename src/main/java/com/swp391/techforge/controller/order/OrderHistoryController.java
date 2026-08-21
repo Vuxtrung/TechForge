@@ -69,8 +69,8 @@ public class OrderHistoryController {
     }
 
     @GetMapping("/{id}")
-    public String viewOrderDetail(@PathVariable("id") Long id, Model model) {
-        Optional<Order> orderOpt = orderService.getOrderById(id);
+    public String viewOrderDetail(@PathVariable("id") Long id, Model model, Principal principal) {
+        Optional<Order> orderOpt = orderService.getOrderByIdForUser(id, currentUser(principal));
         if (orderOpt.isEmpty()) {
             return "redirect:/orders";
         }
@@ -80,8 +80,8 @@ public class OrderHistoryController {
     }
 
     @GetMapping("/success/{id}")
-    public String viewOrderSuccess(@PathVariable("id") Long id, Model model) {
-        Optional<Order> orderOpt = orderService.getOrderById(id);
+    public String viewOrderSuccess(@PathVariable("id") Long id, Model model, Principal principal) {
+        Optional<Order> orderOpt = orderService.getOrderByIdForUser(id, currentUser(principal));
         if (orderOpt.isEmpty()) {
             return "redirect:/orders";
         }
@@ -93,9 +93,10 @@ public class OrderHistoryController {
     @PostMapping("/{id}/cancel")
     public String cancelOrder(@PathVariable("id") Long id,
                               @RequestParam(value = "cancelReason", defaultValue = "Khách hàng đổi ý không muốn mua nữa") String cancelReason,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes,
+                              Principal principal) {
 
-        boolean success = orderService.cancelOrder(id, cancelReason, null);
+        boolean success = orderService.cancelOrder(id, cancelReason, currentUser(principal));
         if (success) {
             redirectAttributes.addFlashAttribute("successMessage", "Hủy đơn hàng #" + id + " thành công!");
         } else {
@@ -106,8 +107,8 @@ public class OrderHistoryController {
     }
 
     @GetMapping("/{id}/print")
-    public String printInvoice(@PathVariable("id") Long id, Model model) {
-        Optional<Order> orderOpt = orderService.getOrderById(id);
+    public String printInvoice(@PathVariable("id") Long id, Model model, Principal principal) {
+        Optional<Order> orderOpt = orderService.getOrderByIdForUser(id, currentUser(principal));
         if (orderOpt.isEmpty()) {
             return "redirect:/orders";
         }
@@ -117,8 +118,9 @@ public class OrderHistoryController {
     }
 
     @PostMapping("/{id}/reorder")
-    public String reorder(@PathVariable("id") Long id, HttpSession session, RedirectAttributes redirectAttributes) {
-        Optional<Order> orderOpt = orderService.getOrderById(id);
+    public String reorder(@PathVariable("id") Long id, HttpSession session, RedirectAttributes redirectAttributes,
+                          Principal principal) {
+        Optional<Order> orderOpt = orderService.getOrderByIdForUser(id, currentUser(principal));
         if (orderOpt.isEmpty()) {
             return "redirect:/orders";
         }
@@ -151,5 +153,10 @@ public class OrderHistoryController {
         session.setAttribute(CART_SESSION_KEY, cart);
         redirectAttributes.addFlashAttribute("successMessage", "Đã thêm lại các sản phẩm vào giỏ hàng!");
         return "redirect:/cart";
+    }
+
+    private User currentUser(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản."));
     }
 }

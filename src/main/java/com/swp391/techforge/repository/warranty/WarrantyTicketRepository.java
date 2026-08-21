@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface WarrantyTicketRepository extends JpaRepository<WarrantyTicket, Long> {
 
     // @Query("SELECT wt FROM WarrantyTicket wt LEFT JOIN wt.user u WHERE " +
@@ -43,4 +45,6 @@ public interface WarrantyTicketRepository extends JpaRepository<WarrantyTicket, 
             Pageable pageable);
 
     Page<WarrantyTicket> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    List<WarrantyTicket> findByImeiSerialIgnoreCaseOrPhoneLookup(String imeiSerial, String phoneLookup);
 }

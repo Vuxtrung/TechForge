@@ -22,6 +22,10 @@
             <i class="bi bi-exclamation-triangle-fill me-2"></i> <span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show fs-7 mb-3 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> <span th:text="${successMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold text-dark mb-0">
@@ -74,6 +78,10 @@
                                             Đánh giá
                                         </button>
                                         <span th:if="${item.isReviewed}" class="badge bg-success">Đã đánh giá</span>
+                                        <a th:href="@{/customer/warranty/create(orderItemId=${item.orderItemId})}"
+                                           class="btn btn-outline-success btn-sm ms-1">
+                                            <i class="bi bi-shield-plus me-1"></i>Bảo hành
+                                        </a>
                                         
                                         <!-- Review Modal -->
                                         <div th:if="${!item.isReviewed}" class="modal fade text-start" th:id="'reviewModal' + ${item.orderItemId}" tabindex="-1">

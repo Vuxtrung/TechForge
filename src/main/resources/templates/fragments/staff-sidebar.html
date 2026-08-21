@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="sidebar" class="admin-sidebar bg-dark text-white d-flex flex-column flex-shrink-0 p-3" style="width: 280px; min-height: calc(100vh - 72px);">
+    <a th:href="@{/staff/dashboard}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none border-bottom border-secondary pb-3 w-100">
+        <span class="fs-5 fw-bold"><i class="bi bi-speedometer2 text-danger me-2"></i>Dashboard</span>
+    </a>
+    <ul class="nav nav-pills flex-column mb-auto mt-3">
+        <li class="nav-item mb-2">
+            <a th:href="@{/staff/orders}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
+                <i class="bi bi-receipt me-2 fs-5"></i> Quản lý đơn hàng
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a th:href="@{/staff/warranty}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
+                <i class="bi bi-shield-check me-2 fs-5"></i> Quản lý bảo hành
+            </a>
+        </li>
+    </ul>
+    <style>
+        .hover-bg-secondary:hover { background-color: #343a40 !important; border-radius: 6px; }
+    </style>
+    <hr class="border-secondary mt-auto mb-3 w-100">
+    <a th:href="@{/account}" class="d-flex align-items-center text-white text-decoration-none w-100 pb-2" title="Tài khoản của tôi">
+        <i class="bi bi-person-circle fs-4 me-2 text-warning"></i>
+        <strong th:text="${#authentication.name}">Staff</strong>
+    </a>
+</div>
+</body>
+</html>
