@@ -29,13 +29,6 @@ public class DataInitializer implements CommandLineRunner {
         private final CategoryRepository categoryRepository;
         private final ProductRepository productRepository;
         private final PasswordEncoder passwordEncoder;
-        private final CpuRepository cpuRepository;
-        private final MainboardRepository mainboardRepository;
-        private final RamRepository ramRepository;
-        private final GpuRepository gpuRepository;
-        private final PsuRepository psuRepository;
-        private final CaseComponentRepository caseComponentRepository;
-        private final CoolerRepository coolerRepository;
         private final com.swp391.techforge.repository.blog.BlogRepository blogRepository;
         @jakarta.persistence.PersistenceContext
         private jakarta.persistence.EntityManager entityManager;
@@ -45,28 +38,12 @@ public class DataInitializer implements CommandLineRunner {
                         CategoryRepository categoryRepository,
                         ProductRepository productRepository,
                         PasswordEncoder passwordEncoder,
-                        CpuRepository cpuRepository,
-                        MainboardRepository mainboardRepository,
-                        RamRepository ramRepository,
-                        GpuRepository gpuRepository,
-                        PsuRepository psuRepository,
-                        CaseComponentRepository caseComponentRepository,
-                        CoolerRepository coolerRepository,
-                        StorageRepository storageRepository,
                         com.swp391.techforge.repository.blog.BlogRepository blogRepository) {
                 this.userRepository = userRepository;
                 this.roleRepository = roleRepository;
                 this.categoryRepository = categoryRepository;
                 this.productRepository = productRepository;
                 this.passwordEncoder = passwordEncoder;
-                this.cpuRepository = cpuRepository;
-                this.mainboardRepository = mainboardRepository;
-                this.ramRepository = ramRepository;
-                this.gpuRepository = gpuRepository;
-                this.psuRepository = psuRepository;
-                this.caseComponentRepository = caseComponentRepository;
-                this.coolerRepository = coolerRepository;
-                this.storageRepository = storageRepository;
                 this.blogRepository = blogRepository;
         }
 
