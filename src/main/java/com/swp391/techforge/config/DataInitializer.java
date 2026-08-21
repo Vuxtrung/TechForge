@@ -70,6 +70,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         @Override
+        @org.springframework.transaction.annotation.Transactional
         public void run(String... args) throws Exception {
                 createRoleIfNotFound(1, "GUEST");
                 createRoleIfNotFound(2, "CUSTOMER");
@@ -308,15 +309,17 @@ public class DataInitializer implements CommandLineRunner {
                 p.setStockQuantity(stock);
                 p.setCategory(category);
                 p.setStatus(Product.ProductStatus.ACTIVE);
-                Product saved = productRepository.save(p);
 
-                ProductImage img = new ProductImage(saved, imageUrl, true);
-                saved.getImages().add(img);
-                return productRepository.save(saved);
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                        ProductImage img = new ProductImage(p, imageUrl, true);
+                        p.getImages().add(img);
+                }
+                return productRepository.save(p);
         }
 
         private void saveCpu(Product product, String socket, int cores, int threads, int tdpWatt) {
                 Cpu cpu = new Cpu();
+                cpu.setProductId(product.getProductId());
                 cpu.setProduct(product);
                 cpu.setSocket(socket);
                 cpu.setCores(cores);
@@ -329,6 +332,7 @@ public class DataInitializer implements CommandLineRunner {
         private void saveMainboard(Product product, String socket, String ramType, int ramSlots, int maxRamGb,
                         String formFactor) {
                 Mainboard mb = new Mainboard();
+                mb.setProductId(product.getProductId());
                 mb.setProduct(product);
                 mb.setSocket(socket);
                 mb.setRamType(Mainboard.RamType.valueOf(ramType));
@@ -340,6 +344,7 @@ public class DataInitializer implements CommandLineRunner {
 
         private void saveRam(Product product, String ramType, int speedMhz, int capacityGbPerModule, int modules) {
                 Ram ram = new Ram();
+                ram.setProductId(product.getProductId());
                 ram.setProduct(product);
                 ram.setRamType(Ram.RamType.valueOf(ramType));
                 ram.setSpeedMhz(speedMhz);
@@ -351,6 +356,7 @@ public class DataInitializer implements CommandLineRunner {
         private void saveGpu(Product product, int vramGb, int lengthMm, String powerConnector, int recommendedPsuWatt,
                         int slotWidth) {
                 Gpu gpu = new Gpu();
+                gpu.setProductId(product.getProductId());
                 gpu.setProduct(product);
                 gpu.setVramGb(vramGb);
                 gpu.setLengthMm(lengthMm);
@@ -362,6 +368,7 @@ public class DataInitializer implements CommandLineRunner {
 
         private void savePsu(Product product, int wattage, String efficiencyRating, String modular, String formFactor) {
                 Psu psu = new Psu();
+                psu.setProductId(product.getProductId());
                 psu.setProduct(product);
                 psu.setWattage(wattage);
                 psu.setEfficiencyRating(efficiencyRating);
@@ -372,6 +379,7 @@ public class DataInitializer implements CommandLineRunner {
 
         private void saveStorage(Product product, String storageType, String storageInterface, int capacityGb) {
                 Storage storage = new Storage();
+                storage.setProductId(product.getProductId());
                 storage.setProduct(product);
                 storage.setStorageType(Storage.StorageType.valueOf(storageType));
                 storage.setStorageInterface(storageInterface);
@@ -382,6 +390,7 @@ public class DataInitializer implements CommandLineRunner {
         private void saveCooler(Product product, String coolerType, Integer heightMm, Integer radiatorSizeMm,
                         String socketSupport) {
                 Cooler cooler = new Cooler();
+                cooler.setProductId(product.getProductId());
                 cooler.setProduct(product);
                 cooler.setCoolerType(Cooler.CoolerType.valueOf(coolerType));
                 cooler.setHeightMm(heightMm);
@@ -393,6 +402,7 @@ public class DataInitializer implements CommandLineRunner {
         private void saveCase(Product product, String formFactorSupport, int maxGpuLengthMm, int maxCoolerHeightMm,
                         int maxRadiatorMm) {
                 CaseComponent c = new CaseComponent();
+                c.setProductId(product.getProductId());
                 c.setProduct(product);
                 c.setFormFactorSupport(formFactorSupport);
                 c.setMaxGpuLengthMm(maxGpuLengthMm);
