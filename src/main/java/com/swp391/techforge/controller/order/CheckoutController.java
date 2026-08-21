@@ -67,7 +67,7 @@ public class CheckoutController {
             subtotal = subtotal.add(BigDecimal.valueOf(item.getTotalPrice()));
             if (item.getProductId() != null) {
                 productRepository.findById(item.getProductId())
-                        .ifPresent(p -> item.setStockQuantity(p.getStockQuantity()));
+                        .ifPresent(p -> item.setStockQuantity(p.isDeleted() ? 0 : p.getStockQuantity()));
             }
         }
 

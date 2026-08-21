@@ -44,11 +44,13 @@ public class CartController {
     public String viewCart(HttpSession session, Model model) {
         List<CartItemDTO> cartItems = getCartFromSession(session);
 
-        // Đọc tồn kho thực tế từ DB cho từng sản phẩm
+        // Đọc tồn kho thực tế từ DB cho từng sản phẩm.
+        // Sản phẩm đã bị xóa mềm (deleted=true) hiển thị như hết hàng (stock=0)
+        // để khách thấy ngay và không thể tăng số lượng / checkout sản phẩm đó.
         for (CartItemDTO item : cartItems) {
             if (item.getProductId() != null) {
                 productRepository.findById(item.getProductId())
-                        .ifPresent(p -> item.setStockQuantity(p.getStockQuantity()));
+                        .ifPresent(p -> item.setStockQuantity(p.isDeleted() ? 0 : p.getStockQuantity()));
             }
         }
 
