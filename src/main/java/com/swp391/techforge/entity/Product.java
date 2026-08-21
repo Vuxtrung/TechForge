@@ -68,6 +68,15 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    // Xóa mềm: sản phẩm không bị xóa khỏi DB, chỉ đánh dấu deleted = true.
+    // Giữ nguyên row để không phá vỡ FK từ order_items -> products (đơn hàng cũ
+    // vẫn hiển thị đúng dù sản phẩm đã bị admin "xóa").
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 

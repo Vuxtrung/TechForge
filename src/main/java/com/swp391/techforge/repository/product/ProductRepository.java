@@ -19,7 +19,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Dùng cho trang admin: tìm kiếm sản phẩm theo keyword, categoryId, status
     @Query("""
             SELECT p FROM Product p
-            WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            WHERE p.deleted = false
+              AND (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
               AND (:categoryId IS NULL OR p.category.categoryId = :categoryId)
               AND (:status IS NULL OR :status = '' OR CAST(p.status AS string) = :status)
             """)
@@ -31,7 +32,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Dùng cho trang khách xem /products: chỉ lấy sản phẩm ACTIVE, có thêm lọc giá & thương hiệu
     @Query("""
             SELECT p FROM Product p
-            WHERE CAST(p.status AS string) = 'ACTIVE'
+            WHERE p.deleted = false
+              AND CAST(p.status AS string) = 'ACTIVE'
               AND (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
               AND (:categoryIds IS NULL OR p.category.categoryId IN :categoryIds)
               AND (:type IS NULL OR :type = '' OR CAST(p.category.type AS string) = :type)
@@ -49,7 +51,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
                 @Query("""
                                                 SELECT p FROM Product p
-                                                WHERE CAST(p.status AS string) = 'ACTIVE'
+                                                WHERE p.deleted = false
+                                                        AND CAST(p.status AS string) = 'ACTIVE'
                                                         AND p.productId IN :productIds
                                                 """)
                 Page<Product> searchPublicByProductIds(@Param("productIds") List<Long> productIds, Pageable pageable);
