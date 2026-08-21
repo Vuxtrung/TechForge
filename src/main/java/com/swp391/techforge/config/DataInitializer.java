@@ -36,8 +36,9 @@ public class DataInitializer implements CommandLineRunner {
         private final PsuRepository psuRepository;
         private final CaseComponentRepository caseComponentRepository;
         private final CoolerRepository coolerRepository;
-        private final StorageRepository storageRepository;
         private final com.swp391.techforge.repository.blog.BlogRepository blogRepository;
+        @jakarta.persistence.PersistenceContext
+        private jakarta.persistence.EntityManager entityManager;
 
         public DataInitializer(UserRepository userRepository,
                         RoleRepository roleRepository,
@@ -319,96 +320,88 @@ public class DataInitializer implements CommandLineRunner {
 
         private void saveCpu(Product product, String socket, int cores, int threads, int tdpWatt) {
                 Cpu cpu = new Cpu();
-                cpu.setProductId(product.getProductId());
                 cpu.setProduct(product);
                 cpu.setSocket(socket);
                 cpu.setCores(cores);
                 cpu.setThreads(threads);
                 cpu.setTdpWatt(tdpWatt);
                 cpu.setHasIgpu(false);
-                cpuRepository.save(cpu);
+                entityManager.persist(cpu);
         }
 
         private void saveMainboard(Product product, String socket, String ramType, int ramSlots, int maxRamGb,
                         String formFactor) {
                 Mainboard mb = new Mainboard();
-                mb.setProductId(product.getProductId());
                 mb.setProduct(product);
                 mb.setSocket(socket);
                 mb.setRamType(Mainboard.RamType.valueOf(ramType));
                 mb.setRamSlots(ramSlots);
                 mb.setMaxRamGb(maxRamGb);
                 mb.setFormFactor(Mainboard.FormFactor.valueOf(formFactor));
-                mainboardRepository.save(mb);
+                entityManager.persist(mb);
         }
 
         private void saveRam(Product product, String ramType, int speedMhz, int capacityGbPerModule, int modules) {
                 Ram ram = new Ram();
-                ram.setProductId(product.getProductId());
                 ram.setProduct(product);
                 ram.setRamType(Ram.RamType.valueOf(ramType));
                 ram.setSpeedMhz(speedMhz);
                 ram.setCapacityGb(capacityGbPerModule);
                 ram.setModules(modules);
-                ramRepository.save(ram);
+                entityManager.persist(ram);
         }
 
         private void saveGpu(Product product, int vramGb, int lengthMm, String powerConnector, int recommendedPsuWatt,
                         int slotWidth) {
                 Gpu gpu = new Gpu();
-                gpu.setProductId(product.getProductId());
                 gpu.setProduct(product);
                 gpu.setVramGb(vramGb);
                 gpu.setLengthMm(lengthMm);
                 gpu.setPowerConnector(powerConnector);
                 gpu.setRecommendedPsuWatt(recommendedPsuWatt);
                 gpu.setSlotWidth(slotWidth);
-                gpuRepository.save(gpu);
+                entityManager.persist(gpu);
         }
 
         private void savePsu(Product product, int wattage, String efficiencyRating, String modular, String formFactor) {
                 Psu psu = new Psu();
-                psu.setProductId(product.getProductId());
                 psu.setProduct(product);
                 psu.setWattage(wattage);
                 psu.setEfficiencyRating(efficiencyRating);
                 psu.setModular(Psu.Modular.valueOf(modular));
                 psu.setFormFactor(formFactor);
-                psuRepository.save(psu);
+                entityManager.persist(psu);
         }
 
         private void saveStorage(Product product, String storageType, String storageInterface, int capacityGb) {
                 Storage storage = new Storage();
-                storage.setProductId(product.getProductId());
                 storage.setProduct(product);
                 storage.setStorageType(Storage.StorageType.valueOf(storageType));
                 storage.setStorageInterface(storageInterface);
                 storage.setCapacityGb(capacityGb);
-                storageRepository.save(storage);
+                entityManager.persist(storage);
         }
 
         private void saveCooler(Product product, String coolerType, Integer heightMm, Integer radiatorSizeMm,
                         String socketSupport) {
                 Cooler cooler = new Cooler();
-                cooler.setProductId(product.getProductId());
                 cooler.setProduct(product);
                 cooler.setCoolerType(Cooler.CoolerType.valueOf(coolerType));
                 cooler.setHeightMm(heightMm);
                 cooler.setRadiatorSizeMm(radiatorSizeMm);
                 cooler.setSocketSupport(socketSupport);
-                coolerRepository.save(cooler);
+                entityManager.persist(cooler);
         }
 
         private void saveCase(Product product, String formFactorSupport, int maxGpuLengthMm, int maxCoolerHeightMm,
                         int maxRadiatorMm) {
                 CaseComponent c = new CaseComponent();
-                c.setProductId(product.getProductId());
                 c.setProduct(product);
                 c.setFormFactorSupport(formFactorSupport);
                 c.setMaxGpuLengthMm(maxGpuLengthMm);
                 c.setMaxCoolerHeightMm(maxCoolerHeightMm);
                 c.setMaxRadiatorMm(maxRadiatorMm);
-                caseComponentRepository.save(c);
+                entityManager.persist(c);
         }
 
         private void seedSampleBlogs(User adminUser) {
