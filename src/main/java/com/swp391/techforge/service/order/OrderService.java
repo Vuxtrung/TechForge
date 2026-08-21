@@ -155,11 +155,19 @@ public class OrderService {
         return savedOrder;
     }
 
-    public List<Order> getCustomerOrders(User user, OrderStatus status, LocalDateTime startDate, LocalDateTime endDate, String search) {
+    @Transactional(readOnly = true)
+    public Page<Order> searchForCustomer(User user, OrderStatus status, LocalDateTime startDate,
+                                         LocalDateTime endDate, String search, int page, int size) {
         if (user == null) {
-            return List.of();
+            return Page.empty();
         }
-        return orderRepository.filterCustomerOrders(user, status, startDate, endDate, search);
+        return orderRepository.filterCustomerOrders(user, status, startDate, endDate, search,
+                PageRequest.of(normalizePage(page), normalizeSize(size), Sort.by(Sort.Direction.DESC, "orderDate")));
+    }
+
+    public List<Order> getCustomerOrders(User user, OrderStatus status, LocalDateTime startDate,
+                                         LocalDateTime endDate, String search) {
+        return searchForCustomer(user, status, startDate, endDate, search, 0, 100).getContent();
     }
 
     @Transactional(readOnly = true)
@@ -174,8 +182,16 @@ public class OrderService {
             }
         }
 
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(normalizePage(page), normalizeSize(size), sort);
         return orderRepository.searchForStaff(orderStatus, startDate, endDate, search, pageable);
+    }
+
+    private int normalizePage(int page) {
+        return Math.max(page, 0);
+    }
+
+    private int normalizeSize(int size) {
+        return size > 0 && size <= 100 ? size : 10;
     }
 
     @Transactional(readOnly = true)
@@ -228,11 +244,30 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng."));
         try {
-            order.setStatus(OrderStatus.valueOf(status.trim().toUpperCase()));
+            OrderStatus nextStatus = OrderStatus.valueOf(status.trim().toUpperCase());
+            if (!isAllowedStatusChange(order.getStatus(), nextStatus)) {
+                throw new IllegalArgumentException("Không thể chuyển trạng thái đơn hàng từ "
+                        + order.getStatus() + " sang " + nextStatus + ".");
+            }
+            order.setStatus(nextStatus);
         } catch (IllegalArgumentException | NullPointerException e) {
+            if (e.getMessage() != null && e.getMessage().startsWith("Không thể chuyển")) {
+                throw e;
+            }
             throw new IllegalArgumentException("Trạng thái đơn hàng không hợp lệ.");
         }
         return orderRepository.save(order);
+    }
+
+    private boolean isAllowedStatusChange(OrderStatus current, OrderStatus next) {
+        if (current == next) return true;
+        return switch (current) {
+            case PENDING -> next == OrderStatus.CONFIRMED || next == OrderStatus.CANCELLED;
+            case CONFIRMED -> next == OrderStatus.SHIPPING || next == OrderStatus.CANCEL_REQUESTED || next == OrderStatus.CANCELLED;
+            case SHIPPING -> next == OrderStatus.DELIVERED || next == OrderStatus.CANCEL_REQUESTED;
+            case CANCEL_REQUESTED -> next == OrderStatus.CANCELLED || next == OrderStatus.CONFIRMED;
+            case DELIVERED, CANCELLED -> false;
+        };
     }
 
     @Transactional

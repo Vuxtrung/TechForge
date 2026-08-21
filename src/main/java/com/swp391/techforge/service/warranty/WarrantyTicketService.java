@@ -43,8 +43,12 @@ public class WarrantyTicketService {
             }
         }
 
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), normalizeSize(size), sort);
         return warrantyTicketRepository.search(keyword, ticketStatus, pageable);
+    }
+
+    private int normalizeSize(int size) {
+        return size > 0 && size <= 100 ? size : 10;
     }
 
     @Transactional(readOnly = true)
@@ -75,12 +79,13 @@ public class WarrantyTicketService {
     @Transactional
     public WarrantyTicket receiveProduct(Long userId, String imeiSerial, String phoneLookup,
                                         String issueDesc, Long orderItemId) {
+        validateWarrantyInput(imeiSerial, issueDesc);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy khách hàng."));
 
         WarrantyTicket ticket = new WarrantyTicket();
         ticket.setUser(user);
-        ticket.setImeiSerial(imeiSerial);
+        ticket.setImeiSerial(imeiSerial.trim());
         ticket.setPhoneLookup(phoneLookup);
         ticket.setIssueDesc(issueDesc);
         ticket.setOrderItemId(orderItemId);
@@ -99,6 +104,7 @@ public class WarrantyTicketService {
         if (imeiSerial == null || imeiSerial.isBlank()) {
             throw new IllegalArgumentException("Vui lòng nhập IMEI hoặc Serial của sản phẩm.");
         }
+        validateWarrantyInput(imeiSerial, issueDesc);
 
         WarrantyTicket ticket = new WarrantyTicket();
         ticket.setUser(customer);
@@ -115,13 +121,32 @@ public class WarrantyTicketService {
         WarrantyTicket ticket = getById(ticketId);
 
         if (status != null && !status.isBlank()) {
-            ticket.setStatus(WarrantyTicketStatus.valueOf(status));
+            WarrantyTicketStatus nextStatus;
+            try {
+                nextStatus = WarrantyTicketStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Trạng thái bảo hành không hợp lệ.");
+            }
+            if (isTerminal(ticket.getStatus()) && ticket.getStatus() != nextStatus) {
+                throw new IllegalArgumentException("Phiếu bảo hành đã hoàn tất, không thể đổi trạng thái.");
+            }
+            ticket.setStatus(nextStatus);
         }
 
         if (assignedStaffId != null && !assignedStaffId.isBlank()) {
-            Long staffId = Long.parseLong(assignedStaffId);
+            Long staffId;
+            try {
+                staffId = Long.valueOf(assignedStaffId.trim());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Mã nhân viên kỹ thuật không hợp lệ.");
+            }
             User staff = userRepository.findById(staffId)
                     .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhân viên kỹ thuật."));
+            if (staff.getRole() == null || staff.getRole().getRoleName() == null
+                    || (!"STAFF_SALES".equalsIgnoreCase(staff.getRole().getRoleName())
+                    && !"STAFF_WARRANTY".equalsIgnoreCase(staff.getRole().getRoleName()))) {
+                throw new IllegalArgumentException("Người được phân công không phải nhân viên hợp lệ.");
+            }
             ticket.setAssignedStaff(staff);
         }
 
@@ -137,6 +162,7 @@ public class WarrantyTicketService {
     @Transactional
     public WarrantyTicket markReplaced1For1(Long ticketId) {
         WarrantyTicket ticket = getById(ticketId);
+        ensureNotTerminal(ticket);
         ticket.setStatus(WarrantyTicketStatus.REPLACED_1_1);
         ticket.setResolvedAt(LocalDateTime.now());
         return warrantyTicketRepository.save(ticket);
@@ -145,6 +171,7 @@ public class WarrantyTicketService {
     @Transactional
     public WarrantyTicket markRepaired(Long ticketId) {
         WarrantyTicket ticket = getById(ticketId);
+        ensureNotTerminal(ticket);
         ticket.setStatus(WarrantyTicketStatus.REPAIRED);
         ticket.setResolvedAt(LocalDateTime.now());
         return warrantyTicketRepository.save(ticket);
@@ -153,6 +180,7 @@ public class WarrantyTicketService {
     @Transactional
     public WarrantyTicket closeTicket(Long ticketId) {
         WarrantyTicket ticket = getById(ticketId);
+        ensureNotTerminal(ticket);
         ticket.setStatus(WarrantyTicketStatus.CLOSED);
         ticket.setResolvedAt(LocalDateTime.now());
         return warrantyTicketRepository.save(ticket);
@@ -162,14 +190,33 @@ public class WarrantyTicketService {
     public void unassignTicketsFromStaff(User staff) {
         List<WarrantyTicket> tickets = warrantyTicketRepository.findByAssignedStaff(staff);
         for (WarrantyTicket ticket : tickets) {
-            // Chỉ gỡ phân công nếu ticket chưa đóng (chưa hoàn thành)
-            if (ticket.getStatus() == WarrantyTicketStatus.IN_PROGRESS || 
-                ticket.getStatus() == WarrantyTicketStatus.SUBMITTED) {
-                
+            if (ticket.getStatus() == WarrantyTicketStatus.IN_PROGRESS ||
+                    ticket.getStatus() == WarrantyTicketStatus.SUBMITTED) {
                 ticket.setAssignedStaff(null);
-                ticket.setStatus(WarrantyTicketStatus.SUBMITTED); // Đưa về trạng thái chờ
+                ticket.setStatus(WarrantyTicketStatus.SUBMITTED);
                 warrantyTicketRepository.save(ticket);
             }
+        }
+    }
+
+    private boolean isTerminal(WarrantyTicketStatus status) {
+        return status == WarrantyTicketStatus.REPAIRED
+                || status == WarrantyTicketStatus.REPLACED_1_1
+                || status == WarrantyTicketStatus.CLOSED;
+    }
+
+    private void ensureNotTerminal(WarrantyTicket ticket) {
+        if (isTerminal(ticket.getStatus())) {
+            throw new IllegalArgumentException("Phiếu bảo hành đã hoàn tất, không thể cập nhật thêm.");
+        }
+    }
+
+    private void validateWarrantyInput(String imeiSerial, String issueDesc) {
+        if (imeiSerial == null || imeiSerial.isBlank() || imeiSerial.trim().length() > 100) {
+            throw new IllegalArgumentException("IMEI hoặc Serial phải có từ 1 đến 100 ký tự.");
+        }
+        if (issueDesc != null && issueDesc.length() > 2000) {
+            throw new IllegalArgumentException("Mô tả lỗi không được vượt quá 2000 ký tự.");
         }
     }
 }
