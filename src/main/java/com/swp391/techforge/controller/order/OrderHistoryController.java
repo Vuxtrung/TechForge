@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.data.domain.Page;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -38,6 +39,8 @@ public class OrderHistoryController {
                                    @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                    @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
                                    @RequestParam(value = "search", required = false) String search,
+                                   @RequestParam(defaultValue = "0") int page,
+                                   @RequestParam(defaultValue = "10") int size,
                                    Model model,
                                    Principal principal) {
 
@@ -57,13 +60,15 @@ public class OrderHistoryController {
             loggedInUser = userRepository.findByEmail(principal.getName()).orElse(null);
         }
 
-        List<Order> orders = orderService.getCustomerOrders(loggedInUser, status, startDateTime, endDateTime, search);
+        Page<Order> orderPage = orderService.searchForCustomer(loggedInUser, status, startDateTime, endDateTime,
+            search, page, size);
 
-        model.addAttribute("orders", orders);
+        model.addAttribute("orderPage", orderPage);
         model.addAttribute("selectedStatus", statusStr);
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("search", search);
+        model.addAttribute("size", size > 0 && size <= 100 ? size : 10);
 
         return "order-history";
     }

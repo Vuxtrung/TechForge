@@ -24,11 +24,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
            "AND (:search IS NULL OR CAST(o.orderId AS string) LIKE %:search% OR LOWER(o.recipientName) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "ORDER BY o.orderDate DESC")
-    List<Order> filterCustomerOrders(@Param("user") User user,
-                                     @Param("status") OrderStatus status,
-                                     @Param("startDate") LocalDateTime startDate,
-                                     @Param("endDate") LocalDateTime endDate,
-                                     @Param("search") String search);
+       Page<Order> filterCustomerOrders(@Param("user") User user,
+                                                                @Param("status") OrderStatus status,
+                                                                @Param("startDate") LocalDateTime startDate,
+                                                                @Param("endDate") LocalDateTime endDate,
+                                                                @Param("search") String search,
+                                                                Pageable pageable);
 
     @Query("SELECT o FROM Order o WHERE " +
            "(:status IS NULL OR o.status = :status) " +
