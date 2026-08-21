@@ -585,23 +585,38 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    // Xóa mềm: không DELETE row khỏi DB (tránh vỡ FK order_items -> products
+    // khi sản phẩm đã từng nằm trong đơn hàng). Chỉ đánh dấu deleted = true
+    // và ép status = HIDDEN để chắc chắn biến mất khỏi trang khách ngay cả khi
+    // sau này có chỗ nào quên lọc theo deleted.
     @Transactional
     public void delete(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
 
-        // // Kiểm tra có trong order không
-        // long orderDetailCount = orderDetailRepository.countByProduct_ProductId(id);
-        // if (orderDetailCount > 0) {
-        //     throw new IllegalArgumentException(
-        //             "Không thể xóa sản phẩm đang có " + orderDetailCount + " đơn hàng.");
-        // }
+        if (product.isDeleted()) {
+            throw new IllegalArgumentException("Sản phẩm đã được xóa trước đó.");
+        }
 
-        // Xóa images trước (cascade)
-        productImageRepository.deleteByProduct_ProductId(id);
-        productSpecificationRepository.deleteAllByProduct_ProductId(id);
+        product.setDeleted(true);
+        product.setDeletedAt(LocalDateTime.now());
+        product.setStatus(Product.ProductStatus.HIDDEN);
+        productRepository.save(product);
+    }
 
-        productRepository.delete(product);
+    // Khôi phục sản phẩm đã xóa mềm (dùng cho màn "thùng rác" nếu admin cần).
+    @Transactional
+    public void restore(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm."));
+
+        if (!product.isDeleted()) {
+            throw new IllegalArgumentException("Sản phẩm chưa bị xóa.");
+        }
+
+        product.setDeleted(false);
+        product.setDeletedAt(null);
+        productRepository.save(product);
     }
 
     private void validateName(String name, Long currentId) {
