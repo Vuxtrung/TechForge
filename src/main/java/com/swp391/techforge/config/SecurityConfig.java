@@ -33,7 +33,7 @@ public class SecurityConfig {
 								"/reset-password")
 						.permitAll()
 
-						.requestMatchers("/account/**", "/checkout/**").authenticated()
+						.requestMatchers("/account/**", "/checkout/**", "/orders/**", "/customer/warranty/**").authenticated()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.requestMatchers("/staff/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
 						.anyRequest().permitAll()
