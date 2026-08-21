@@ -30,5 +30,5 @@ public class AccountAddressRequest {
     @NotBlank(message = "Vui lòng chọn loại địa chỉ")
     private String type;
 
-    private boolean isDefault;
+    private boolean defaultAddress;
 }

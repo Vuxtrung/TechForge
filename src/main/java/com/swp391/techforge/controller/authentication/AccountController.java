@@ -79,7 +79,7 @@ public class AccountController {
                                 request.setWard(address.getWard());
                                 request.setAddressLine(address.getAddressLine());
                                 request.setType(address.getType().name());
-                                request.setDefault(address.isDefault());
+                                request.setDefaultAddress(address.isDefault());
                             });
                 }
 
@@ -144,7 +144,7 @@ public class AccountController {
         address.setAddressLine(request.getAddressLine());
         address.setType(AddressType.valueOf(request.getType()));
 
-        if (request.isDefault()) {
+        if (request.isDefaultAddress()) {
             setDefaultAddress(user.getUserId(), address);
         } else if (addressId == null
                 && userAddressRepository.findByUserUserIdAndIsDefaultTrue(user.getUserId()).isEmpty()) {
@@ -190,10 +190,12 @@ public class AccountController {
     }
 
     private void setDefaultAddress(Long userId, UserAddress address) {
-        userAddressRepository.findByUserUserIdAndIsDefaultTrue(userId).ifPresent(current -> {
-            current.setDefault(false);
-            userAddressRepository.save(current);
-        });
+        userAddressRepository.findByUserUserIdAndIsDefaultTrue(userId)
+                .filter(current -> !current.getAddressId().equals(address.getAddressId()))
+                .ifPresent(current -> {
+                    current.setDefault(false);
+                    userAddressRepository.saveAndFlush(current);
+                });
         address.setDefault(true);
     }
 
