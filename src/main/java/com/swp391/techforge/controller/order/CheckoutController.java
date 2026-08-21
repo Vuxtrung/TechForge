@@ -37,6 +37,7 @@ public class CheckoutController {
     private final ProductRepository productRepository;
     private final VoucherService voucherService;
     private final OrderRepository orderRepository;
+    private final com.swp391.techforge.service.cart.CartService cartService;
 
     public CheckoutController(OrderService orderService,
                               VNPayService vnPayService,
@@ -44,7 +45,8 @@ public class CheckoutController {
                               UserRepository userRepository,
                               ProductRepository productRepository,
                               VoucherService voucherService,
-                              OrderRepository orderRepository) {
+                              OrderRepository orderRepository,
+                              com.swp391.techforge.service.cart.CartService cartService) {
         this.orderService = orderService;
         this.vnPayService = vnPayService;
         this.paymentRepository = paymentRepository;
@@ -52,12 +54,12 @@ public class CheckoutController {
         this.productRepository = productRepository;
         this.voucherService = voucherService;
         this.orderRepository = orderRepository;
+        this.cartService = cartService;
     }
 
     @GetMapping
     public String viewCheckoutPage(HttpSession session, Model model, Principal principal) {
-        @SuppressWarnings("unchecked")
-        List<CartItemDTO> cartItems = (List<CartItemDTO>) session.getAttribute(CART_SESSION_KEY);
+        List<CartItemDTO> cartItems = cartService.getCart(principal, session);
         if (cartItems == null || cartItems.isEmpty()) {
             return "redirect:/cart";
         }
@@ -107,8 +109,7 @@ public class CheckoutController {
                                Principal principal,
                                RedirectAttributes redirectAttributes) {
 
-        @SuppressWarnings("unchecked")
-        List<CartItemDTO> cartItems = (List<CartItemDTO>) session.getAttribute(CART_SESSION_KEY);
+        List<CartItemDTO> cartItems = cartService.getCart(principal, session);
         if (cartItems == null || cartItems.isEmpty()) {
             redirectAttributes.addFlashAttribute("voucherErrorMessage", "Giỏ hàng của bạn đang trống!");
             return "redirect:/checkout";
@@ -152,8 +153,7 @@ public class CheckoutController {
                                   Principal principal,
                                   RedirectAttributes redirectAttributes) {
 
-        @SuppressWarnings("unchecked")
-        List<CartItemDTO> cartItems = (List<CartItemDTO>) session.getAttribute(CART_SESSION_KEY);
+        List<CartItemDTO> cartItems = cartService.getCart(principal, session);
         if (cartItems == null || cartItems.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Giỏ hàng của bạn đang trống!");
             return "redirect:/cart";
@@ -166,7 +166,7 @@ public class CheckoutController {
             }
 
             Order order = orderService.createOrder(checkoutRequest, cartItems, loggedInUser);
-            session.removeAttribute(CART_SESSION_KEY);
+            cartService.clearCart(loggedInUser, session);
 
             if ("VNPAY".equalsIgnoreCase(checkoutRequest.getPaymentMethod())) {
                 String paymentUrl = vnPayService.createPaymentUrl(order, request);
