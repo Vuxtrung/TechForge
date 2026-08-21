@@ -12,8 +12,8 @@ public class VNPayConfig {
     }
     public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static String vnp_ReturnUrl = "http://localhost:8080/checkout/vnpay-return";
-    public static String vnp_TmnCode = "CGXZ8J08";
-    public static String secretKey = "XJJWJQLTHQLCFFVBNTHWJQLTHQLCFFVB";
+    public static String vnp_TmnCode = "5EXNPEA4";
+    public static String secretKey = "ZSADTVIAMGSZTICYOANQIOULELWHYPNK";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String hmacSHA512(final String key, final String data) {

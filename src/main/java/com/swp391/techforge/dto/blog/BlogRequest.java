@@ -35,6 +35,8 @@ public class BlogRequest {
 
     private String thumbnailUrl;
 
+    private org.springframework.web.multipart.MultipartFile thumbnailFile;
+
     @NotNull(message = "Vui lòng chọn trạng thái bài viết")
     private BlogStatus status = BlogStatus.DRAFT;
 }

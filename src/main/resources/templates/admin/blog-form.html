@@ -35,6 +35,7 @@
           <form th:action="${isEditMode} ? @{'/admin/blogs/' + ${blog.id} + '/edit'} : @{/admin/blogs/new}"
                 th:object="${blogRequest}"
                 method="post"
+                enctype="multipart/form-data"
                 class="row g-4">
             
             <input type="hidden" th:if="${isEditMode}" th:field="*{id}" />
@@ -93,16 +94,33 @@
 
                 <!-- Nội dung chi tiết bài viết -->
                 <div class="mb-3">
-                  <label for="content" class="form-label fw-bold fs-7 text-dark">
-                    Nội dung bài viết chi tiết <span class="text-danger">*</span>
-                  </label>
-                  <textarea id="content" class="form-control font-monospace fs-7" rows="14" 
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <label for="content" class="form-label fw-bold fs-7 text-dark mb-0">
+                      Nội dung bài viết chi tiết <span class="text-danger">*</span>
+                    </label>
+
+                    <!-- Nút Tải & Chèn Ảnh Minh Họa có kiểm tra < 6MB -->
+                    <div>
+                      <input type="file" id="inlineImageFileInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;" onchange="handleInlineImageUpload(this)" />
+                      <button type="button" class="btn btn-outline-danger btn-sm fw-semibold shadow-sm" onclick="document.getElementById('inlineImageFileInput').click();" id="btnUploadInline">
+                        <i class="bi bi-cloud-arrow-up me-1"></i> Tải & Chèn Ảnh Vào Bài Viết (&lt; 6MB)
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Khung trạng thái upload ảnh minh họa -->
+                  <div id="inlineUploadStatus" class="alert alert-info py-2 px-3 fs-8 d-none align-items-center justify-content-between mb-2">
+                    <span><i class="bi bi-arrow-repeat spin me-2"></i>Đang tải ảnh lên hệ thống, vui lòng chờ...</span>
+                  </div>
+
+                  <textarea id="content" class="form-control font-monospace fs-7" rows="15" 
                             th:field="*{content}" 
-                            placeholder="Nhập nội dung bài viết chi tiết (Hỗ trợ định dạng văn bản, thẻ HTML như <h3>, <p>, <ul>, <li>, <img>, <blockquote>)..." 
+                            placeholder="Nhập nội dung bài viết chi tiết..." 
                             th:classappend="${#fields.hasErrors('content')} ? 'is-invalid' : ''"></textarea>
                   <div class="invalid-feedback fs-8" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">Lỗi nội dung</div>
-                  <div class="form-text fs-8 text-muted">
-                    <i class="bi bi-info-circle me-1"></i> Có thể chèn hình ảnh minh họa bằng thẻ: <code>&lt;img src="link_anh" class="img-fluid rounded my-3" alt="mô tả"&gt;</code>
+                  
+                  <div class="d-flex justify-content-end align-items-center mt-2 fs-8 text-muted">
+                    <span class="badge bg-secondary-subtle text-secondary border"><i class="bi bi-shield-check me-1"></i>Dung lượng ảnh tối đa: &le; 6MB</span>
                   </div>
                 </div>
 
@@ -146,19 +164,44 @@
                   <div class="invalid-feedback fs-8" th:if="${#fields.hasErrors('category')}" th:errors="*{category}">Vui lòng chọn danh mục</div>
                 </div>
 
-                <!-- Ảnh đại diện Thumbnail URL -->
+                <!-- Ảnh đại diện Thumbnail (Chọn File Upload hoặc Nhập Link) -->
                 <div class="mb-3">
-                  <label for="thumbnailUrl" class="form-label fw-semibold fs-8 text-dark">Ảnh đại diện (URL)</label>
-                  <input type="url" id="thumbnailUrl" class="form-control form-control-sm" 
-                         th:field="*{thumbnailUrl}" 
-                         placeholder="https://example.com/image.jpg"
-                         oninput="document.getElementById('previewThumb').src = this.value || '/images/default-blog.jpg'" />
-                  <div class="mt-2 text-center border rounded p-2 bg-light">
+                  <label class="form-label fw-semibold fs-8 text-dark">
+                    Ảnh đại diện bài viết (Thumbnail)
+                  </label>
+                  
+                  <!-- File Upload từ máy tính -->
+                  <div class="mb-2">
+                    <label for="thumbnailFile" class="form-label fs-8 text-muted mb-1">
+                      <i class="bi bi-upload me-1"></i> Tải ảnh từ máy tính (Tối đa 6MB):
+                    </label>
+                    <input type="file" id="thumbnailFile" name="thumbnailFile" class="form-control form-control-sm" 
+                           accept="image/jpeg,image/png,image/webp,image/gif"
+                           onchange="validateAndPreviewThumb(this)" />
+                  </div>
+
+                  <!-- Hoặc nhập link URL -->
+                  <div class="mb-2">
+                    <label for="thumbnailUrl" class="form-label fs-8 text-muted mb-1">
+                      <i class="bi bi-link-45deg me-1"></i> Hoặc dán đường dẫn ảnh (URL):
+                    </label>
+                    <input type="url" id="thumbnailUrl" class="form-control form-control-sm" 
+                           th:field="*{thumbnailUrl}" 
+                           placeholder="https://example.com/image.jpg"
+                           oninput="document.getElementById('previewThumb').src = this.value || '/images/default-blog.jpg'" />
+                  </div>
+
+                  <div class="form-text fs-8 text-muted mb-2">
+                    <i class="bi bi-check-circle text-success me-1"></i> Định dạng: JPG, PNG, WEBP, GIF (&le; 6MB).
+                  </div>
+
+                  <!-- Khung Preview Ảnh Đại Diện -->
+                  <div class="text-center border rounded p-2 bg-light">
                     <div class="fs-8 text-muted mb-1">Xem trước ảnh bìa:</div>
                     <img id="previewThumb" 
                          th:src="${blogRequest.thumbnailUrl != null and !blogRequest.thumbnailUrl.isEmpty()} ? ${blogRequest.thumbnailUrl} : '/images/default-blog.jpg'" 
                          class="rounded border shadow-sm img-fluid" 
-                         style="max-height: 140px; object-fit: cover;" 
+                         style="max-height: 140px; width: 100%; object-fit: cover;" 
                          alt="Preview Thumbnail"
                          onerror="this.src='/images/default-blog.jpg';" />
                   </div>
@@ -166,7 +209,7 @@
 
                 <!-- Nút Lưu / Cập nhật -->
                 <div class="d-grid gap-2 mt-4 pt-2 border-top">
-                  <button type="submit" class="btn btn-danger fw-bold py-2 shadow-sm">
+                  <button type="submit" class="btn btn-danger fw-bold py-2 shadow-sm" id="btnSubmitForm">
                     <i class="bi bi-cloud-arrow-up me-1"></i>
                     <span th:text="${isEditMode} ? 'Lưu Thay Đổi Bài Viết' : 'Đăng / Lưu Bài Viết'">Lưu Bài Viết</span>
                   </button>
@@ -217,5 +260,110 @@
         </div>
       </div>
     </main>
+
+    <!-- JavaScript Xử Lý Kiểm Tra Dung Lượng Ảnh <= 6MB & Tải Ảnh Minh Họa Tự Động -->
+    <script>
+      const MAX_FILE_SIZE = 6 * 1024 * 1024; // 6MB (6,291,456 bytes)
+
+      // 1. Kiểm tra dung lượng & Preview ảnh đại diện Thumbnail
+      function validateAndPreviewThumb(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        // Kiểm tra dung lượng tối đa 6MB
+        if (file.size > MAX_FILE_SIZE) {
+          const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+          alert('⚠️ LỖI DUNG LƯỢNG: Ảnh bạn chọn có dung lượng ' + fileSizeMB + 'MB, vượt quá giới hạn tối đa 6MB!\nVui lòng nén hoặc chọn ảnh nhỏ hơn.');
+          input.value = '';
+          return;
+        }
+
+        // Kiểm tra định dạng ảnh
+        if (!file.type.startsWith('image/')) {
+          alert('⚠️ ĐỊNH DẠNG KHÔNG HỢP LỆ: Vui lòng chỉ chọn tệp hình ảnh (JPG, PNG, WEBP, GIF)!');
+          input.value = '';
+          return;
+        }
+
+        // Hiển thị xem trước ảnh ngay lập tức
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('previewThumb').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // 2. Tải và chèn ảnh minh họa trực tiếp vào nội dung bài viết (< 6MB)
+      function handleInlineImageUpload(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        // Kiểm tra dung lượng tối đa 6MB
+        if (file.size > MAX_FILE_SIZE) {
+          const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+          alert('⚠️ LỖI DUNG LƯỢNG: Ảnh minh họa có dung lượng ' + fileSizeMB + 'MB, vượt quá giới hạn tối đa 6MB!\nVui lòng chọn ảnh khác.');
+          input.value = '';
+          return;
+        }
+
+        // Kiểm tra định dạng
+        if (!file.type.startsWith('image/')) {
+          alert('⚠️ Vui lòng chỉ chọn tệp hình ảnh (JPG, PNG, WEBP, GIF)!');
+          input.value = '';
+          return;
+        }
+
+        const statusBox = document.getElementById('inlineUploadStatus');
+        const btnUpload = document.getElementById('btnUploadInline');
+        
+        statusBox.classList.remove('d-none');
+        statusBox.classList.add('d-flex');
+        btnUpload.disabled = true;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/admin/blogs/api/upload-image', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          statusBox.classList.add('d-none');
+          statusBox.classList.remove('d-flex');
+          btnUpload.disabled = false;
+          input.value = '';
+
+          if (data.success && data.imgTag) {
+            insertTagToTextarea('content', '\n' + data.imgTag + '\n');
+            alert('✅ Đã tải ảnh lên thành công và tự động chèn thẻ <img> vào nội dung bài viết!');
+          } else {
+            alert('❌ Lỗi tải ảnh: ' + (data.message || 'Không thể upload ảnh lên hệ thống.'));
+          }
+        })
+        .catch(err => {
+          statusBox.classList.add('d-none');
+          statusBox.classList.remove('d-flex');
+          btnUpload.disabled = false;
+          input.value = '';
+          alert('❌ Lỗi kết nối máy chủ: ' + err.message);
+        });
+      }
+
+      // Hàm chèn chuỗi HTML vào vị trí con trỏ chuột trong Textarea
+      function insertTagToTextarea(textareaId, textToInsert) {
+        const textarea = document.getElementById(textareaId);
+        if (!textarea) return;
+
+        const startPos = textarea.selectionStart;
+        const endPos = textarea.selectionEnd;
+        const currentVal = textarea.value;
+
+        textarea.value = currentVal.substring(0, startPos) + textToInsert + currentVal.substring(endPos, currentVal.length);
+        textarea.focus();
+        textarea.selectionStart = startPos + textToInsert.length;
+        textarea.selectionEnd = startPos + textToInsert.length;
+      }
+    </script>
   </body>
 </html>

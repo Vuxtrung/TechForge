@@ -147,6 +147,61 @@ public class CartController {
         return response;
     }
 
+    /**
+     * API Thêm hàng loạt linh kiện PC vào giỏ hàng trong một lượt
+     */
+    @PostMapping("/api/add-multiple")
+    @ResponseBody
+    public java.util.Map<String, Object> addToCartMultipleApi(@RequestBody List<CartItemDTO> items,
+                                                              HttpSession session) {
+        List<CartItemDTO> cartItems = getCartFromSession(session);
+
+        if (items != null) {
+            for (CartItemDTO newItem : items) {
+                if (newItem.getProductId() == null) continue;
+
+                boolean found = false;
+                for (CartItemDTO existing : cartItems) {
+                    if (existing.getProductId() != null && existing.getProductId().equals(newItem.getProductId())) {
+                        existing.setQuantity(existing.getQuantity() + (newItem.getQuantity() != null ? newItem.getQuantity() : 1));
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    productRepository.findById(newItem.getProductId()).ifPresent(p -> {
+                        if (newItem.getProductName() == null || newItem.getProductName().isEmpty()) {
+                            newItem.setProductName(p.getName());
+                        }
+                        if (newItem.getPrice() == null) {
+                            newItem.setPrice(p.getBasePrice() != null ? p.getBasePrice().doubleValue() : 0.0);
+                        }
+                        if (newItem.getImageUrl() == null || newItem.getImageUrl().isEmpty()) {
+                            newItem.setImageUrl(p.getPrimaryImageUrl() != null ? p.getPrimaryImageUrl() : "");
+                        }
+                    });
+                    if (newItem.getQuantity() == null || newItem.getQuantity() <= 0) {
+                        newItem.setQuantity(1);
+                    }
+                    cartItems.add(newItem);
+                }
+            }
+        }
+
+        session.setAttribute(CART_SESSION_KEY, cartItems);
+
+        int totalItemCount = 0;
+        for (CartItemDTO item : cartItems) {
+            totalItemCount += item.getQuantity();
+        }
+
+        java.util.Map<String, Object> response = new java.util.HashMap<>();
+        response.put("success", true);
+        response.put("cartSize", totalItemCount);
+        response.put("message", "Đã thêm toàn bộ linh kiện vào giỏ hàng!");
+        return response;
+    }
+
     // 3. Cập nhật số lượng sản phẩm (Update Quantity)
     @PostMapping("/update")
     public String updateQuantity(@RequestParam("productId") Long productId,
