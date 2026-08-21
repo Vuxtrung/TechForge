@@ -206,12 +206,18 @@ function renderBuildSummary() {
 
     document.getElementById('totalPrice').innerText = formatCurrency(total);
     
+    const btnBuyNow = document.getElementById('btnBuyNow');
     const btnAddToCart = document.getElementById('btnAddToCart');
-    if (Object.keys(selectedComponents).length > 0) {
-        btnAddToCart.disabled = false;
-        btnAddToCart.onclick = addToCartAll;
-    } else {
-        btnAddToCart.disabled = true;
+    const hasItems = Object.keys(selectedComponents).length > 0;
+
+    if (btnBuyNow) {
+        btnBuyNow.disabled = !hasItems;
+        btnBuyNow.onclick = () => addComponentsToCart(true);
+    }
+
+    if (btnAddToCart) {
+        btnAddToCart.disabled = !hasItems;
+        btnAddToCart.onclick = () => addComponentsToCart(false);
     }
 }
 
@@ -271,28 +277,63 @@ function validateBuild() {
     .catch(err => console.error('Lỗi kiểm tra tương thích:', err));
 }
 
-function addToCartAll() {
+/**
+ * Thêm toàn bộ linh kiện đã chọn vào giỏ hàng và chuyển hướng
+ * @param {boolean} redirectToCheckout - true: chuyển đến /checkout, false: chuyển đến /cart
+ */
+function addComponentsToCart(redirectToCheckout) {
     const products = Object.values(selectedComponents);
     if (products.length === 0) return;
-    
-    const btn = document.getElementById('btnAddToCart');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ĐANG THÊM...`;
-    btn.disabled = true;
 
-    // Gọi hàm addToCartAjax dùng chung của hệ thống (trong header.html) cho từng linh kiện
-    products.forEach(p => {
-        if (typeof addToCartAjax === 'function') {
-            addToCartAjax(p.productId, p.name, p.basePrice, p.primaryImageUrl || '', 1);
+    const btnBuyNow = document.getElementById('btnBuyNow');
+    const btnAddToCart = document.getElementById('btnAddToCart');
+
+    if (btnBuyNow) btnBuyNow.disabled = true;
+    if (btnAddToCart) btnAddToCart.disabled = true;
+
+    if (redirectToCheckout && btnBuyNow) {
+        btnBuyNow.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span> ĐANG CHUYỂN ĐẾN THANH TOÁN...`;
+    } else if (btnAddToCart) {
+        btnAddToCart.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span> ĐANG THÊM VÀO GIỎ...`;
+    }
+
+    const payload = products.map(p => ({
+        productId: p.productId,
+        productName: p.name,
+        price: p.basePrice,
+        imageUrl: p.primaryImageUrl || '',
+        quantity: 1
+    }));
+
+    fetch('/cart/api/add-multiple', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (redirectToCheckout) {
+            window.location.href = '/checkout';
+        } else {
+            window.location.href = '/cart';
         }
+    })
+    .catch(err => {
+        console.error('Error adding components to cart via bulk API:', err);
+        // Fallback gọi addToCartAjax hoặc /cart/api/add
+        products.forEach(p => {
+            if (typeof addToCartAjax === 'function') {
+                addToCartAjax(p.productId, p.name, p.basePrice, p.primaryImageUrl || '', 1);
+            }
+        });
+        setTimeout(() => {
+            if (redirectToCheckout) {
+                window.location.href = '/checkout';
+            } else {
+                window.location.href = '/cart';
+            }
+        }, 800);
     });
-
-    // Sau khi ném hết các request đi, chờ 1 chút cho đẹp UI rồi chuyển hướng
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-        
-        // Vẫn giữ lại tính năng chuyển hướng đến giỏ hàng
-        window.location.href = '/cart';
-    }, 1000);
 }

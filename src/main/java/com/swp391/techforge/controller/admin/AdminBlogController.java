@@ -32,6 +32,9 @@ public class AdminBlogController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.swp391.techforge.service.product.CloudinaryService cloudinaryService;
+
     /**
      * Màn hình danh sách bài viết: Tìm kiếm, lọc theo danh mục/trạng thái, sắp xếp, phân trang và thao tác nhanh
      */
@@ -83,7 +86,7 @@ public class AdminBlogController {
     }
 
     /**
-     * Tiếp nhận và xử lý thêm mới bài viết
+     * Tiếp nhận và xử lý thêm mới bài viết (Validate ảnh <= 6MB)
      */
     @PostMapping("/new")
     public String createBlog(
@@ -92,6 +95,17 @@ public class AdminBlogController {
             Principal principal,
             RedirectAttributes redirectAttributes,
             Model model) {
+
+        // Validate file ảnh đại diện (nếu có upload) <= 6MB
+        if (request.getThumbnailFile() != null && !request.getThumbnailFile().isEmpty()) {
+            if (request.getThumbnailFile().getSize() > 6 * 1024 * 1024) {
+                bindingResult.rejectValue("thumbnailFile", "error.thumbnailFile", "Kích thước ảnh đại diện phải dưới 6MB!");
+            }
+            String contentType = request.getThumbnailFile().getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                bindingResult.rejectValue("thumbnailFile", "error.thumbnailFile", "Định dạng file không hợp lệ! Vui lòng chọn tệp ảnh (JPG, PNG, WEBP, GIF).");
+            }
+        }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", blogService.getAllCategories());
@@ -102,6 +116,12 @@ public class AdminBlogController {
         }
 
         try {
+            // Upload ảnh lên Cloudinary nếu có file được chọn
+            if (request.getThumbnailFile() != null && !request.getThumbnailFile().isEmpty()) {
+                String uploadedUrl = cloudinaryService.uploadImage(request.getThumbnailFile(), "techforge/blogs");
+                request.setThumbnailUrl(uploadedUrl);
+            }
+
             User author = null;
             if (principal != null) {
                 author = userRepository.findByEmail(principal.getName()).orElse(null);
@@ -157,7 +177,7 @@ public class AdminBlogController {
     }
 
     /**
-     * Xử lý cập nhật thông tin bài viết
+     * Xử lý cập nhật thông tin bài viết (Validate ảnh <= 6MB)
      */
     @PostMapping("/{id}/edit")
     public String updateBlog(
@@ -167,6 +187,17 @@ public class AdminBlogController {
             Principal principal,
             RedirectAttributes redirectAttributes,
             Model model) {
+
+        // Validate file ảnh đại diện (nếu có upload) <= 6MB
+        if (request.getThumbnailFile() != null && !request.getThumbnailFile().isEmpty()) {
+            if (request.getThumbnailFile().getSize() > 6 * 1024 * 1024) {
+                bindingResult.rejectValue("thumbnailFile", "error.thumbnailFile", "Kích thước ảnh đại diện phải dưới 6MB!");
+            }
+            String contentType = request.getThumbnailFile().getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                bindingResult.rejectValue("thumbnailFile", "error.thumbnailFile", "Định dạng file không hợp lệ! Vui lòng chọn tệp ảnh (JPG, PNG, WEBP, GIF).");
+            }
+        }
 
         if (bindingResult.hasErrors()) {
             Blog blog = blogService.getBlogById(id);
@@ -179,6 +210,12 @@ public class AdminBlogController {
         }
 
         try {
+            // Upload ảnh mới nếu người dùng chọn file
+            if (request.getThumbnailFile() != null && !request.getThumbnailFile().isEmpty()) {
+                String uploadedUrl = cloudinaryService.uploadImage(request.getThumbnailFile(), "techforge/blogs");
+                request.setThumbnailUrl(uploadedUrl);
+            }
+
             User updater = null;
             if (principal != null) {
                 updater = userRepository.findByEmail(principal.getName()).orElse(null);
@@ -197,6 +234,49 @@ public class AdminBlogController {
             model.addAttribute("formTitle", "Chi Tiết & Chỉnh Sửa Bài Viết #" + id);
             model.addAttribute("isEditMode", true);
             return "admin/blog-form";
+        }
+    }
+
+    /**
+     * API upload ảnh minh họa bài viết lên Cloudinary và trả về thẻ <img> chuẩn
+     * Kiểm tra chặt chẽ dung lượng tối đa 6MB và định dạng MIME type hợp lệ
+     */
+    @PostMapping("/api/upload-image")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<?> uploadInlineImage(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        
+        if (file == null || file.isEmpty()) {
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(java.util.Map.of("success", false, "message", "Vui lòng chọn tệp ảnh để tải lên!"));
+        }
+
+        // Kiểm tra dung lượng tối đa 6MB
+        long maxSize = 6 * 1024 * 1024;
+        if (file.getSize() > maxSize) {
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(java.util.Map.of("success", false, "message", "Kích thước ảnh vượt quá giới hạn 6MB (Dung lượng: " + String.format("%.2f", (double) file.getSize() / (1024 * 1024)) + "MB)!"));
+        }
+
+        // Kiểm tra định dạng ảnh hợp lệ
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(java.util.Map.of("success", false, "message", "Định dạng tệp không hợp lệ! Vui lòng chọn file hình ảnh (JPG, PNG, WEBP, GIF)."));
+        }
+
+        try {
+            String imageUrl = cloudinaryService.uploadImage(file, "techforge/blogs");
+            String imgTag = "<img src=\"" + imageUrl + "\" class=\"img-fluid rounded my-3 shadow-sm\" alt=\"Hình ảnh minh họa TechForge\">";
+            
+            return org.springframework.http.ResponseEntity.ok(java.util.Map.of(
+                    "success", true,
+                    "url", imageUrl,
+                    "imgTag", imgTag
+            ));
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.internalServerError()
+                    .body(java.util.Map.of("success", false, "message", "Lỗi tải ảnh lên Cloudinary: " + e.getMessage()));
         }
     }
 
