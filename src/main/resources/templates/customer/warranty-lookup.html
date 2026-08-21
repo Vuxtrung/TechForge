@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header-head}">
+    <title>Tra cứu bảo hành 1 đổi 1 - TechForge</title>
+</head>
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<main class="container-fluid px-lg-5 py-4 bg-light min-vh-100">
+    <div class="row justify-content-center">
+        <div class="col-xl-9 col-lg-10">
+            <div class="mb-4">
+                <span class="text-success fw-semibold"><i class="bi bi-shield-check me-1"></i>CHÍNH SÁCH BẢO HÀNH</span>
+                <h1 class="display-6 fw-bold mt-2">Tra cứu bảo hành 1 đổi 1</h1>
+                <p class="text-muted mb-0">Nhập IMEI, Serial hoặc số điện thoại đã đăng ký để kiểm tra tiến độ bảo hành.</p>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form th:action="@{/warranty-lookup}" method="get" class="row g-3 align-items-end">
+                        <div class="col-md-9">
+                            <label for="query" class="form-label fw-semibold">IMEI / Serial / Số điện thoại</label>
+                            <input id="query" name="query" type="search" class="form-control form-control-lg" th:value="${query}" placeholder="Ví dụ: ABC123 hoặc 0988888888" required>
+                        </div>
+                        <div class="col-md-3 d-grid">
+                            <button class="btn btn-success btn-lg" type="submit"><i class="bi bi-search me-1"></i>Tra cứu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-warning" th:text="${errorMessage}"></div>
+            <div th:if="${tickets != null and !tickets.isEmpty()}">
+                <h2 class="h5 mb-3">Kết quả tra cứu</h2>
+                <div class="card border-0 shadow-sm mb-3" th:each="ticket : ${tickets}">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <div>
+                                <div class="text-muted small">Mã phiếu</div>
+                                <h3 class="h5 mb-0" th:text="${'#' + ticket.ticketId}"></h3>
+                            </div>
+                            <span class="badge bg-primary fs-6" th:text="${ticket.status}"></span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6"><small class="text-muted d-block">IMEI / Serial</small><strong th:text="${ticket.imeiSerial}"></strong></div>
+                            <div class="col-md-6"><small class="text-muted d-block">Ngày tiếp nhận</small><span th:text="${#temporals.format(ticket.createdAt, 'dd/MM/yyyy HH:mm')}"></span></div>
+                            <div class="col-md-6"><small class="text-muted d-block">Nhân viên phụ trách</small><span th:text="${ticket.assignedStaff != null ? ticket.assignedStaff.fullName : 'Đang chờ phân công'}"></span></div>
+                            <div class="col-md-6"><small class="text-muted d-block">Ngày hoàn tất</small><span th:text="${ticket.resolvedAt != null ? #temporals.format(ticket.resolvedAt, 'dd/MM/yyyy HH:mm') : 'Đang xử lý'}"></span></div>
+                            <div class="col-12"><small class="text-muted d-block">Tình trạng tiếp nhận</small><span th:text="${ticket.issueDesc != null ? ticket.issueDesc : 'Thông tin đang được cập nhật'}"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border rounded-3 p-4 mt-4">
+                <h2 class="h6 fw-bold"><i class="bi bi-info-circle text-success me-1"></i>Lưu ý</h2>
+                <p class="text-muted small mb-0">Nếu thông tin chưa hiển thị hoặc cần hỗ trợ thêm, vui lòng liên hệ hotline bảo hành 0988.882.838.</p>
+            </div>
+        </div>
+    </div>
+</main>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

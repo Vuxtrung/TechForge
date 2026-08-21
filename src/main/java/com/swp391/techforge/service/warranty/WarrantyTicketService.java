@@ -3,7 +3,9 @@ package com.swp391.techforge.service.warranty;
 import com.swp391.techforge.entity.User;
 import com.swp391.techforge.entity.WarrantyTicket;
 import com.swp391.techforge.entity.WarrantyTicketStatus;
+import com.swp391.techforge.entity.OrderItem;
 import com.swp391.techforge.repository.authentication.UserRepository;
+import com.swp391.techforge.repository.order.OrderItemRepository;
 import com.swp391.techforge.repository.warranty.WarrantyTicketRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,11 +22,14 @@ public class WarrantyTicketService {
 
     private final WarrantyTicketRepository warrantyTicketRepository;
     private final UserRepository userRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public WarrantyTicketService(WarrantyTicketRepository warrantyTicketRepository,
-                                UserRepository userRepository) {
+                                UserRepository userRepository,
+                                OrderItemRepository orderItemRepository) {
         this.warrantyTicketRepository = warrantyTicketRepository;
         this.userRepository = userRepository;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +67,11 @@ public class WarrantyTicketService {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiếu bảo hành."));
     }
 
+    @Transactional(readOnly = true)
+    public List<WarrantyTicket> lookupForCustomer(String query) {
+        return warrantyTicketRepository.findByImeiSerialIgnoreCaseOrPhoneLookup(query, query);
+    }
+
     @Transactional
     public WarrantyTicket receiveProduct(Long userId, String imeiSerial, String phoneLookup,
                                         String issueDesc, Long orderItemId) {
@@ -74,6 +84,28 @@ public class WarrantyTicketService {
         ticket.setPhoneLookup(phoneLookup);
         ticket.setIssueDesc(issueDesc);
         ticket.setOrderItemId(orderItemId);
+        ticket.setStatus(WarrantyTicketStatus.SUBMITTED);
+        return warrantyTicketRepository.save(ticket);
+    }
+
+    @Transactional
+    public WarrantyTicket createForCustomer(Long orderItemId, User customer, String imeiSerial, String issueDesc) {
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy sản phẩm trong đơn hàng."));
+        if (customer == null || orderItem.getOrder() == null || orderItem.getOrder().getUser() == null
+                || !orderItem.getOrder().getUser().getUserId().equals(customer.getUserId())) {
+            throw new IllegalArgumentException("Bạn không có quyền tạo phiếu cho sản phẩm này.");
+        }
+        if (imeiSerial == null || imeiSerial.isBlank()) {
+            throw new IllegalArgumentException("Vui lòng nhập IMEI hoặc Serial của sản phẩm.");
+        }
+
+        WarrantyTicket ticket = new WarrantyTicket();
+        ticket.setUser(customer);
+        ticket.setOrderItemId(orderItemId);
+        ticket.setImeiSerial(imeiSerial.trim());
+        ticket.setPhoneLookup(customer.getPhone());
+        ticket.setIssueDesc(issueDesc);
         ticket.setStatus(WarrantyTicketStatus.SUBMITTED);
         return warrantyTicketRepository.save(ticket);
     }
