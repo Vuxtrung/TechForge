@@ -8,15 +8,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.swp391.techforge.repository.authentication.UserRepository;
 
 @Controller
 @RequestMapping("/customer/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final UserRepository userRepository;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService, UserRepository userRepository) {
         this.reviewService = reviewService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/add")
@@ -24,10 +27,14 @@ public class ReviewController {
                             @RequestParam("orderId") Long orderId,
                             @RequestParam("rating") Integer rating,
                             @RequestParam("comment") String comment,
-                            HttpSession session,
+                            java.security.Principal principal,
                             RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        User loggedInUser = userRepository.findByEmail(principal.getName()).orElse(null);
         if (loggedInUser == null) {
             return "redirect:/login";
         }
