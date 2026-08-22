@@ -73,6 +73,7 @@ public class AddressService {
         userAddressRepository.save(address);
     }
 
+    @SuppressWarnings("null")
     @Transactional
     public void setDefaultAddress(Long userId, Long addressId) {
         UserAddress address = userAddressRepository.findByAddressIdAndUserUserId(addressId, userId)

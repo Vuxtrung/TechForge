@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/header :: header-head}">
+<head>
     <meta charset="UTF-8">
     <title>Liên hệ - TechForge</title>
+    <th:block th:replace="~{fragments/header :: header-head}"></th:block>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body>
@@ -36,9 +38,9 @@
         <div class="row justify-content-center">
             <div class="col-6 bg-white rounded-3 shadow-sm border p-4 h-100">
                 <h5 class="fw-bold text-dark mb-3">
-                            <i class="bi bi-feather text-danger me-2"></i>
-                            Điền thông tin liên hệ
-                        </h5>
+                    <i class="bi bi-feather text-danger me-2"></i>
+                    Điền thông tin liên hệ
+                </h5>
                 <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
                 <form th:action="@{/contact}" th:object="${contactRequest}" method="post">
                     <div class="form-group">
@@ -64,6 +66,11 @@
                         <textarea th:field="*{message}" rows="5" required></textarea>
                         <div th:if="${#fields.hasErrors('message')}" class="text-danger" th:errors="*{message}"></div>
                     </div>
+
+                    <div class="g-recaptcha mt-3" data-sitekey="6LdM0JMtAAAAALGE3bOz-GHS9v1vP29N5OgBOk8q"></div>
+                    <div th:if="${#fields.hasErrors('global')}" style="color: red;">
+                    </div>
+                    <p th:if="${param.error}" style="color: red;" th:text="'Xác thực captcha thất bại!'"></p>
 
                     <button type="submit" class="btn btn-danger w-100 fw-bold py-2 shadow-sm mt-3">Gửi liên hệ</button>
                 </form>

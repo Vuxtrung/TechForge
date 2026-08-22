@@ -3,11 +3,8 @@ package com.swp391.techforge.controller.authentication;
 import com.swp391.techforge.dto.account.AccountAddressRequest;
 import com.swp391.techforge.dto.account.AccountInfoRequest;
 import com.swp391.techforge.dto.account.ChangePasswordRequest;
-import com.swp391.techforge.entity.AddressType;
 import com.swp391.techforge.entity.Order;
 import com.swp391.techforge.entity.User;
-import com.swp391.techforge.entity.UserAddress;
-import com.swp391.techforge.repository.authentication.UserAddressRepository;
 import com.swp391.techforge.service.authentication.AddressService;
 import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.service.order.OrderService;
@@ -141,16 +138,6 @@ public class AccountController {
 
         redirectAttributes.addFlashAttribute("successMessage", "Đã xoá địa chỉ thành công");
         return "redirect:/account?view=addresses";
-    }
-
-    private void setDefaultAddress(Long userId, UserAddress address) {
-        userAddressRepository.findByUserUserIdAndIsDefaultTrue(userId)
-                .filter(current -> !current.getAddressId().equals(address.getAddressId()))
-                .ifPresent(current -> {
-                    current.setDefault(false);
-                    userAddressRepository.saveAndFlush(current);
-                });
-        address.setDefault(true);
     }
 
     private void prepareAddressView(Model model, User user, Long addressId, String mode) {

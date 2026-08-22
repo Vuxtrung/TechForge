@@ -3,6 +3,9 @@ package com.swp391.techforge.controller.admin;
 import com.swp391.techforge.dto.contact.ContactRequest;
 import com.swp391.techforge.entity.Contact;
 import com.swp391.techforge.repository.contact.ContactRepository;
+import com.swp391.techforge.service.contact.CaptchaService;
+import com.swp391.techforge.service.contact.ContactRateLimiterService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -30,18 +34,39 @@ public class ContactController {
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private ContactRateLimiterService rateLimiterService;
+
+    @Autowired
+    private CaptchaService captchaService;
+
     @GetMapping("/contact")
     public String showContactPage(Model model) {
-        // model.addAttribute("contactRequest", new ContactRequest());
-        return "redirect:/";
+        model.addAttribute("contactRequest", new ContactRequest());
+        return "contact";
     }
 
     @PostMapping("/contact")
     public String submitContact(@Valid @ModelAttribute("contactRequest") ContactRequest request,
-            BindingResult bindingResult,
+            BindingResult bindingResult, HttpServletRequest httpRequest,
+            @RequestParam(value = "g-recaptcha-response", required = false) String recaptchaResponse,
             Model model) {
+
+        if (!captchaService.verifyCaptcha(recaptchaResponse)) {
+            bindingResult.reject("recaptcha", "Vui lòng xác nhận lại bạn không phải là người máy.");
+        }
+
         if (bindingResult.hasErrors()) {
             return "contact";
+        }
+
+        String clientIp = httpRequest.getHeader("X-Forwarded-For");
+        if (clientIp == null || clientIp.isEmpty()) {
+            clientIp = httpRequest.getRemoteAddr();
+        }
+
+        if (!rateLimiterService.isAllowed(clientIp)) {
+            bindingResult.reject("rateLimit", "Bạn đang gửi liên hệ quá nhanh. Vui lòng thử lại sau 1 phút.");
         }
 
         Contact contact = new Contact();
