@@ -8,6 +8,7 @@ import com.swp391.techforge.entity.Order;
 import com.swp391.techforge.entity.User;
 import com.swp391.techforge.entity.UserAddress;
 import com.swp391.techforge.repository.authentication.UserAddressRepository;
+import com.swp391.techforge.service.authentication.AddressService;
 import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.service.product.CloudinaryService;
@@ -20,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,16 +34,16 @@ public class AccountController {
     private static final Set<String> ALLOWED_VIEWS = Set.of("info", "addresses", "orders", "password");
 
     private final UserRepository userRepository;
-    private final UserAddressRepository userAddressRepository;
+    private final AddressService addressService;
     private final CloudinaryService cloudinaryService;
     private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
 
-    public AccountController(UserRepository userRepository, UserAddressRepository userAddressRepository,
+    public AccountController(UserRepository userRepository, AddressService addressService,
             CloudinaryService cloudinaryService, OrderService orderService,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.userAddressRepository = userAddressRepository;
+        this.addressService = addressService;
         this.cloudinaryService = cloudinaryService;
         this.orderService = orderService;
         this.passwordEncoder = passwordEncoder;
@@ -60,29 +62,11 @@ public class AccountController {
         model.addAttribute("view", ALLOWED_VIEWS.contains(view) ? view : null);
 
         if ("addresses".equals(view)) {
-            List<UserAddress> addresses = userAddressRepository
-                    .findByUserUserIdOrderByIsDefaultDescAddressIdDesc(user.getUserId());
-            model.addAttribute("addresses", addresses);
+            model.addAttribute("addresses", addressService.getAddressesForUser(user.getUserId()));
 
             if (!model.containsAttribute("addressRequest")) {
                 AccountAddressRequest request = new AccountAddressRequest();
-                request.setRecipientName(user.getFullName());
-                request.setPhone(user.getPhone());
-                request.setType(AddressType.HOME.name());
-
-                if (addressId != null && ("edit".equals(mode) || "details".equals(mode))) {
-                    userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
-                            .ifPresent(address -> {
-                                request.setRecipientName(address.getRecipientName());
-                                request.setPhone(address.getPhone());
-                                request.setProvince(address.getProvince());
-                                request.setWard(address.getWard());
-                                request.setAddressLine(address.getAddressLine());
-                                request.setType(address.getType().name());
-                                request.setDefaultAddress(address.isDefault());
-                            });
-                }
-
+                addressService.prepareAddressRequest(request, user, addressId, mode);
                 model.addAttribute("addressRequest", request);
             }
 
@@ -111,12 +95,12 @@ public class AccountController {
     }
 
     @PostMapping("/addresses/save")
-    @Transactional
     public String saveAddress(
             @RequestParam(value = "addressId", required = false) Long addressId,
             @Valid @ModelAttribute("addressRequest") AccountAddressRequest request,
             BindingResult bindingResult,
             Authentication authentication,
+            RedirectAttributes redirectAttributes,
             Model model) {
 
         User user = userRepository.findByEmail(authentication.getName())
@@ -127,65 +111,35 @@ public class AccountController {
             return "account";
         }
 
-        UserAddress address;
-
-        if (addressId == null) {
-            address = new UserAddress();
-            address.setUser(user);
-        } else {
-            address = userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
-                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy địa chỉ"));
-        }
-
-        address.setRecipientName(request.getRecipientName());
-        address.setPhone(request.getPhone());
-        address.setProvince(request.getProvince());
-        address.setWard(request.getWard());
-        address.setAddressLine(request.getAddressLine());
-        address.setType(AddressType.valueOf(request.getType()));
-
-        if (request.isDefaultAddress()) {
-            setDefaultAddress(user.getUserId(), address);
-        } else if (addressId == null
-                && userAddressRepository.findByUserUserIdAndIsDefaultTrue(user.getUserId()).isEmpty()) {
-            address.setDefault(true);
-        }
-
-        userAddressRepository.save(address);
-
+        addressService.saveAddress(user.getUserId(), addressId, request);
+        redirectAttributes.addFlashAttribute("successMessage", "Lưu địa chỉ thành công");
         return "redirect:/account?view=addresses";
     }
 
-    @SuppressWarnings("null")
     @PostMapping("/addresses/{addressId}/default")
     @Transactional
     public String setDefault(@PathVariable Long addressId, Authentication authentication) {
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
-        UserAddress address = userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy địa chỉ"));
-
-        setDefaultAddress(user.getUserId(), address);
-        userAddressRepository.save(address);
+        addressService.setDefaultAddress(user.getUserId(), addressId);
 
         return "redirect:/account?view=addresses";
     }
 
     @PostMapping("/addresses/{addressId}/delete")
-    @Transactional
-    public String deleteAddress(@PathVariable Long addressId, Authentication authentication) {
+    public String deleteAddress(@PathVariable Long addressId, Authentication authentication,
+            RedirectAttributes redirectAttributes) {
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
-        UserAddress address = userAddressRepository.findByAddressIdAndUserUserId(addressId, user.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy địa chỉ"));
+        boolean isDeleted = addressService.deleteAddress(user.getUserId(), addressId);
 
-        if (address.isDefault()) {
+        if (!isDeleted) {
             return "redirect:/account?view=addresses&error=default";
         }
 
-        userAddressRepository.delete(address);
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xoá địa chỉ thành công");
         return "redirect:/account?view=addresses";
     }
 
@@ -202,8 +156,7 @@ public class AccountController {
     private void prepareAddressView(Model model, User user, Long addressId, String mode) {
         model.addAttribute("user", user);
         model.addAttribute("view", "addresses");
-        model.addAttribute("addresses",
-                userAddressRepository.findByUserUserIdOrderByIsDefaultDescAddressIdDesc(user.getUserId()));
+        model.addAttribute("addresses", addressService.getAddressesForUser(user.getUserId()));
         model.addAttribute("selectedAddressId", addressId);
         model.addAttribute("addressMode", mode);
     }
