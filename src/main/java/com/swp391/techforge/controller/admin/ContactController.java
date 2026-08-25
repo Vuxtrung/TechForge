@@ -29,14 +29,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 @Controller
 public class ContactController {
 
-    private static final Set<String> ALLOWED_SORT_FIELDS =
-            Set.of("createdAt", "fullName", "email", "subject", "status");
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt", "fullName", "email", "subject",
+            "status");
 
     @Autowired
     private ContactRepository contactRepository;
@@ -162,16 +161,18 @@ public class ContactController {
         }
         contactRepository.save(contact);
 
-        String redirectUrl = UriComponentsBuilder.fromPath("/admin/contacts")
-                .queryParamIfPresent("keyword", Optional.ofNullable(keyword))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/admin/contacts")
                 .queryParam("status", status)
                 .queryParam("sortBy", sortBy)
                 .queryParam("direction", direction)
                 .queryParam("page", page)
-                .queryParam("size", size)
-                .build().toUriString();
+                .queryParam("size", size);
 
-        return "redirect:" + redirectUrl;
+        if (StringUtils.hasText(keyword)) {
+            builder.queryParam("keyword", keyword);
+        }
+
+        return "redirect:" + builder.build().toUriString();
     }
 
     @PostMapping("/admin/contacts/{id}/reply")
