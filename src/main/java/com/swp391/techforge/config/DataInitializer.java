@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Component
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializer {
 
         private final UserRepository userRepository;
         private final RoleRepository roleRepository;
@@ -69,76 +69,82 @@ public class DataInitializer implements CommandLineRunner {
                 this.blogRepository = blogRepository;
         }
 
-        @Override
-        @org.springframework.transaction.annotation.Transactional
-        public void run(String... args) throws Exception {
-                createRoleIfNotFound(1, "GUEST");
-                createRoleIfNotFound(2, "CUSTOMER");
-                createRoleIfNotFound(3, "STAFF_SALES");
-                createRoleIfNotFound(4, "STAFF_WARRANTY");
-                createRoleIfNotFound(5, "ADMIN");
+        // @Override
+        // @org.springframework.transaction.annotation.Transactional
+        // public void run(String... args) throws Exception {
+        // createRoleIfNotFound(1, "GUEST");
+        // createRoleIfNotFound(2, "CUSTOMER");
+        // createRoleIfNotFound(3, "STAFF_SALES");
+        // createRoleIfNotFound(4, "STAFF_WARRANTY");
+        // createRoleIfNotFound(5, "ADMIN");
 
-                User adminUser = userRepository.findByEmail("admin@techforge.com").orElse(null);
-                Role adminRole = roleRepository.findByRoleName("ADMIN").orElse(null);
+        // User adminUser =
+        // userRepository.findByEmail("admin@techforge.com").orElse(null);
+        // Role adminRole = roleRepository.findByRoleName("ADMIN").orElse(null);
 
-                if (adminUser == null) {
-                        adminUser = new User();
-                        adminUser.setEmail("admin@techforge.com");
-                }
-                adminUser.setRole(adminRole);
-                adminUser.setFullName("TechForge Admin");
-                adminUser.setPasswordHash(passwordEncoder.encode("123456"));
-                adminUser.setPhone("0988888888");
-                adminUser.setAddress("Hà Nội");
-                adminUser.setStatus(UserStatus.ACTIVE);
-                userRepository.save(adminUser);
+        // if (adminUser == null) {
+        // adminUser = new User();
+        // adminUser.setEmail("admin@techforge.com");
+        // }
+        // adminUser.setRole(adminRole);
+        // adminUser.setFullName("TechForge Admin");
+        // adminUser.setPasswordHash(passwordEncoder.encode("123456"));
+        // adminUser.setPhone("0988888888");
+        // adminUser.setAddress("Hà Nội");
+        // adminUser.setStatus(UserStatus.ACTIVE);
+        // userRepository.save(adminUser);
 
-                Role staffSalesRole = roleRepository.findByRoleName("STAFF_SALES").orElse(null);
-                User staffUser = userRepository.findByEmail("sales01@techforge.com").orElse(null);
-                if (staffUser == null) {
-                        staffUser = new User();
-                        staffUser.setEmail("sales01@techforge.com");
-                }
-                staffUser.setRole(staffSalesRole);
-                staffUser.setFullName("Nhân Viên Sales");
-                staffUser.setPasswordHash(passwordEncoder.encode("123456"));
-                staffUser.setPhone("0911111111");
-                staffUser.setAddress("Hà Nội");
-                staffUser.setStatus(UserStatus.ACTIVE);
-                userRepository.save(staffUser);
+        // Role staffSalesRole =
+        // roleRepository.findByRoleName("STAFF_SALES").orElse(null);
+        // User staffUser =
+        // userRepository.findByEmail("sales01@techforge.com").orElse(null);
+        // if (staffUser == null) {
+        // staffUser = new User();
+        // staffUser.setEmail("sales01@techforge.com");
+        // }
+        // staffUser.setRole(staffSalesRole);
+        // staffUser.setFullName("Nhân Viên Sales");
+        // staffUser.setPasswordHash(passwordEncoder.encode("123456"));
+        // staffUser.setPhone("0911111111");
+        // staffUser.setAddress("Hà Nội");
+        // staffUser.setStatus(UserStatus.ACTIVE);
+        // userRepository.save(staffUser);
 
-                Role staffWarrantyRole = roleRepository.findByRoleName("STAFF_WARRANTY").orElse(null);
-                User warrantyUser = userRepository.findByEmail("warranty01@techforge.com").orElse(null);
-                if (warrantyUser == null) {
-                        warrantyUser = new User();
-                        warrantyUser.setEmail("warranty01@techforge.com");
-                }
-                warrantyUser.setRole(staffWarrantyRole);
-                warrantyUser.setFullName("Nhân Viên Bảo Hành");
-                warrantyUser.setPasswordHash(passwordEncoder.encode("123456")); 
-                warrantyUser.setPhone("0922222222");
-                warrantyUser.setAddress("Hà Nội");
-                warrantyUser.setStatus(UserStatus.ACTIVE);
-                userRepository.save(warrantyUser);
+        // Role staffWarrantyRole =
+        // roleRepository.findByRoleName("STAFF_WARRANTY").orElse(null);
+        // User warrantyUser =
+        // userRepository.findByEmail("warranty01@techforge.com").orElse(null);
+        // if (warrantyUser == null) {
+        // warrantyUser = new User();
+        // warrantyUser.setEmail("warranty01@techforge.com");
+        // }
+        // warrantyUser.setRole(staffWarrantyRole);
+        // warrantyUser.setFullName("Nhân Viên Bảo Hành");
+        // warrantyUser.setPasswordHash(passwordEncoder.encode("123456"));
+        // warrantyUser.setPhone("0922222222");
+        // warrantyUser.setAddress("Hà Nội");
+        // warrantyUser.setStatus(UserStatus.ACTIVE);
+        // userRepository.save(warrantyUser);
 
-                User customerUser = userRepository.findByEmail("customer@techforge.com").orElse(null);
-                Role customerRole = roleRepository.findByRoleName("CUSTOMER").orElse(null);
+        // User customerUser =
+        // userRepository.findByEmail("customer@techforge.com").orElse(null);
+        // Role customerRole = roleRepository.findByRoleName("CUSTOMER").orElse(null);
 
-                if (customerUser == null) {
-                        customerUser = new User();
-                        customerUser.setEmail("customer@techforge.com");
-                }
-                customerUser.setRole(customerRole);
-                customerUser.setFullName("Khách Hàng Mẫu");
-                customerUser.setPasswordHash(passwordEncoder.encode("123456"));
-                customerUser.setPhone("0977777777");
-                customerUser.setAddress("Hà Nội");
-                customerUser.setStatus(UserStatus.ACTIVE);
-                userRepository.save(customerUser);
+        // if (customerUser == null) {
+        // customerUser = new User();
+        // customerUser.setEmail("customer@techforge.com");
+        // }
+        // customerUser.setRole(customerRole);
+        // customerUser.setFullName("Khách Hàng Mẫu");
+        // customerUser.setPasswordHash(passwordEncoder.encode("123456"));
+        // customerUser.setPhone("0977777777");
+        // customerUser.setAddress("Hà Nội");
+        // customerUser.setStatus(UserStatus.ACTIVE);
+        // userRepository.save(customerUser);
 
-                seedCategoriesAndProducts();
-                seedSampleBlogs(adminUser);
-        }
+        // seedCategoriesAndProducts();
+        // seedSampleBlogs(adminUser);
+        // }
 
         private void createRoleIfNotFound(Integer roleId, String roleName) {
                 Optional<Role> roleOpt = roleRepository.findByRoleName(roleName);
@@ -150,139 +156,180 @@ public class DataInitializer implements CommandLineRunner {
                 }
         }
 
-        private void seedCategoriesAndProducts() {
-                Category catPc = getOrCreateCategory("PC Gaming & Workstation",
-                                Category.CategoryType.PC_PRODUCT, Category.ComponentType.NONE, null);
-                Category catComponent = getOrCreateCategory("Linh Kiện Máy Tính",
-                                Category.CategoryType.PC_COMPONENT, Category.ComponentType.NONE, null);
+        // private void seedCategoriesAndProducts() {
+        // Category catPc = getOrCreateCategory("PC Gaming & Workstation",
+        // Category.CategoryType.PC_PRODUCT, Category.ComponentType.NONE, null);
+        // Category catComponent = getOrCreateCategory("Linh Kiện Máy Tính",
+        // Category.CategoryType.PC_COMPONENT, Category.ComponentType.NONE, null);
 
-                // 8 category con dùng đúng tên mà Build PC (buildpc.js -> CATEGORIES[].key)
-                // đang tìm bằng LIKE ở BuildPcApiController.getComponents(). Trước đây các
-                // category này không tồn tại nên các tab RAM/Mainboard/Nguồn/Ổ Cứng/Fan tản
-                // nhiệt/Vỏ máy luôn trống, còn CPU/VGA thì bị lệch vì sản phẩm lại gán vào
-                // category cha "Linh Kiện Máy Tính" thay vì category con tương ứng.
-                Category catCpu = getOrCreateCategory("CPU", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.CPU, catComponent);
-                Category catMainboard = getOrCreateCategory("Mainboard", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.MAINBOARD, catComponent);
-                Category catRam = getOrCreateCategory("RAM", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.RAM, catComponent);
-                Category catVga = getOrCreateCategory("VGA", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.GPU, catComponent);
-                Category catPsu = getOrCreateCategory("Nguồn", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.PSU, catComponent);
-                Category catStorage = getOrCreateCategory("Ổ Cứng", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.STORAGE, catComponent);
-                Category catCooler = getOrCreateCategory("Fan tản nhiệt", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.COOLER, catComponent);
-                Category catCase = getOrCreateCategory("Vỏ máy", Category.CategoryType.PC_COMPONENT,
-                                Category.ComponentType.CASE_TYPE, catComponent);
+        // 8 category con dùng đúng tên mà Build PC (buildpc.js -> CATEGORIES[].key)
+        // đang tìm bằng LIKE ở BuildPcApiController.getComponents(). Trước đây các
+        // category này không tồn tại nên các tab RAM/Mainboard/Nguồn/Ổ Cứng/Fan tản
+        // nhiệt/Vỏ máy luôn trống, còn CPU/VGA thì bị lệch vì sản phẩm lại gán vào
+        // category cha "Linh Kiện Máy Tính" thay vì category con tương ứng.
 
-                if (productRepository.count() > 0) {
-                        return;
-                }
+        // Category catCpu = getOrCreateCategory("CPU",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.CPU, catComponent);
+        // Category catMainboard = getOrCreateCategory("Mainboard",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.MAINBOARD, catComponent);
+        // Category catRam = getOrCreateCategory("RAM",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.RAM, catComponent);
+        // Category catVga = getOrCreateCategory("VGA",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.GPU, catComponent);
+        // Category catPsu = getOrCreateCategory("Nguồn",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.PSU, catComponent);
+        // Category catStorage = getOrCreateCategory("Ổ Cứng",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.STORAGE, catComponent);
+        // Category catCooler = getOrCreateCategory("Fan tản nhiệt",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.COOLER, catComponent);
+        // Category catCase = getOrCreateCategory("Vỏ máy",
+        // Category.CategoryType.PC_COMPONENT,
+        // Category.ComponentType.CASE_TYPE, catComponent);
 
-                createProduct("PC TechForge Ultra Gaming i9-14900K / RTX 4090 24GB",
-                                "Cấu hình gaming đồ họa đỉnh cao 2026, trang bị vi xử lý Intel i9 14900K, VGA ASUS ROG Strix RTX 4090 24GB, RAM 64GB DDR5, SSD 2TB Gen4.",
-                                BigDecimal.valueOf(89990000), 15,
-                                "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800", catPc);
+        // if (productRepository.count() > 0) {
+        // return;
+        // }
 
-                createProduct("PC TechForge Vanguard i7-14700K / RTX 4070 Ti Super",
-                                "Cấu hình gaming chuyên nghiệp 2K/4K, i7 14700K, RTX 4070 Ti Super 16GB, RAM 32GB DDR5, Tản nhiệt nước AIO 360mm.",
-                                BigDecimal.valueOf(49990000), 25,
-                                "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800", catPc);
+        // createProduct("PC TechForge Ultra Gaming i9-14900K / RTX 4090 24GB",
+        // "Cấu hình gaming đồ họa đỉnh cao 2026, trang bị vi xử lý Intel i9 14900K, VGA
+        // ASUS ROG Strix RTX 4090 24GB, RAM 64GB DDR5, SSD 2TB Gen4.",
+        // BigDecimal.valueOf(89990000), 15,
+        // "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800", catPc);
 
-                createProduct("PC TechForge Streamer Ryzen 7 7800X3D / RTX 4070",
-                                "Cấu hình livestream esport đỉnh cao, chip AMD Ryzen 7 7800X3D chuyên game, RTX 4070 12GB, RAM 32GB Bus 6000MHz.",
-                                BigDecimal.valueOf(39990000), 30,
-                                "https://images.unsplash.com/photo-1547082297-819692d51857?w=800", catPc);
+        // createProduct("PC TechForge Vanguard i7-14700K / RTX 4070 Ti Super",
+        // "Cấu hình gaming chuyên nghiệp 2K/4K, i7 14700K, RTX 4070 Ti Super 16GB, RAM
+        // 32GB DDR5, Tản nhiệt nước AIO 360mm.",
+        // BigDecimal.valueOf(49990000), 25,
+        // "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800", catPc);
 
-                createProduct("PC TechForge Office Pro i5-13400 / 16GB RAM / 512GB SSD",
-                                "Máy tính văn phòng học tập doanh nghiệp siêu bền bỉ, Intel Core i5 13400, RAM 16GB, SSD NVMe 512GB siêu tốc.",
-                                BigDecimal.valueOf(12990000), 50,
-                                "https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800", catPc);
+        // createProduct("PC TechForge Streamer Ryzen 7 7800X3D / RTX 4070",
+        // "Cấu hình livestream esport đỉnh cao, chip AMD Ryzen 7 7800X3D chuyên game,
+        // RTX 4070 12GB, RAM 32GB Bus 6000MHz.",
+        // BigDecimal.valueOf(39990000), 30,
+        // "https://images.unsplash.com/photo-1547082297-819692d51857?w=800", catPc);
 
-                // ==== Linh kiện rời cho Build PC — mỗi sản phẩm kèm 1 row bảng con tương
-                // ứng để CompatibilityService có dữ liệu thật để test đủ 7 rule ====
+        // createProduct("PC TechForge Office Pro i5-13400 / 16GB RAM / 512GB SSD",
+        // "Máy tính văn phòng học tập doanh nghiệp siêu bền bỉ, Intel Core i5 13400,
+        // RAM 16GB, SSD NVMe 512GB siêu tốc.",
+        // BigDecimal.valueOf(12990000), 50,
+        // "https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800", catPc);
 
-                Product cpu1 = createProduct("CPU Intel Core i9-14900K (Up to 6.0GHz, 24 Nhân 32 Luồng)",
-                                "Bộ vi xử lý flagship thế hệ 14 của Intel, xung nhịp turbo lên tới 6.0GHz, xử lý đồ họa render 3D siêu tốc.",
-                                BigDecimal.valueOf(15490000), 40,
-                                "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800", catCpu);
-                saveCpu(cpu1, "LGA1700", 24, 32, 253);
+        // // ==== Linh kiện rời cho Build PC — mỗi sản phẩm kèm 1 row bảng con tương
+        // // ứng để CompatibilityService có dữ liệu thật để test đủ 7 rule ====
 
-                Product cpu2 = createProduct("CPU AMD Ryzen 7 7800X3D (8 Nhân 16 Luồng, 3D V-Cache)",
-                                "Vi xử lý chuyên game hàng đầu nhờ công nghệ 3D V-Cache, hiệu năng chơi game vượt trội, tiết kiệm điện.",
-                                BigDecimal.valueOf(9990000), 35,
-                                "https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=800", catCpu);
-                saveCpu(cpu2, "AM5", 8, 16, 120);
+        // Product cpu1 = createProduct("CPU Intel Core i9-14900K (Up to 6.0GHz, 24 Nhân
+        // 32 Luồng)",
+        // "Bộ vi xử lý flagship thế hệ 14 của Intel, xung nhịp turbo lên tới 6.0GHz, xử
+        // lý đồ họa render 3D siêu tốc.",
+        // BigDecimal.valueOf(15490000), 40,
+        // "https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=800",
+        // catCpu);
+        // saveCpu(cpu1, "LGA1700", 24, 32, 253);
 
-                Product mb1 = createProduct("Mainboard ASUS ROG Strix Z790-E Gaming WiFi",
-                                "Bo mạch chủ cao cấp chipset Z790 cho CPU Intel LGA1700, hỗ trợ DDR5, PCIe 5.0, WiFi 6E tích hợp.",
-                                BigDecimal.valueOf(9990000), 20,
-                                "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800", catMainboard);
-                saveMainboard(mb1, "LGA1700", "DDR5", 4, 192, "ATX");
+        // Product cpu2 = createProduct("CPU AMD Ryzen 7 7800X3D (8 Nhân 16 Luồng, 3D
+        // V-Cache)",
+        // "Vi xử lý chuyên game hàng đầu nhờ công nghệ 3D V-Cache, hiệu năng chơi game
+        // vượt trội, tiết kiệm điện.",
+        // BigDecimal.valueOf(9990000), 35,
+        // "https://images.unsplash.com/photo-1555617981-dac3880eac6e?w=800", catCpu);
+        // saveCpu(cpu2, "AM5", 8, 16, 120);
 
-                Product mb2 = createProduct("Mainboard MSI MAG B650 Tomahawk WiFi",
-                                "Bo mạch chủ chipset B650 cho CPU AMD AM5, hỗ trợ DDR5, PCIe 4.0, VRM tản nhiệt tốt cho ép xung.",
-                                BigDecimal.valueOf(5490000), 25,
-                                "https://images.unsplash.com/photo-1591405351990-4726e331f141?w=800", catMainboard);
-                saveMainboard(mb2, "AM5", "DDR5", 4, 128, "ATX");
+        // Product mb1 = createProduct("Mainboard ASUS ROG Strix Z790-E Gaming WiFi",
+        // "Bo mạch chủ cao cấp chipset Z790 cho CPU Intel LGA1700, hỗ trợ DDR5, PCIe
+        // 5.0, WiFi 6E tích hợp.",
+        // BigDecimal.valueOf(9990000), 20,
+        // "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
+        // catMainboard);
+        // saveMainboard(mb1, "LGA1700", "DDR5", 4, 192, "ATX");
 
-                Product ram1 = createProduct("RAM Corsair Vengeance RGB 32GB (2x16GB) DDR5 6000MHz",
-                                "Bộ nhớ trong DDR5 hiệu năng cao tích hợp dải đèn LED RGB sinh động, tương thích hoàn hảo XMP 3.0.",
-                                BigDecimal.valueOf(3890000), 60,
-                                "https://images.unsplash.com/photo-1562976540-1502c2145186?w=800", catRam);
-                saveRam(ram1, "DDR5", 6000, 16, 2);
+        // Product mb2 = createProduct("Mainboard MSI MAG B650 Tomahawk WiFi",
+        // "Bo mạch chủ chipset B650 cho CPU AMD AM5, hỗ trợ DDR5, PCIe 4.0, VRM tản
+        // nhiệt tốt cho ép xung.",
+        // BigDecimal.valueOf(5490000), 25,
+        // "https://images.unsplash.com/photo-1591405351990-4726e331f141?w=800",
+        // catMainboard);
+        // saveMainboard(mb2, "AM5", "DDR5", 4, 128, "ATX");
 
-                Product gpu1 = createProduct("Card màn hình ASUS ROG Strix GeForce RTX 4090 OC 24GB",
-                                "VGA cao cấp nhất kiến trúc Ada Lovelace, trang bị 24GB GDDR6X, hệ thống quạt Axial-tech mát lạnh.",
-                                BigDecimal.valueOf(56990000), 10,
-                                "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=800", catVga);
-                saveGpu(gpu1, 24, 348, "16-pin", 1000, 3);
+        // Product ram1 = createProduct("RAM Corsair Vengeance RGB 32GB (2x16GB) DDR5
+        // 6000MHz",
+        // "Bộ nhớ trong DDR5 hiệu năng cao tích hợp dải đèn LED RGB sinh động, tương
+        // thích hoàn hảo XMP 3.0.",
+        // BigDecimal.valueOf(3890000), 60,
+        // "https://images.unsplash.com/photo-1562976540-1502c2145186?w=800", catRam);
+        // saveRam(ram1, "DDR5", 6000, 16, 2);
 
-                Product gpu2 = createProduct("Card màn hình MSI Gaming X Trio RTX 4070 12GB",
-                                "VGA tầm trung cao cấp cho gaming 2K, hiệu năng/giá tốt, hệ thống tản nhiệt Tri Frozr 3 êm ái.",
-                                BigDecimal.valueOf(16990000), 18,
-                                "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800", catVga);
-                saveGpu(gpu2, 12, 337, "8-pin", 650, 2);
+        // Product gpu1 = createProduct("Card màn hình ASUS ROG Strix GeForce RTX 4090
+        // OC 24GB",
+        // "VGA cao cấp nhất kiến trúc Ada Lovelace, trang bị 24GB GDDR6X, hệ thống quạt
+        // Axial-tech mát lạnh.",
+        // BigDecimal.valueOf(56990000), 10,
+        // "https://images.unsplash.com/photo-1555680202-c86f0e12f086?w=800", catVga);
+        // saveGpu(gpu1, 24, 348, "16-pin", 1000, 3);
 
-                Product psu1 = createProduct("Nguồn Corsair RM1000e 1000W 80 Plus Gold Full Modular",
-                                "PSU công suất lớn, chuẩn 80 Plus Gold, dây rời hoàn toàn, đủ tải cho cấu hình RTX 4090.",
-                                BigDecimal.valueOf(3490000), 30,
-                                "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=800", catPsu);
-                savePsu(psu1, 1000, "80 Plus Gold", "FULL", "ATX");
+        // Product gpu2 = createProduct("Card màn hình MSI Gaming X Trio RTX 4070 12GB",
+        // "VGA tầm trung cao cấp cho gaming 2K, hiệu năng/giá tốt, hệ thống tản nhiệt
+        // Tri Frozr 3 êm ái.",
+        // BigDecimal.valueOf(16990000), 18,
+        // "https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800",
+        // catVga);
+        // saveGpu(gpu2, 12, 337, "8-pin", 650, 2);
 
-                Product psu2 = createProduct("Nguồn Cooler Master MWE 650W 80 Plus Bronze",
-                                "PSU phổ thông ổn định, phù hợp cấu hình văn phòng/gaming tầm trung.",
-                                BigDecimal.valueOf(1290000), 45,
-                                "https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?w=800", catPsu);
-                savePsu(psu2, 650, "80 Plus Bronze", "NONE", "ATX");
+        // Product psu1 = createProduct("Nguồn Corsair RM1000e 1000W 80 Plus Gold Full
+        // Modular",
+        // "PSU công suất lớn, chuẩn 80 Plus Gold, dây rời hoàn toàn, đủ tải cho cấu
+        // hình RTX 4090.",
+        // BigDecimal.valueOf(3490000), 30,
+        // "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=800",
+        // catPsu);
+        // savePsu(psu1, 1000, "80 Plus Gold", "FULL", "ATX");
 
-                Product storage1 = createProduct("Ổ cứng SSD Samsung 990 PRO 1TB M.2 NVMe PCIe Gen 4.0",
-                                "SSD PCIe 4.0 có tốc độ đọc/ghi hàng đầu thế giới 7450/6900 MB/s, tối ưu cho game thủ và chuyên gia render.",
-                                BigDecimal.valueOf(2990000), 100,
-                                "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=800", catStorage);
-                saveStorage(storage1, "SSD_NVME", "NVMe PCIe 4.0", 1000);
+        // Product psu2 = createProduct("Nguồn Cooler Master MWE 650W 80 Plus Bronze",
+        // "PSU phổ thông ổn định, phù hợp cấu hình văn phòng/gaming tầm trung.",
+        // BigDecimal.valueOf(1290000), 45,
+        // "https://images.unsplash.com/photo-1591370874773-6702e8f12fd8?w=800",
+        // catPsu);
+        // savePsu(psu2, 650, "80 Plus Bronze", "NONE", "ATX");
 
-                Product cooler1 = createProduct("Tản nhiệt nước AIO NZXT Kraken 360mm RGB",
-                                "Tản nhiệt AIO 360mm làm mát mạnh mẽ cho CPU cao cấp, đèn RGB đồng bộ, hỗ trợ đa socket Intel/AMD.",
-                                BigDecimal.valueOf(4290000), 15,
-                                "https://images.unsplash.com/photo-1591405351990-4726e331f141?w=800", catCooler);
-                saveCooler(cooler1, "AIO", null, 360, "LGA1700,AM5,AM4");
+        // Product storage1 = createProduct("Ổ cứng SSD Samsung 990 PRO 1TB M.2 NVMe
+        // PCIe Gen 4.0",
+        // "SSD PCIe 4.0 có tốc độ đọc/ghi hàng đầu thế giới 7450/6900 MB/s, tối ưu cho
+        // game thủ và chuyên gia render.",
+        // BigDecimal.valueOf(2990000), 100,
+        // "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=800",
+        // catStorage);
+        // saveStorage(storage1, "SSD_NVME", "NVMe PCIe 4.0", 1000);
 
-                Product cooler2 = createProduct("Tản nhiệt khí DeepCool AK620 Dual Tower",
-                                "Tản khí dual tower 6 heatpipe, hiệu năng tương đương AIO 240mm, giá thành hợp lý.",
-                                BigDecimal.valueOf(1190000), 40,
-                                "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800", catCooler);
-                saveCooler(cooler2, "AIR", 160, null, "LGA1700,AM5,AM4");
+        // Product cooler1 = createProduct("Tản nhiệt nước AIO NZXT Kraken 360mm RGB",
+        // "Tản nhiệt AIO 360mm làm mát mạnh mẽ cho CPU cao cấp, đèn RGB đồng bộ, hỗ trợ
+        // đa socket Intel/AMD.",
+        // BigDecimal.valueOf(4290000), 15,
+        // "https://images.unsplash.com/photo-1591405351990-4726e331f141?w=800",
+        // catCooler);
+        // saveCooler(cooler1, "AIO", null, 360, "LGA1700,AM5,AM4");
 
-                Product case1 = createProduct("Vỏ máy Lian Li O11 Dynamic EVO Mid Tower",
-                                "Case gaming cao cấp hỗ trợ ATX/M-ATX/ITX, không gian rộng cho tản AIO 360mm và GPU dài.",
-                                BigDecimal.valueOf(3290000), 20,
-                                "https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800", catCase);
-                saveCase(case1, "ATX,MICRO_ATX,MINI_ITX", 420, 175, 360);
-        }
+        // Product cooler2 = createProduct("Tản nhiệt khí DeepCool AK620 Dual Tower",
+        // "Tản khí dual tower 6 heatpipe, hiệu năng tương đương AIO 240mm, giá thành
+        // hợp lý.",
+        // BigDecimal.valueOf(1190000), 40,
+        // "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800",
+        // catCooler);
+        // saveCooler(cooler2, "AIR", 160, null, "LGA1700,AM5,AM4");
+
+        // Product case1 = createProduct("Vỏ máy Lian Li O11 Dynamic EVO Mid Tower",
+        // "Case gaming cao cấp hỗ trợ ATX/M-ATX/ITX, không gian rộng cho tản AIO 360mm
+        // và GPU dài.",
+        // BigDecimal.valueOf(3290000), 20,
+        // "https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800",
+        // catCase);
+        // saveCase(case1, "ATX,MICRO_ATX,MINI_ITX", 420, 175, 360);
+        // }
 
         private Category getOrCreateCategory(String name, Category.CategoryType type,
                         Category.ComponentType componentType, Category parent) {

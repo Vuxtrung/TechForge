@@ -16,7 +16,8 @@ import com.swp391.techforge.service.authentication.CustomUserDetailsService;
 public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, DaoAuthenticationProvider authenticationProvider)
+			throws Exception {
 		http
 				.authenticationProvider(authenticationProvider)
 				.authorizeHttpRequests(auth -> auth
@@ -33,11 +34,11 @@ public class SecurityConfig {
 								"/reset-password")
 						.permitAll()
 
-						.requestMatchers("/account/**", "/checkout/**", "/orders/**", "/customer/warranty/**").authenticated()
+						.requestMatchers("/account/**", "/checkout/**", "/orders/**", "/customer/warranty/**")
+						.authenticated()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.requestMatchers("/staff/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
-						.anyRequest().permitAll()
-				)
+						.anyRequest().permitAll())
 
 				.formLogin(form -> form
 						.loginPage("/login")
@@ -62,13 +63,16 @@ public class SecurityConfig {
 		return (request, response, authentication) -> {
 			boolean isAdmin = authentication.getAuthorities().stream()
 					.anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-			boolean isStaff = authentication.getAuthorities().stream()
-					.anyMatch(a -> a.getAuthority().equals("ROLE_STAFF_SALES")
-							|| a.getAuthority().equals("ROLE_STAFF_WARRANTY"));
+			boolean isSaleStaff = authentication.getAuthorities().stream()
+					.anyMatch(a -> a.getAuthority().equals("ROLE_STAFF_SALES"));
+			boolean isWarrantyStaff = authentication.getAuthorities().stream()
+					.anyMatch(a -> a.getAuthority().equals("ROLE_STAFF_WARRANTY"));
 			if (isAdmin) {
 				response.sendRedirect("/admin/products");
-			} else if (isStaff) {
-				response.sendRedirect("/staff/dashboard");
+			} else if (isSaleStaff) {
+				response.sendRedirect("/staff/orders");
+			} else if (isWarrantyStaff) {
+				response.sendRedirect("/staff/warranty");
 			} else {
 				response.sendRedirect("/");
 			}

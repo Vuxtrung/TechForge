@@ -110,7 +110,14 @@ function fetchAndRenderProducts(categoryId, sort = 'basePrice,asc') {
     document.getElementById('loadingSpinner').classList.remove('d-none');
     document.getElementById('productGridContainer').innerHTML = '';
 
-    fetch(`/api/buildpc/components?categoryName=${encodeURIComponent(category.key)}&sort=${sort}&size=50`)
+    let queryParams = `categoryName=${encodeURIComponent(category.key)}&sort=${sort}&size=50`;
+    CATEGORIES.forEach(cat => {
+        if (selectedComponents[cat.id]) {
+            queryParams += `&${cat.mapKey}=${selectedComponents[cat.id].productId}`;
+        }
+    });
+
+    fetch(`/api/buildpc/components?${queryParams}`)
         .then(res => res.json())
         .then(data => {
             currentProducts = data;
