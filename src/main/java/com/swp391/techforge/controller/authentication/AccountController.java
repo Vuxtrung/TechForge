@@ -1,9 +1,11 @@
 package com.swp391.techforge.controller.authentication;
 
+import com.swp391.techforge.dto.account.AccountAddressRequest;
 import com.swp391.techforge.dto.account.AccountInfoRequest;
 import com.swp391.techforge.dto.account.ChangePasswordRequest;
 import com.swp391.techforge.entity.Order;
 import com.swp391.techforge.entity.User;
+import com.swp391.techforge.service.authentication.AddressService;
 import com.swp391.techforge.repository.authentication.UserRepository;
 import com.swp391.techforge.service.order.OrderService;
 import com.swp391.techforge.service.product.CloudinaryService;
@@ -11,10 +13,12 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,48 +28,48 @@ import java.util.Set;
 @RequestMapping("/account")
 public class AccountController {
 
-    private static final Set<String> ALLOWED_VIEWS = Set.of("info", "orders", "password");
+    private static final Set<String> ALLOWED_VIEWS = Set.of("info", "addresses", "orders", "password");
 
     private final UserRepository userRepository;
+    private final AddressService addressService;
     private final CloudinaryService cloudinaryService;
     private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
 
-    public AccountController(
-            UserRepository userRepository,
-            CloudinaryService cloudinaryService,
-            OrderService orderService,
+    public AccountController(UserRepository userRepository, AddressService addressService,
+            CloudinaryService cloudinaryService, OrderService orderService,
             PasswordEncoder passwordEncoder) {
-
         this.userRepository = userRepository;
+        this.addressService = addressService;
         this.cloudinaryService = cloudinaryService;
         this.orderService = orderService;
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Hiển thị trang quản lý tài khoản chính.
-     * Tùy thuộc vào tham số 'view' truyền vào URL, trang sẽ load nội dung tương ứng (thông tin, đơn hàng, mật khẩu).
-     * 
-     * @param view Chế độ xem (info, orders, password)
-     * @param authentication Thông tin xác thực người dùng hiện tại
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template HTML của trang tài khoản
-     */
     @GetMapping
-    public String account(
-            @RequestParam(value = "view", defaultValue = "none") String view,
-            Authentication authentication,
-            Model model) {
+    public String account(@RequestParam(value = "view", defaultValue = "none") String view,
+            @RequestParam(value = "addressId", required = false) Long addressId,
+            @RequestParam(value = "mode", required = false) String mode,
+            Authentication authentication, Model model) {
 
-        String email = authentication.getName();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException(
-                        "Không tìm thấy tài khoản với email: " + email));
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
         model.addAttribute("user", user);
         model.addAttribute("view", ALLOWED_VIEWS.contains(view) ? view : null);
+
+        if ("addresses".equals(view)) {
+            model.addAttribute("addresses", addressService.getAddressesForUser(user.getUserId()));
+
+            if (!model.containsAttribute("addressRequest")) {
+                AccountAddressRequest request = new AccountAddressRequest();
+                addressService.prepareAddressRequest(request, user, addressId, mode);
+                model.addAttribute("addressRequest", request);
+            }
+
+            model.addAttribute("selectedAddressId", addressId);
+            model.addAttribute("addressMode", mode);
+        }
 
         if ("orders".equals(view)) {
             List<Order> orders = orderService.getCustomerOrders(user, null, null, null, null);
@@ -87,21 +91,66 @@ public class AccountController {
         return "account";
     }
 
-    /**
-     * Xử lý yêu cầu cập nhật thông tin cá nhân (Họ tên, SĐT, Địa chỉ, Ảnh đại diện).
-     * 
-     * @param request Dữ liệu từ form cập nhật thông tin
-     * @param bindingResult Chứa kết quả validate dữ liệu
-     * @param authentication Thông tin xác thực người dùng
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template HTML của trang tài khoản (hiển thị thông báo thành công hoặc lỗi)
-     */
-    @PostMapping("/info")
-    public String updateInfo(
-            @Valid @ModelAttribute("accountInfoRequest") AccountInfoRequest request,
+    @PostMapping("/addresses/save")
+    public String saveAddress(
+            @RequestParam(value = "addressId", required = false) Long addressId,
+            @Valid @ModelAttribute("addressRequest") AccountAddressRequest request,
             BindingResult bindingResult,
             Authentication authentication,
+            RedirectAttributes redirectAttributes,
             Model model) {
+
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+
+        if (bindingResult.hasErrors()) {
+            prepareAddressView(model, user, addressId, "edit");
+            return "account";
+        }
+
+        addressService.saveAddress(user.getUserId(), addressId, request);
+        redirectAttributes.addFlashAttribute("successMessage", "Lưu địa chỉ thành công");
+        return "redirect:/account?view=addresses";
+    }
+
+    @PostMapping("/addresses/{addressId}/default")
+    @Transactional
+    public String setDefault(@PathVariable Long addressId, Authentication authentication) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+
+        addressService.setDefaultAddress(user.getUserId(), addressId);
+
+        return "redirect:/account?view=addresses";
+    }
+
+    @PostMapping("/addresses/{addressId}/delete")
+    public String deleteAddress(@PathVariable Long addressId, Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        User user = userRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
+
+        boolean isDeleted = addressService.deleteAddress(user.getUserId(), addressId);
+
+        if (!isDeleted) {
+            return "redirect:/account?view=addresses&error=default";
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", "Đã xoá địa chỉ thành công");
+        return "redirect:/account?view=addresses";
+    }
+
+    private void prepareAddressView(Model model, User user, Long addressId, String mode) {
+        model.addAttribute("user", user);
+        model.addAttribute("view", "addresses");
+        model.addAttribute("addresses", addressService.getAddressesForUser(user.getUserId()));
+        model.addAttribute("selectedAddressId", addressId);
+        model.addAttribute("addressMode", mode);
+    }
+
+    @PostMapping("/info")
+    public String updateInfo(@Valid @ModelAttribute("accountInfoRequest") AccountInfoRequest request,
+            BindingResult bindingResult, Authentication authentication, Model model) {
 
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
@@ -143,28 +192,14 @@ public class AccountController {
         return "account";
     }
 
-    /**
-     * Xử lý yêu cầu thay đổi mật khẩu của người dùng.
-     * Kiểm tra mật khẩu cũ phải khớp với CSDL, và mật khẩu mới phải khớp với xác nhận.
-     * 
-     * @param request Dữ liệu từ form đổi mật khẩu
-     * @param bindingResult Chứa kết quả validate dữ liệu
-     * @param authentication Thông tin xác thực người dùng
-     * @param model Đối tượng chứa dữ liệu đẩy ra view
-     * @return Tên template HTML của trang tài khoản
-     */
     @PostMapping("/password")
-    public String changePassword(
-            @Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
-            BindingResult bindingResult,
-            Authentication authentication,
-            Model model) {
+    public String changePassword(@Valid @ModelAttribute("changePasswordRequest") ChangePasswordRequest request,
+            BindingResult bindingResult, Authentication authentication, Model model) {
 
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản"));
 
-        if (!bindingResult.hasErrors()
-                && !request.getNewPassword().equals(request.getConfirmPassword())) {
+        if (!bindingResult.hasErrors() && !request.getNewPassword().equals(request.getConfirmPassword())) {
             bindingResult.rejectValue("confirmPassword", "error.confirmPassword", "Mật khẩu xác nhận không khớp");
         }
 

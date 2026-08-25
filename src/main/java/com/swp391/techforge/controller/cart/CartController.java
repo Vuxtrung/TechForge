@@ -1,13 +1,13 @@
 package com.swp391.techforge.controller.cart;
 
 import com.swp391.techforge.dto.cart.CartItemDTO;
-import com.swp391.techforge.entity.Product;
 import com.swp391.techforge.entity.User;
 import com.swp391.techforge.entity.Voucher;
 import com.swp391.techforge.repository.authentication.UserRepository;
-import com.swp391.techforge.repository.product.ProductRepository;
+import com.swp391.techforge.service.cart.CartService;
 import com.swp391.techforge.service.order.VoucherService;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,44 +15,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/cart")
+@RequiredArgsConstructor
 public class CartController {
 
-    private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
     private static final String VOUCHER_SESSION_KEY = "APPLIED_VOUCHER_DISCOUNT";
     private static final String VOUCHER_CODE_SESSION_KEY = "APPLIED_VOUCHER_CODE";
 
-    private final ProductRepository productRepository;
+    private final CartService cartService;
     private final VoucherService voucherService;
     private final UserRepository userRepository;
 
-    public CartController(ProductRepository productRepository,
-                           VoucherService voucherService,
-                           UserRepository userRepository) {
-        this.productRepository = productRepository;
-        this.voucherService = voucherService;
-        this.userRepository = userRepository;
-    }
-
     // 1. Màn hình Xem Giỏ hàng (View Cart)
     @GetMapping
-    public String viewCart(HttpSession session, Model model) {
-        List<CartItemDTO> cartItems = getCartFromSession(session);
-
-        // Đọc tồn kho thực tế từ DB cho từng sản phẩm.
-        // Sản phẩm đã bị xóa mềm (deleted=true) hiển thị như hết hàng (stock=0)
-        // để khách thấy ngay và không thể tăng số lượng / checkout sản phẩm đó.
-        for (CartItemDTO item : cartItems) {
-            if (item.getProductId() != null) {
-                productRepository.findById(item.getProductId())
-                        .ifPresent(p -> item.setStockQuantity(p.isDeleted() ? 0 : p.getStockQuantity()));
-            }
-        }
+    public String viewCart(HttpSession session, Model model, Principal principal) {
+        List<CartItemDTO> cartItems = cartService.getCart(principal, session);
 
         // Tính tổng tiền tạm tính
         double subtotal = 0.0;
@@ -60,7 +40,7 @@ public class CartController {
             subtotal += item.getTotalPrice();
         }
 
-        // Lấy số tiền giảm giá từ Voucher & Điểm thưởng trong Session (nếu có)
+        // Lấy số tiền giảm giá từ Voucher trong Session (nếu có)
         Double voucherDiscount = (Double) session.getAttribute(VOUCHER_SESSION_KEY);
         if (voucherDiscount == null) voucherDiscount = 0.0;
 
@@ -85,30 +65,13 @@ public class CartController {
                             @RequestParam(value = "imageUrl", defaultValue = "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400") String imageUrl,
                             @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
                             @RequestHeader(value = "Referer", required = false) String referer,
+                            Principal principal,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
 
-        List<CartItemDTO> cartItems = getCartFromSession(session);
-        boolean found = false;
-
-        // Kiểm tra nếu sản phẩm đã có trong giỏ thì tăng số lượng
-        for (CartItemDTO item : cartItems) {
-            if (item.getProductId().equals(productId)) {
-                item.setQuantity(item.getQuantity() + quantity);
-                found = true;
-                break;
-            }
-        }
-
-        // Nếu chưa có thì thêm mới vào danh sách
-        if (!found) {
-            cartItems.add(new CartItemDTO(productId, productName, imageUrl, price, quantity));
-        }
-
-        session.setAttribute(CART_SESSION_KEY, cartItems);
+        cartService.addToCart(productId, productName, price, imageUrl, quantity, principal, session);
         redirectAttributes.addFlashAttribute("successMessage", "Đã thêm \"" + productName + "\" vào giỏ hàng thành công!");
 
-        // Giữ khách hàng ở nguyên trang hiện tại (Trang chủ / Danh sách SP) để mua thêm món khác
         if (referer != null && !referer.isEmpty()) {
             return "redirect:" + referer;
         }
@@ -123,30 +86,11 @@ public class CartController {
                                                       @RequestParam(value = "price", defaultValue = "1000000") Double price,
                                                       @RequestParam(value = "imageUrl", defaultValue = "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=400") String imageUrl,
                                                       @RequestParam(value = "quantity", defaultValue = "1") Integer quantity,
+                                                      Principal principal,
                                                       HttpSession session) {
 
-        List<CartItemDTO> cartItems = getCartFromSession(session);
-        boolean found = false;
-
-        for (CartItemDTO item : cartItems) {
-            if (item.getProductId().equals(productId)) {
-                item.setQuantity(item.getQuantity() + quantity);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            cartItems.add(new CartItemDTO(productId, productName, imageUrl, price, quantity));
-        }
-
-        session.setAttribute(CART_SESSION_KEY, cartItems);
-
-        // Tính tổng số lượng tất cả các sản phẩm trong giỏ
-        int totalItemCount = 0;
-        for (CartItemDTO item : cartItems) {
-            totalItemCount += item.getQuantity();
-        }
+        cartService.addToCart(productId, productName, price, imageUrl, quantity, principal, session);
+        int totalItemCount = cartService.getCartCount(principal, session);
 
         java.util.Map<String, Object> response = new java.util.HashMap<>();
         response.put("success", true);
@@ -162,47 +106,10 @@ public class CartController {
     @PostMapping("/api/add-multiple")
     @ResponseBody
     public java.util.Map<String, Object> addToCartMultipleApi(@RequestBody List<CartItemDTO> items,
+                                                              Principal principal,
                                                               HttpSession session) {
-        List<CartItemDTO> cartItems = getCartFromSession(session);
-
-        if (items != null) {
-            for (CartItemDTO newItem : items) {
-                if (newItem.getProductId() == null) continue;
-
-                boolean found = false;
-                for (CartItemDTO existing : cartItems) {
-                    if (existing.getProductId() != null && existing.getProductId().equals(newItem.getProductId())) {
-                        existing.setQuantity(existing.getQuantity() + (newItem.getQuantity() != null ? newItem.getQuantity() : 1));
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    productRepository.findById(newItem.getProductId()).ifPresent(p -> {
-                        if (newItem.getProductName() == null || newItem.getProductName().isEmpty()) {
-                            newItem.setProductName(p.getName());
-                        }
-                        if (newItem.getPrice() == null) {
-                            newItem.setPrice(p.getBasePrice() != null ? p.getBasePrice().doubleValue() : 0.0);
-                        }
-                        if (newItem.getImageUrl() == null || newItem.getImageUrl().isEmpty()) {
-                            newItem.setImageUrl(p.getPrimaryImageUrl() != null ? p.getPrimaryImageUrl() : "");
-                        }
-                    });
-                    if (newItem.getQuantity() == null || newItem.getQuantity() <= 0) {
-                        newItem.setQuantity(1);
-                    }
-                    cartItems.add(newItem);
-                }
-            }
-        }
-
-        session.setAttribute(CART_SESSION_KEY, cartItems);
-
-        int totalItemCount = 0;
-        for (CartItemDTO item : cartItems) {
-            totalItemCount += item.getQuantity();
-        }
+        cartService.addMultipleToCart(items, principal, session);
+        int totalItemCount = cartService.getCartCount(principal, session);
 
         java.util.Map<String, Object> response = new java.util.HashMap<>();
         response.put("success", true);
@@ -215,48 +122,34 @@ public class CartController {
     @PostMapping("/update")
     public String updateQuantity(@RequestParam("productId") Long productId,
                                  @RequestParam("quantity") Integer quantity,
+                                 Principal principal,
                                  HttpSession session) {
 
-        List<CartItemDTO> cartItems = getCartFromSession(session);
-
-        for (CartItemDTO item : cartItems) {
-            if (item.getProductId().equals(productId)) {
-                if (quantity > 0) {
-                    item.setQuantity(quantity);
-                }
-                break;
-            }
-        }
-
-        session.setAttribute(CART_SESSION_KEY, cartItems);
+        cartService.updateQuantity(productId, quantity, principal, session);
         return "redirect:/cart";
     }
 
     // 4. Xóa sản phẩm khỏi giỏ hàng (Remove Item)
     @PostMapping("/remove")
     public String removeItem(@RequestParam("productId") Long productId,
+                             Principal principal,
                              HttpSession session,
                              RedirectAttributes redirectAttributes) {
 
-        List<CartItemDTO> cartItems = getCartFromSession(session);
-        cartItems.removeIf(item -> item.getProductId().equals(productId));
-
-        session.setAttribute(CART_SESSION_KEY, cartItems);
+        cartService.removeFromCart(productId, principal, session);
         redirectAttributes.addFlashAttribute("successMessage", "Đã xóa sản phẩm khỏi giỏ hàng!");
 
         return "redirect:/cart";
     }
 
     // 5. Áp dụng Voucher giảm giá (Apply Voucher)
-    // Dùng chung VoucherService với CheckoutController — voucher được kiểm tra
-    // thật với DB (BR-V02..BR-V06) thay vì so khớp chuỗi cứng như trước đây.
     @PostMapping("/apply-voucher")
     public String applyVoucher(@RequestParam("voucherCode") String voucherCode,
                                HttpSession session,
                                Principal principal,
                                RedirectAttributes redirectAttributes) {
 
-        List<CartItemDTO> cartItems = getCartFromSession(session);
+        List<CartItemDTO> cartItems = cartService.getCart(principal, session);
         if (cartItems.isEmpty()) {
             redirectAttributes.addFlashAttribute("voucherErrorMessage", "Giỏ hàng của bạn đang trống!");
             return "redirect:/cart";
@@ -291,15 +184,5 @@ public class CartController {
         }
 
         return "redirect:/cart";
-    }
-
-    // Hàm tiện ích lấy giỏ hàng từ Session
-    @SuppressWarnings("unchecked")
-    private List<CartItemDTO> getCartFromSession(HttpSession session) {
-        List<CartItemDTO> cart = (List<CartItemDTO>) session.getAttribute(CART_SESSION_KEY);
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
-        return cart;
     }
 }

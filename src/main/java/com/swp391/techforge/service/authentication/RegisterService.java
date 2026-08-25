@@ -74,8 +74,8 @@ public class RegisterService {
         address.setProvince(request.getProvince());
         address.setWard(request.getWard());
         address.setAddressLine(request.getAddressLine());
-        address.setAddressType(AddressType.HOME);
-        address.setIsDefault(true);
+        address.setType(AddressType.HOME);
+        address.setDefault(true);
         userAddressRepository.save(address);
     }
 }
