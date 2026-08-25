@@ -21,10 +21,14 @@ public class UserController {
 
     private final UserService userService;
     private final RoleRepository roleRepository;
+    private final com.swp391.techforge.service.order.OrderService orderService;
 
-    public UserController(UserService userService, RoleRepository roleRepository) {
+    public UserController(UserService userService, 
+                          RoleRepository roleRepository,
+                          com.swp391.techforge.service.order.OrderService orderService) {
         this.userService = userService;
         this.roleRepository = roleRepository;
+        this.orderService = orderService;
     }
 
     /**
@@ -156,5 +160,32 @@ public class UserController {
         } catch (Exception e) {
             return "redirect:/admin/users";
         }
+    }
+
+    @GetMapping("/{id}/orders-summary")
+    @ResponseBody
+    public java.util.Map<String, Object> getOrdersSummary(@PathVariable Long id) {
+        java.util.Map<String, Object> summary = new java.util.HashMap<>();
+        try {
+            User user = userService.getById(id);
+            // Lấy danh sách tất cả các đơn hàng của người dùng này
+            List<com.swp391.techforge.entity.Order> orders = orderService.getCustomerOrders(user, null, null, null, null);
+            
+            long pending = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.PENDING).count();
+            long confirmed = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.CONFIRMED).count();
+            long shipping = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.SHIPPING).count();
+            long delivered = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.DELIVERED).count();
+            
+            summary.put("success", true);
+            summary.put("total", orders.size());
+            summary.put("pending", pending);
+            summary.put("confirmed", confirmed);
+            summary.put("shipping", shipping);
+            summary.put("delivered", delivered);
+        } catch (Exception e) {
+            summary.put("success", false);
+            summary.put("message", e.getMessage());
+        }
+        return summary;
     }
 }

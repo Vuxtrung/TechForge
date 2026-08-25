@@ -3,6 +3,9 @@ package com.swp391.techforge.service.authentication;
 import com.swp391.techforge.entity.User;
 import com.swp391.techforge.entity.UserStatus;
 import com.swp391.techforge.repository.authentication.UserRepository;
+import com.swp391.techforge.service.order.OrderService;
+import com.swp391.techforge.service.warranty.WarrantyTicketService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +19,15 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final OrderService orderService;
+    private final WarrantyTicketService warrantyTicketService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, 
+                       @Lazy OrderService orderService, 
+                       @Lazy WarrantyTicketService warrantyTicketService) {
         this.userRepository = userRepository;
+        this.orderService = orderService;
+        this.warrantyTicketService = warrantyTicketService;
     }
 
     /**
@@ -88,6 +97,7 @@ public class UserService {
     /**
      * Khóa tài khoản người dùng, chuyển trạng thái sang LOCKED.
      * Người dùng này sẽ không thể đăng nhập. Ngăn chặn việc khóa Admin.
+     * Tự động hủy đơn hàng PENDING đối với Customer và gỡ ticket đối với Staff.
      * 
      * @param userId ID người dùng
      * @return User sau khi khóa
@@ -99,7 +109,19 @@ public class UserService {
             throw new IllegalStateException("Không thể khóa tài khoản quản trị viên (ADMIN)!");
         }
         user.setStatus(UserStatus.LOCKED);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        // Xử lý logic nghiệp vụ khi khóa
+        if (user.getRole() != null) {
+            String roleName = user.getRole().getRoleName();
+            if ("CUSTOMER".equalsIgnoreCase(roleName)) {
+                orderService.cancelPendingOrdersForUser(savedUser);
+            } else if ("STAFF_WARRANTY".equalsIgnoreCase(roleName)) {
+                warrantyTicketService.unassignTicketsFromStaff(savedUser);
+            }
+        }
+
+        return savedUser;
     }
 
     /**

@@ -157,4 +157,19 @@ public class WarrantyTicketService {
         ticket.setResolvedAt(LocalDateTime.now());
         return warrantyTicketRepository.save(ticket);
     }
+
+    @Transactional
+    public void unassignTicketsFromStaff(User staff) {
+        List<WarrantyTicket> tickets = warrantyTicketRepository.findByAssignedStaff(staff);
+        for (WarrantyTicket ticket : tickets) {
+            // Chỉ gỡ phân công nếu ticket chưa đóng (chưa hoàn thành)
+            if (ticket.getStatus() == WarrantyTicketStatus.IN_PROGRESS || 
+                ticket.getStatus() == WarrantyTicketStatus.SUBMITTED) {
+                
+                ticket.setAssignedStaff(null);
+                ticket.setStatus(WarrantyTicketStatus.SUBMITTED); // Đưa về trạng thái chờ
+                warrantyTicketRepository.save(ticket);
+            }
+        }
+    }
 }

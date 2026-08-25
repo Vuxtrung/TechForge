@@ -1,5 +1,6 @@
 package com.swp391.techforge.repository.warranty;
 
+import com.swp391.techforge.entity.User;
 import com.swp391.techforge.entity.WarrantyTicket;
 import com.swp391.techforge.entity.WarrantyTicketStatus;
 import org.springframework.data.domain.Page;
@@ -47,4 +48,6 @@ public interface WarrantyTicketRepository extends JpaRepository<WarrantyTicket, 
     Page<WarrantyTicket> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     List<WarrantyTicket> findByImeiSerialIgnoreCaseOrPhoneLookup(String imeiSerial, String phoneLookup);
+
+    List<WarrantyTicket> findByAssignedStaff(User assignedStaff);
 }

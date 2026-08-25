@@ -256,6 +256,14 @@ public class OrderService {
         return false;
     }
 
+    @Transactional
+    public void cancelPendingOrdersForUser(User user) {
+        List<Order> pendingOrders = orderRepository.findByUserAndStatusIn(user, List.of(OrderStatus.PENDING));
+        for (Order order : pendingOrders) {
+            cancelOrder(order.getOrderId(), "Tài khoản của bạn đã bị khoá", null);
+        }
+    }
+
     // Hoàn lại stockQuantity đã trừ lúc tạo đơn. Dùng chung cho cancelOrder()
     // và cho trường hợp đơn bị hủy do thanh toán VNPay thất bại (xem
     // CheckoutController#vnpayReturn), tránh trùng logic ở 2 nơi.
