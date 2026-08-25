@@ -129,10 +129,7 @@ public class ContactController {
     }
 
     @GetMapping("/admin/contacts/{id}")
-    public String viewContactDetail(@PathVariable Long id, Model model) {
-        if (id == null) {
-            return "admin/contacts";
-        }
+    public String viewContactDetail(@PathVariable long id, Model model) {
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin liên hệ với ID: " + id));
         model.addAttribute("contact", contact);
@@ -140,7 +137,7 @@ public class ContactController {
     }
 
     @PostMapping("/admin/contacts/{id}/toggle-hidden")
-    public String toggleHidden(@PathVariable Long id,
+    public String toggleHidden(@PathVariable long id,
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "ALL") String status,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -176,12 +173,9 @@ public class ContactController {
     }
 
     @PostMapping("/admin/contacts/{id}/reply")
-    public String replyContact(@PathVariable Long id,
+    public String replyContact(@PathVariable long id,
             @RequestParam("replyMessage") String replyMessage,
             Model model) {
-        if (id == null) {
-            return "admin/contacts";
-        }
         Contact contact = contactRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin liên hệ với ID: " + id));
 
