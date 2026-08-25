@@ -30,7 +30,6 @@
                             </a>
                         </div>
 
-                        <!-- Thông báo -->
                         <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="bi bi-check-circle me-1"></i> <span th:text="${successMessage}"></span>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -40,7 +39,15 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
 
-                        <!-- Thông tin chi tiết hiển thị dạng read-only -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted d-block">Trạng thái</label>
+                            <span th:switch="${contact.status.name()}">
+                                <span th:case="'PENDING'" class="badge bg-warning text-dark fs-6">Đợi phản hồi</span>
+                                <span th:case="'REPLIED'" class="badge bg-success fs-6">Đã phản hồi</span>
+                                <span th:case="'HIDDEN'" class="badge bg-secondary fs-6">Đã ẩn</span>
+                            </span>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-semibold text-muted">Họ và tên khách hàng</label>
                             <input type="text" class="form-control" th:value="${contact.fullName}" readonly>
@@ -61,35 +68,39 @@
                             <textarea class="form-control" rows="4" readonly th:text="${contact.message}"></textarea>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label fw-semibold text-muted">Thời gian gửi</label>
                             <input type="text" class="form-control" th:value="${#temporals.format(contact.createdAt, 'dd/MM/yyyy HH:mm:ss')}" readonly>
                         </div>
 
-                        <!-- Form Gửi Phản Hồi Trực Tiếp -->
-                        <form th:action="@{/admin/contacts/{id}/reply(id=${contact.id})}" method="post" class="border-top pt-3 mb-4">
-                            <div class="mb-3">
-                                <label for="replyMessage" class="form-label fw-semibold text-danger">
-                                    <i class="bi bi-reply-fill me-1"></i> Soạn nội dung phản hồi gửi qua email
-                                </label>
-                                <textarea name="replyMessage" id="replyMessage" class="form-control" rows="5" 
-                                          placeholder="Nhập nội dung trả lời khách hàng..." required></textarea>
-                            </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-danger px-4 fw-semibold">
-                                    <i class="bi bi-send-fill me-1"></i> Gửi Phản Hồi Ngay
-                                </button>
-                            </div>
-                        </form>
+                        <div class="mb-4" th:if="${contact.repliedAt != null}">
+                            <label class="form-label fw-semibold text-muted">Thời gian phản hồi gần nhất</label>
+                            <input type="text" class="form-control" th:value="${#temporals.format(contact.repliedAt, 'dd/MM/yyyy HH:mm:ss')}" readonly>
+                        </div>
 
-                        <!-- Hành động phụ (Xóa liên hệ) -->
-                        <div class="d-flex justify-content-between align-items-center border-top pt-3">
-                            <form th:action="@{/admin/contacts/{id}/delete(id=${contact.id})}" method="post" class="m-0"
-                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa thông tin liên hệ này không?');">
-                                <button type="submit" class="btn btn-outline-danger px-4">
-                                    <i class="bi bi-trash me-1"></i> Xóa Liên Hệ
-                                </button>
-                            </form>
+                        <div class="border-top pt-3 mb-4">
+                            <label for="replyMessage" class="form-label fw-semibold text-danger">
+                                <i class="bi bi-reply-fill me-1"></i> Soạn nội dung phản hồi gửi qua email
+                            </label>
+                            <textarea form="replyForm" name="replyMessage" id="replyMessage" class="form-control mb-3" rows="5"
+                                      placeholder="Nhập nội dung trả lời khách hàng..." required></textarea>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <form th:action="@{/admin/contacts/{id}/toggle-hidden(id=${contact.id})}" method="post" class="m-0"
+                                      th:attr="onsubmit=${contact.status.name() == 'HIDDEN'} ? null : 'return confirm(\'Bạn có chắc chắn muốn ẩn liên hệ này không?\');'">
+                                    <button type="submit"
+                                            th:class="${contact.status.name() == 'HIDDEN'} ? 'btn btn-outline-success px-4' : 'btn btn-outline-danger px-4'">
+                                        <i th:class="${contact.status.name() == 'HIDDEN'} ? 'bi bi-eye-fill me-1' : 'bi bi-eye-slash me-1'"></i>
+                                        <span th:text="${contact.status.name() == 'HIDDEN'} ? 'Hiện Lại Liên Hệ' : 'Ẩn Liên Hệ'"></span>
+                                    </button>
+                                </form>
+
+                                <form id="replyForm" th:action="@{/admin/contacts/{id}/reply(id=${contact.id})}" method="post" class="m-0">
+                                    <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                                        <i class="bi bi-send-fill me-1"></i> Gửi Phản Hồi Ngay
+                                    </button>
+                                </form>
+                            </div>
                         </div>
 
                     </div>

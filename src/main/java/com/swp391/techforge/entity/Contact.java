@@ -32,6 +32,13 @@ public class Contact {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private ContactStatus status = ContactStatus.PENDING;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "replied_at")
+    private LocalDateTime repliedAt;
 }

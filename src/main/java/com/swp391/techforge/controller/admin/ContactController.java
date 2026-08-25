@@ -2,6 +2,7 @@ package com.swp391.techforge.controller.admin;
 
 import com.swp391.techforge.dto.contact.ContactRequest;
 import com.swp391.techforge.entity.Contact;
+import com.swp391.techforge.entity.ContactStatus;
 import com.swp391.techforge.repository.contact.ContactRepository;
 import com.swp391.techforge.service.contact.CaptchaService;
 import com.swp391.techforge.service.contact.ContactRateLimiterService;
@@ -16,17 +17,26 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriComponentsBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Set;
+
 @Controller
 public class ContactController {
+
+    private static final Set<String> ALLOWED_SORT_FIELDS =
+            Set.of("createdAt", "fullName", "email", "subject", "status");
 
     @Autowired
     private ContactRepository contactRepository;
@@ -86,23 +96,36 @@ public class ContactController {
     @GetMapping("/admin/contacts")
     public String listContacts(
             @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "ALL") String status,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Model model) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Contact> contactPage;
+        String safeSortBy = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "createdAt";
+        Sort.Direction dir = "asc".equalsIgnoreCase(direction) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(dir, safeSortBy));
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            contactPage = contactRepository
-                    .findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrSubjectContainingIgnoreCase(
-                            keyword.trim(), keyword.trim(), keyword.trim(), pageable);
-            model.addAttribute("keyword", keyword);
-        } else {
-            contactPage = contactRepository.findAll(pageable);
+        String safeKeyword = StringUtils.hasText(keyword) ? keyword.trim() : null;
+
+        ContactStatus statusEnum = null;
+        if (StringUtils.hasText(status) && !"ALL".equalsIgnoreCase(status)) {
+            try {
+                statusEnum = ContactStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                // status không hợp lệ -> coi như ALL
+            }
         }
 
+        Page<Contact> contactPage = contactRepository.search(safeKeyword, statusEnum, pageable);
+
         model.addAttribute("contactPage", contactPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("status", status);
+        model.addAttribute("sortBy", safeSortBy);
+        model.addAttribute("direction", dir.name().toLowerCase());
+        model.addAttribute("statusOptions", ContactStatus.values());
         return "admin/contact-list";
     }
 
@@ -117,19 +140,38 @@ public class ContactController {
         return "admin/contact-form";
     }
 
-    @PostMapping("/admin/contacts/{id}/delete")
-    public String deleteContact(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        if (id == null) {
-            return "admin/contacts";
-        }
-        if (!contactRepository.existsById(id)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy liên hệ để xoá.");
-            return "redirect:/admin/contacts";
-        }
+    @PostMapping("/admin/contacts/{id}/toggle-hidden")
+    public String toggleHidden(@PathVariable Long id,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "ALL") String status,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            RedirectAttributes redirectAttributes) {
 
-        contactRepository.deleteById(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã xoá liên hệ thành công");
-        return "redirect:/admin/contacts";
+        Contact contact = contactRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy liên hệ với ID: " + id));
+
+        if (contact.getStatus() == ContactStatus.HIDDEN) {
+            contact.setStatus(contact.getRepliedAt() != null ? ContactStatus.REPLIED : ContactStatus.PENDING);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã hiện lại liên hệ.");
+        } else {
+            contact.setStatus(ContactStatus.HIDDEN);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã ẩn liên hệ.");
+        }
+        contactRepository.save(contact);
+
+        String redirectUrl = UriComponentsBuilder.fromPath("/admin/contacts")
+                .queryParamIfPresent("keyword", Optional.ofNullable(keyword))
+                .queryParam("status", status)
+                .queryParam("sortBy", sortBy)
+                .queryParam("direction", direction)
+                .queryParam("page", page)
+                .queryParam("size", size)
+                .build().toUriString();
+
+        return "redirect:" + redirectUrl;
     }
 
     @PostMapping("/admin/contacts/{id}/reply")
@@ -153,6 +195,12 @@ public class ContactController {
                     "Đội ngũ hỗ trợ TechForge");
 
             mailSender.send(message);
+
+            contact.setRepliedAt(LocalDateTime.now());
+            if (contact.getStatus() != ContactStatus.HIDDEN) {
+                contact.setStatus(ContactStatus.REPLIED);
+            }
+            contactRepository.save(contact);
 
             model.addAttribute("successMessage", "Đã gửi phản hồi thành công đến " + contact.getEmail());
         } catch (Exception e) {

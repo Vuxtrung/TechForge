@@ -179,7 +179,7 @@ CREATE TABLE vouchers(
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     usage_limit INT,
-    max_usage_per_customer INT DEFAULT 1;
+    max_usage_per_customer INT DEFAULT 1,
     is_active TINYINT(1) DEFAULT 1
 );
 
@@ -253,10 +253,12 @@ CREATE TABLE cart_items(
 CREATE TABLE contacts(
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     created_at DATETIME(6),
+    replied_at DATETIME(6) DEFAULT NULL,
     email VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     message TEXT NOT NULL,
-    subject VARCHAR(150) NOT NULL
+    subject VARCHAR(150) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING'
 );
 
 CREATE TABLE installment_plans(

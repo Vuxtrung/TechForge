@@ -9,22 +9,18 @@
     <div th:replace="~{fragments/header :: header}"></div>
 
     <main class="main-body d-flex">
-      <!-- Sidebar -->
       <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
-      
-      <!-- Main Content -->
+
       <div class="content flex-grow-1 p-4 bg-light" style="min-height: calc(100vh - 72px);">
         <div class="container-fluid">
           <div class="bg-white rounded-3 shadow-sm border p-4">
-            
-            <!-- Page Title -->
+
             <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
               <span class="fs-4 text-dark fw-bold">
                 <i class="bi bi-envelope-paper text-danger me-2"></i> Quản Lý Liên Hệ Người Dùng
               </span>
             </div>
 
-            <!-- Flash messages -->
             <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check-circle me-1"></i>
               <span th:text="${successMessage}"></span>
@@ -36,20 +32,53 @@
               <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-            <!-- Search form -->
+            <!-- Search + Filter + Sort form -->
             <form th:action="@{/admin/contacts}" method="get" class="row g-2 align-items-end mb-3">
-              <div class="col-md-8">
+              <div class="col-md-4">
                 <label class="form-label fs-8 text-muted mb-1">Tìm kiếm</label>
-                <input type="search" name="keyword" th:value="${keyword}" class="form-control" placeholder="Tìm theo tên, email hoặc tiêu đề..." />
+                <input type="search" name="keyword" th:value="${keyword}" class="form-control"
+                       placeholder="Tìm theo tên, email hoặc tiêu đề..." />
               </div>
-              <div class="col-md-2 d-flex gap-2">
-                <button type="submit" class="btn btn-dark w-100 fw-semibold">
-                  <i class="bi bi-funnel me-1"></i> Lọc
+
+              <div class="col-md-2">
+                <label class="form-label fs-8 text-muted mb-1">Trạng thái</label>
+                <select name="status" class="form-select">
+                  <option value="ALL" th:selected="${status == 'ALL'}">Tất cả</option>
+                  <option th:each="s : ${statusOptions}"
+                          th:value="${s.name()}"
+                          th:text="${s.label}"
+                          th:selected="${status == s.name()}">
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-md-2">
+                <label class="form-label fs-8 text-muted mb-1">Sắp xếp theo</label>
+                <select name="sortBy" class="form-select">
+                  <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày gửi</option>
+                  <option value="fullName" th:selected="${sortBy == 'fullName'}">Tên</option>
+                  <option value="email" th:selected="${sortBy == 'email'}">Email</option>
+                  <option value="subject" th:selected="${sortBy == 'subject'}">Tiêu đề</option>
+                  <option value="status" th:selected="${sortBy == 'status'}">Trạng thái</option>
+                </select>
+              </div>
+
+              <div class="col-md-2">
+                <label class="form-label fs-8 text-muted mb-1">Chiều</label>
+                <select name="direction" class="form-select">
+                  <option value="desc" th:selected="${direction == 'desc'}">Giảm dần</option>
+                  <option value="asc" th:selected="${direction == 'asc'}">Tăng dần</option>
+                </select>
+              </div>
+
+              <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-dark fw-semibold">
+                  <i class="bi bi-funnel"></i>
                 </button>
               </div>
-              <div class="col-md-2">
-                <a th:href="@{/admin/contacts}" class="btn btn-outline-secondary w-100" title="Xóa bộ lọc">
-                  <i class="bi bi-x-lg"></i> Reset
+              <div class="col-md-1 d-grid">
+                <a th:href="@{/admin/contacts}" class="btn btn-outline-secondary" title="Xóa bộ lọc">
+                  <i class="bi bi-x-lg"></i>
                 </a>
               </div>
             </form>
@@ -65,16 +94,18 @@
                     <th scope="col">Tiêu đề</th>
                     <th scope="col">Nội dung</th>
                     <th scope="col">Ngày gửi</th>
+                    <th scope="col">Trạng thái</th>
                     <th scope="col" class="text-end">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr th:if="${contactPage.empty}">
-                    <td colspan="7" class="text-center text-muted py-4">
+                    <td colspan="8" class="text-center text-muted py-4">
                       Không tìm thấy thông tin liên hệ nào.
                     </td>
                   </tr>
-                  <tr th:each="contact, iter : ${contactPage.content}">
+                  <tr th:each="contact, iter : ${contactPage.content}"
+                      th:classappend="${contact.status.name() == 'HIDDEN'} ? 'table-secondary text-muted' : ''">
                     <td th:text="${contactPage.number * contactPage.size + iter.index + 1}">1</td>
                     <td>
                       <span class="fw-semibold text-dark" th:text="${contact.fullName}">Tên khách</span>
@@ -83,10 +114,29 @@
                     <td class="fw-medium" th:text="${contact.subject}">Tiêu đề</td>
                     <td class="text-wrap" style="max-width: 300px;" th:text="${contact.message}">Nội dung liên hệ</td>
                     <td th:text="${#temporals.format(contact.createdAt, 'dd/MM/yyyy HH:mm')}">Ngày gửi</td>
+                    <td>
+                      <span th:switch="${contact.status.name()}">
+                        <span th:case="'PENDING'" class="badge bg-warning text-dark">Đợi phản hồi</span>
+                        <span th:case="'REPLIED'" class="badge bg-success">Đã phản hồi</span>
+                        <span th:case="'HIDDEN'" class="badge bg-secondary">Đã ẩn</span>
+                      </span>
+                    </td>
                     <td class="text-end">
-                      <a th:href="@{/admin/contacts/{id}(id=${contact.id})}" class="btn btn-outline-primary btn-sm" title="Xem chi tiết">
+                      <a th:href="@{/admin/contacts/{id}(id=${contact.id})}" class="btn btn-outline-primary btn-sm me-1" title="Xem chi tiết">
                         <i class="bi bi-eye"></i>
                       </a>
+                      <form th:action="@{/admin/contacts/{id}/toggle-hidden(id=${contact.id})}" method="post" class="d-inline">
+                        <input type="hidden" name="keyword" th:value="${keyword}" />
+                        <input type="hidden" name="status" th:value="${status}" />
+                        <input type="hidden" name="sortBy" th:value="${sortBy}" />
+                        <input type="hidden" name="direction" th:value="${direction}" />
+                        <input type="hidden" name="page" th:value="${contactPage.number}" />
+                        <input type="hidden" name="size" th:value="${contactPage.size}" />
+                        <button type="submit" class="btn btn-outline-secondary btn-sm"
+                                th:title="${contact.status.name() == 'HIDDEN'} ? 'Hiện lại' : 'Ẩn'">
+                          <i th:class="${contact.status.name() == 'HIDDEN'} ? 'bi bi-eye-slash-fill' : 'bi bi-eye-slash'"></i>
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 </tbody>
@@ -94,19 +144,23 @@
             </div>
 
             <!-- Pagination -->
-            <nav th:if="${contactPage.totalPages > 1}" aria-label="Contact pagination">
+            <nav th:if="${contactPage.totalPages > 0}" aria-label="Contact pagination">
               <ul class="pagination justify-content-center mb-0">
                 <li class="page-item" th:classappend="${contactPage.first} ? 'disabled'">
-                  <a class="page-link" th:href="@{/admin/contacts(page=${contactPage.number - 1}, keyword=${keyword})}">
+                  <a class="page-link"
+                     th:href="@{/admin/contacts(page=${contactPage.number - 1}, keyword=${keyword}, status=${status}, sortBy=${sortBy}, direction=${direction})}">
                     <i class="bi bi-chevron-left"></i>
                   </a>
                 </li>
                 <li class="page-item" th:each="i : ${#numbers.sequence(0, contactPage.totalPages - 1)}"
                     th:classappend="${i == contactPage.number} ? 'active'">
-                  <a class="page-link" th:href="@{/admin/contacts(page=${i}, keyword=${keyword})}" th:text="${i + 1}">1</a>
+                  <a class="page-link"
+                     th:href="@{/admin/contacts(page=${i}, keyword=${keyword}, status=${status}, sortBy=${sortBy}, direction=${direction})}"
+                     th:text="${i + 1}">1</a>
                 </li>
                 <li class="page-item" th:classappend="${contactPage.last} ? 'disabled'">
-                  <a class="page-link" th:href="@{/admin/contacts(page=${contactPage.number + 1}, keyword=${keyword})}">
+                  <a class="page-link"
+                     th:href="@{/admin/contacts(page=${contactPage.number + 1}, keyword=${keyword}, status=${status}, sortBy=${sortBy}, direction=${direction})}">
                     <i class="bi bi-chevron-right"></i>
                   </a>
                 </li>
