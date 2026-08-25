@@ -36,18 +36,20 @@ public class ContactController {
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt", "fullName", "email", "subject",
             "status");
+    private final ContactRepository contactRepository;
+    private final JavaMailSender mailSender;
+    private final ContactRateLimiterService rateLimiterService;
+    private final CaptchaService captchaService;
 
-    @Autowired
-    private ContactRepository contactRepository;
-
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
-    private ContactRateLimiterService rateLimiterService;
-
-    @Autowired
-    private CaptchaService captchaService;
+    public ContactController(ContactRepository contactRepository,
+            JavaMailSender mailSender,
+            ContactRateLimiterService rateLimiterService,
+            CaptchaService captchaService) {
+        this.contactRepository = contactRepository;
+        this.mailSender = mailSender;
+        this.rateLimiterService = rateLimiterService;
+        this.captchaService = captchaService;
+    }
 
     @GetMapping("/contact")
     public String showContactPage(Model model) {
