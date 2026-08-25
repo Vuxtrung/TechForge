@@ -57,7 +57,9 @@ public class CompatibilityService {
         if (cpu.getSocket() == null || mainboard.getSocket() == null) {
             return;
         }
-        if (!cpu.getSocket().equalsIgnoreCase(mainboard.getSocket())) {
+        String cpuSocket = cpu.getSocket().replace(",", "").trim();
+        String mbSocket = mainboard.getSocket().replace(",", "").trim();
+        if (!cpuSocket.equalsIgnoreCase(mbSocket)) {
             report.addError(RuleCode.CPU_SOCKET_MB.getMessage()
                     + " (CPU: " + cpu.getSocket() + ", Mainboard: " + mainboard.getSocket() + ")");
         }
@@ -151,8 +153,9 @@ public class CompatibilityService {
         if (cooler.getSocketSupport() == null || cpu.getSocket() == null) {
             return;
         }
+        String cpuSocket = cpu.getSocket().replace(",", "").trim();
         boolean ok = Arrays.stream(cooler.getSocketSupport().split(","))
-                .anyMatch(s -> s.trim().equalsIgnoreCase(cpu.getSocket()));
+                .anyMatch(s -> s.trim().equalsIgnoreCase(cpuSocket));
         if (!ok) {
             report.addError(RuleCode.COOLER_SOCKET_CPU.getMessage()
                     + " (CPU: " + cpu.getSocket() + ", Tản hỗ trợ: " + cooler.getSocketSupport() + ")");

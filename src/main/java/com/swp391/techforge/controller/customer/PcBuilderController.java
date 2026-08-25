@@ -26,7 +26,8 @@ public class PcBuilderController {
     @GetMapping("/components")
     public ResponseEntity<List<BuildPcProductDto>> getComponents(@RequestParam String categoryName,
                                                                  @RequestParam(defaultValue = "basePrice,asc") String sort,
-                                                                 @RequestParam(defaultValue = "50") int size) {
-        return ResponseEntity.ok(pcBuilderService.getComponentsByCategory(categoryName, sort, size));
+                                                                 @RequestParam(defaultValue = "50") int size,
+                                                                 @ModelAttribute BuildPcValidateRequest selectedComponents) {
+        return ResponseEntity.ok(pcBuilderService.getComponentsByCategory(categoryName, sort, size, selectedComponents));
     }
 }

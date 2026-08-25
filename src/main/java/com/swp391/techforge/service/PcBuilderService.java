@@ -9,12 +9,14 @@ import com.swp391.techforge.entity.component.*;
 import com.swp391.techforge.repository.category.CategoryRepository;
 import com.swp391.techforge.repository.product.ProductRepository;
 import com.swp391.techforge.repository.component.*;
+import com.swp391.techforge.service.buildpc.CompatibilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,7 @@ public class PcBuilderService {
     private final CoolerRepository coolerRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final CompatibilityService compatibilityService;
 
     public CompatibilityReport checkCompatibility(BuildPcValidateRequest request) {
         CompatibilityReport report = new CompatibilityReport();
@@ -130,7 +133,7 @@ public class PcBuilderService {
         return report;
     }
 
-    public List<BuildPcProductDto> getComponentsByCategory(String categoryKey, String sortStr, int size) {
+    public List<BuildPcProductDto> getComponentsByCategory(String categoryKey, String sortStr, int size, BuildPcValidateRequest selectedComponents) {
         Category.ComponentType componentType = mapKeyToComponentType(categoryKey);
         if (componentType == null) {
             return List.of();
@@ -143,13 +146,127 @@ public class PcBuilderService {
 
         List<Long> categoryIds = categories.stream().map(Category::getCategoryId).collect(Collectors.toList());
 
+        // Lấy tất cả active product trong danh mục này để làm ứng viên lọc (giới hạn 1000 để tránh lag nếu data quá lớn)
+        PageRequest maxPageRequest = PageRequest.of(0, 1000);
+        Page<Product> allProductsPage = productRepository.searchPublic(null, categoryIds, null, null, null, null, maxPageRequest);
+        List<Long> candidateProductIds = allProductsPage.getContent().stream()
+                .map(Product::getProductId)
+                .collect(Collectors.toList());
+
+        if (candidateProductIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> compatibleProductIds = new ArrayList<>();
+
+        if (selectedComponents == null) {
+            compatibleProductIds.addAll(candidateProductIds);
+        } else {
+            Cpu cpu = selectedComponents.getCpuId() != null ? cpuRepository.findById(selectedComponents.getCpuId()).orElse(null) : null;
+            Mainboard mainboard = selectedComponents.getMainboardId() != null ? mainboardRepository.findById(selectedComponents.getMainboardId()).orElse(null) : null;
+            Ram ram = selectedComponents.getRamId() != null ? ramRepository.findById(selectedComponents.getRamId()).orElse(null) : null;
+            Gpu gpu = selectedComponents.getVgaId() != null ? gpuRepository.findById(selectedComponents.getVgaId()).orElse(null) : null;
+            Psu psu = selectedComponents.getPsuId() != null ? psuRepository.findById(selectedComponents.getPsuId()).orElse(null) : null;
+            CaseComponent pcCase = selectedComponents.getCaseId() != null ? caseRepository.findById(selectedComponents.getCaseId()).orElse(null) : null;
+            Cooler cooler = selectedComponents.getCoolerId() != null ? coolerRepository.findById(selectedComponents.getCoolerId()).orElse(null) : null;
+
+            switch (componentType) {
+                case CPU:
+                    List<Cpu> candidateCpus = cpuRepository.findAllById(candidateProductIds);
+                    for (Cpu candidate : candidateCpus) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkCpuMainboard(candidate, mainboard, report);
+                        compatibilityService.checkCoolerCpu(cooler, candidate, report);
+                        compatibilityService.checkPsuWattage(candidate, gpu, psu, report);
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case MAINBOARD:
+                    List<Mainboard> candidateMbs = mainboardRepository.findAllById(candidateProductIds);
+                    for (Mainboard candidate : candidateMbs) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkCpuMainboard(cpu, candidate, report);
+                        compatibilityService.checkMainboardRam(candidate, ram, report);
+                        compatibilityService.checkMainboardCase(candidate, pcCase, report);
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case RAM:
+                    List<Ram> candidateRams = ramRepository.findAllById(candidateProductIds);
+                    for (Ram candidate : candidateRams) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkMainboardRam(mainboard, candidate, report);
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case GPU:
+                    List<Gpu> candidateGpus = gpuRepository.findAllById(candidateProductIds);
+                    for (Gpu candidate : candidateGpus) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkGpuCase(candidate, pcCase, report);
+                        compatibilityService.checkPsuWattage(cpu, candidate, psu, report);
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case PSU:
+                    List<Psu> candidatePsus = psuRepository.findAllById(candidateProductIds);
+                    for (Psu candidate : candidatePsus) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkPsuWattage(cpu, gpu, candidate, report);
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case CASE_TYPE:
+                    List<CaseComponent> candidateCases = caseRepository.findAllById(candidateProductIds);
+                    for (CaseComponent candidate : candidateCases) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkMainboardCase(mainboard, candidate, report);
+                        compatibilityService.checkGpuCase(gpu, candidate, report);
+                        // Bỏ qua checkCoolerCase cho tản nước (và cả khí) ở bước lọc theo yêu cầu
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case COOLER:
+                    List<Cooler> candidateCoolers = coolerRepository.findAllById(candidateProductIds);
+                    for (Cooler candidate : candidateCoolers) {
+                        CompatibilityReport report = new CompatibilityReport();
+                        compatibilityService.checkCoolerCpu(candidate, cpu, report);
+                        // Bỏ qua checkCoolerCase ở đây
+                        if (report.getErrors().isEmpty()) {
+                            compatibleProductIds.add(candidate.getProductId());
+                        }
+                    }
+                    break;
+                case STORAGE:
+                default:
+                    compatibleProductIds.addAll(candidateProductIds);
+                    break;
+            }
+        }
+
+        if (compatibleProductIds.isEmpty()) {
+            return List.of();
+        }
+
         String[] sortParams = sortStr.split(",");
         Sort sort = Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]);
         PageRequest pageRequest = PageRequest.of(0, size, sort);
 
-        Page<Product> productPage = productRepository.searchPublic(null, categoryIds, null, null, null, null, pageRequest);
+        Page<Product> finalProductPage = productRepository.searchPublicByProductIds(compatibleProductIds, pageRequest);
 
-        return productPage.getContent().stream()
+        return finalProductPage.getContent().stream()
                 .map(BuildPcProductDto::new)
                 .collect(Collectors.toList());
     }
