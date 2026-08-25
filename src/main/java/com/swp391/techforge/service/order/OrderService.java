@@ -285,4 +285,56 @@ public class OrderService {
             }
         }
     }
+
+    @Transactional
+    public boolean confirmReceived(Long orderId, User user) {
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) return false;
+
+        Order order = orderOpt.get();
+        if (user != null && order.getUser() != null && !order.getUser().getUserId().equals(user.getUserId())) {
+            return false;
+        }
+
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            order.setStatus(OrderStatus.COMPLETED);
+            orderRepository.save(order);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean reportComplaint(Long orderId, User user) {
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) return false;
+
+        Order order = orderOpt.get();
+        if (user != null && order.getUser() != null && !order.getUser().getUserId().equals(user.getUserId())) {
+            return false;
+        }
+
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+            order.setStatus(OrderStatus.COMPLAINT);
+            orderRepository.save(order);
+            return true;
+        }
+        return false;
+    }
+
+    @org.springframework.scheduling.annotation.Scheduled(cron = "0 0 0 * * ?")
+    @Transactional
+    public void autoCompleteDeliveredOrders() {
+        List<Order> deliveredOrders = orderRepository.findByStatus(OrderStatus.DELIVERED);
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+        
+        for (Order order : deliveredOrders) {
+            // Assuming orderDate is close enough to when it was actually delivered, 
+            // or we just use orderDate + 3 days as the auto-complete limit.
+            if (order.getOrderDate().isBefore(threeDaysAgo)) {
+                order.setStatus(OrderStatus.COMPLETED);
+                orderRepository.save(order);
+            }
+        }
+    }
 }

@@ -47,8 +47,8 @@ public class ReviewService {
             throw new IllegalStateException("Bạn đã đánh giá sản phẩm này rồi.");
         }
 
-        if (!"DELIVERED".equals(orderItem.getOrder().getStatus().name())) {
-            throw new IllegalStateException("Đơn hàng chưa được giao, không thể đánh giá.");
+        if (!"COMPLETED".equals(orderItem.getOrder().getStatus().name())) {
+            throw new IllegalStateException("Bạn chỉ có thể đánh giá sản phẩm sau khi đã nhận được hàng (Trạng thái Đã hoàn thành).");
         }
 
         Product product = orderItem.getProduct();

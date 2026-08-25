@@ -17,6 +17,8 @@
         .status-confirmed { background: #d1ecf1; color: #0c5460; }
         .status-shipping { background: #cfe2ff; color: #10141a; }
         .status-delivered { background: #d1e7dd; color: #0f5132; }
+        .status-completed { background: #198754; color: #fff; }
+        .status-complaint { background: #dc3545; color: #fff; }
         .status-cancelled { background: #f8d7da; color: #842029; }
         .status-cancel-requested { background: #f4d5c9; color: #7a2d1d; }
     </style>
@@ -103,6 +105,8 @@
                             <span th:if="${order.status.name() == 'CONFIRMED'}" class="badge badge-status status-confirmed">CONFIRMED</span>
                             <span th:if="${order.status.name() == 'SHIPPING'}" class="badge badge-status status-shipping">SHIPPING</span>
                             <span th:if="${order.status.name() == 'DELIVERED'}" class="badge badge-status status-delivered">DELIVERED</span>
+                            <span th:if="${order.status.name() == 'COMPLETED'}" class="badge badge-status status-completed">COMPLETED</span>
+                            <span th:if="${order.status.name() == 'COMPLAINT'}" class="badge badge-status status-complaint">COMPLAINT</span>
                             <span th:if="${order.status.name() == 'CANCEL_REQUESTED'}" class="badge badge-status status-cancel-requested">CANCEL_REQUESTED</span>
                             <span th:if="${order.status.name() == 'CANCELLED'}" class="badge badge-status status-cancelled">CANCELLED</span>
                         </td>

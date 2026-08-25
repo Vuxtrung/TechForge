@@ -7,8 +7,9 @@
     </a>
     <ul class="nav nav-pills flex-column mb-auto mt-3">
         <li class="nav-item mb-2">
-            <a th:href="@{/staff/orders}" class="nav-link text-white d-flex align-items-center hover-bg-secondary">
-                <i class="bi bi-receipt me-2 fs-5"></i> Quản lý đơn hàng
+            <a th:href="@{/staff/orders}" class="nav-link text-white d-flex align-items-center justify-content-between hover-bg-secondary" th:with="complaintCount=${@orderRepository.countByStatus(T(com.swp391.techforge.entity.OrderStatus).COMPLAINT)}">
+                <div><i class="bi bi-receipt me-2 fs-5"></i> Quản lý đơn hàng</div>
+                <span th:if="${complaintCount > 0}" class="badge bg-danger rounded-pill" th:text="${complaintCount}"></span>
             </a>
         </li>
         <li class="nav-item mb-2">

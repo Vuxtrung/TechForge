@@ -174,7 +174,10 @@ public class UserController {
             long pending = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.PENDING).count();
             long confirmed = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.CONFIRMED).count();
             long shipping = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.SHIPPING).count();
-            long delivered = orders.stream().filter(o -> o.getStatus() == com.swp391.techforge.entity.OrderStatus.DELIVERED).count();
+            long delivered = orders.stream().filter(o -> 
+                o.getStatus() == com.swp391.techforge.entity.OrderStatus.DELIVERED || 
+                o.getStatus() == com.swp391.techforge.entity.OrderStatus.COMPLETED
+            ).count();
             
             summary.put("success", true);
             summary.put("total", orders.size());

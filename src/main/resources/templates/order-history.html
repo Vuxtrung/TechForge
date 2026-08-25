@@ -40,6 +40,8 @@
                         <option value="CONFIRMED" th:selected="${selectedStatus == 'CONFIRMED'}">Đã xác nhận (Confirmed)</option>
                         <option value="SHIPPING" th:selected="${selectedStatus == 'SHIPPING'}">Đang giao hàng (Shipping)</option>
                         <option value="DELIVERED" th:selected="${selectedStatus == 'DELIVERED'}">Giao thành công (Delivered)</option>
+                        <option value="COMPLETED" th:selected="${selectedStatus == 'COMPLETED'}">Đã nhận hàng (Completed)</option>
+                        <option value="COMPLAINT" th:selected="${selectedStatus == 'COMPLAINT'}">Đang khiếu nại (Complaint)</option>
                         <option value="CANCELLED" th:selected="${selectedStatus == 'CANCELLED'}">Đã hủy (Cancelled)</option>
                     </select>
                 </div>
@@ -85,8 +87,10 @@
                                 <span th:if="${order.status.name() == 'PENDING'}" class="badge bg-warning text-dark fs-8">Chờ xử lý</span>
                                 <span th:if="${order.status.name() == 'CONFIRMED'}" class="badge bg-info text-white fs-8">Đã xác nhận</span>
                                 <span th:if="${order.status.name() == 'SHIPPING'}" class="badge bg-primary fs-8">Đang giao hàng</span>
-                                <span th:if="${order.status.name() == 'DELIVERED'}" class="badge bg-success fs-8">Giao thành công</span>
-                                <span th:if="${order.status.name() == 'CANCELLED'}" class="badge bg-danger fs-8">Đã hủy</span>
+                                <span th:if="${order.status.name() == 'DELIVERED'}" class="badge bg-info text-white fs-8">Giao thành công</span>
+                                <span th:if="${order.status.name() == 'COMPLETED'}" class="badge bg-success fs-8">Đã nhận hàng</span>
+                                <span th:if="${order.status.name() == 'COMPLAINT'}" class="badge bg-danger fs-8">Đang khiếu nại</span>
+                                <span th:if="${order.status.name() == 'CANCELLED'}" class="badge bg-secondary fs-8">Đã hủy</span>
                             </td>
                             <td class="text-end fw-bold text-danger" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">
                                 18.020.000đ

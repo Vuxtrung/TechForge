@@ -47,6 +47,18 @@
                 <button th:if="${order.status.name() == 'PENDING' || order.status.name() == 'CONFIRMED'}" type="button" class="btn btn-danger btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#cancelModal">
                     <i class="bi bi-x-circle me-1"></i> Hủy Đơn Hàng
                 </button>
+
+                <form th:if="${order.status.name() == 'DELIVERED'}" th:action="@{'/orders/' + ${order.orderId} + '/confirm-received'}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success btn-sm fw-bold">
+                        <i class="bi bi-check-circle me-1"></i> Đã Nhận Được Hàng
+                    </button>
+                </form>
+
+                <form id="reportComplaintForm" th:if="${order.status.name() == 'DELIVERED'}" th:action="@{'/orders/' + ${order.orderId} + '/report-complaint'}" method="post" class="d-inline">
+                    <button type="button" class="btn btn-warning btn-sm fw-bold text-dark" onclick="reportComplaint()">
+                        <i class="bi bi-exclamation-triangle me-1"></i> Chưa Nhận Được Hàng
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -63,7 +75,7 @@
                                     <th scope="col" class="text-center">Đơn Giá</th>
                                     <th scope="col" class="text-center">Số Lượng</th>
                                     <th scope="col" class="text-end">Thành Tiền</th>
-                                    <th scope="col" class="text-center" th:if="${order.status.name() == 'DELIVERED'}">Hành động</th>
+                                    <th scope="col" class="text-center" th:if="${order.status.name() == 'COMPLETED'}">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,7 +84,7 @@
                                     <td class="text-center fw-semibold" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
                                     <td class="text-center fw-bold" th:text="${item.quantity}">1</td>
                                     <td class="text-end fw-bold text-danger" th:text="${#numbers.formatDecimal(item.totalPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">17.990.000đ</td>
-                                    <td class="text-center" th:if="${order.status.name() == 'DELIVERED'}">
+                                    <td class="text-center" th:if="${order.status.name() == 'COMPLETED'}">
                                         <button th:if="${!item.isReviewed}" type="button" class="btn btn-outline-warning btn-sm"
                                                 data-bs-toggle="modal" th:data-bs-target="'#reviewModal' + ${item.orderItemId}">
                                             Đánh giá
@@ -211,6 +223,14 @@
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+    <script>
+        function reportComplaint() {
+            if (confirm('Bạn xác nhận chưa nhận được hàng?')) {
+                alert('CSKH sẽ liên hệ lại với bạn trong vòng 4 giờ làm việc để kiểm tra với bên vận chuyển.');
+                document.getElementById('reportComplaintForm').submit();
+            }
+        }
+    </script>
 </body>
 
 </html>

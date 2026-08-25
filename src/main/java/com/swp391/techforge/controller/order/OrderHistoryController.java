@@ -155,6 +155,32 @@ public class OrderHistoryController {
         return "redirect:/cart";
     }
 
+    @PostMapping("/{id}/confirm-received")
+    public String confirmReceived(@PathVariable("id") Long id,
+                                  RedirectAttributes redirectAttributes,
+                                  Principal principal) {
+        boolean success = orderService.confirmReceived(id, currentUser(principal));
+        if (success) {
+            redirectAttributes.addFlashAttribute("successMessage", "Cảm ơn bạn đã xác nhận nhận hàng thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể xác nhận nhận hàng!");
+        }
+        return "redirect:/orders/" + id;
+    }
+
+    @PostMapping("/{id}/report-complaint")
+    public String reportComplaint(@PathVariable("id") Long id,
+                                  RedirectAttributes redirectAttributes,
+                                  Principal principal) {
+        boolean success = orderService.reportComplaint(id, currentUser(principal));
+        if (success) {
+            redirectAttributes.addFlashAttribute("successMessage", "Đã gửi khiếu nại. CSKH sẽ liên hệ lại với bạn trong vòng 4 giờ làm việc.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Không thể báo cáo khiếu nại!");
+        }
+        return "redirect:/orders/" + id;
+    }
+
     private User currentUser(Principal principal) {
         return userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new IllegalStateException("Không tìm thấy tài khoản."));
