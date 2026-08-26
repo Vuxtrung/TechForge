@@ -17,6 +17,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByActiveTrueOrderByNameAsc();
 
+    List<Category> findAllByParentIsNotNullAndActiveTrueOrderByNameAsc();
+
     List<Category> findAllByActiveTrueAndComponentTypeOrderByNameAsc(Category.ComponentType componentType);
 
     // Lấy danh mục gốc (cha) đang active, dùng cho mega-menu ở header

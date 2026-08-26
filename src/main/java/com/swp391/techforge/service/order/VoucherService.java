@@ -115,6 +115,7 @@ public class VoucherService {
         if (duplicated) {
             throw new IllegalArgumentException("Mã voucher \"" + voucher.getCode() + "\" đã tồn tại.");
         }
+
         if (voucher.getStartDate() == null || voucher.getEndDate() == null) {
             throw new IllegalArgumentException("Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc.");
         }
@@ -207,6 +208,7 @@ public class VoucherService {
             discount = voucher.getDiscountValue();
         }
 
+        
         // BR-V10: không giảm quá tổng tiền hàng.
         if (discount.compareTo(subtotal) > 0) {
             discount = subtotal;

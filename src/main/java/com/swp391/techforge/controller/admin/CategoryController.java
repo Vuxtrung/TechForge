@@ -48,14 +48,14 @@ public class CategoryController {
     @GetMapping("/new")
     public String newForm(Model model) {
         model.addAttribute("category", new Category());
-        model.addAttribute("parentCategories", categoryService.findAllActive());
+        model.addAttribute("parentCategories", categoryService.findRootActive());
         return "admin/category-form";
     }
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         model.addAttribute("category", categoryService.getById(id));
-        model.addAttribute("parentCategories", categoryService.findAllActive());
+        model.addAttribute("parentCategories", categoryService.findRootActive());
         return "admin/category-form";
     }
 
@@ -64,14 +64,14 @@ public class CategoryController {
                           BindingResult result, Model model,
                           RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("parentCategories", categoryService.findAllActive());
+            model.addAttribute("parentCategories", categoryService.findRootActive());
             return "admin/category-form";  //lỗi validate quay lại form
         }
         try {
             categoryService.create(category);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            model.addAttribute("parentCategories", categoryService.findAllActive());
+            model.addAttribute("parentCategories", categoryService.findRootActive());
             return "admin/category-form";
         }
         redirectAttributes.addFlashAttribute("successMessage", "Thêm danh mục thành công.");
@@ -84,14 +84,14 @@ public class CategoryController {
                           BindingResult result, Model model,
                           RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("parentCategories", categoryService.findAllActive());
+            model.addAttribute("parentCategories", categoryService.findRootActive());
             return "admin/category-form";
         }
         try {
             categoryService.update(id, category);
         } catch (IllegalArgumentException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            model.addAttribute("parentCategories", categoryService.findAllActive());
+            model.addAttribute("parentCategories", categoryService.findRootActive());
             return "admin/category-form";
         }
         redirectAttributes.addFlashAttribute("successMessage", "Cập nhật danh mục thành công.");
