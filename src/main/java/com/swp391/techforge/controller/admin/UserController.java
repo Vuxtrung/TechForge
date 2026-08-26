@@ -106,11 +106,11 @@ public class UserController {
      * @return Redirect về trang danh sách người dùng
      */
     @PostMapping("/{id}/lock")
-    public String lockUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String lockUser(@PathVariable Long id, @RequestParam(required = false) String lockReason, RedirectAttributes redirectAttributes) {
         User user = null;
         try {
             user = userService.getById(id);
-            userService.lockUser(id);
+            userService.lockUser(id, lockReason);
             redirectAttributes.addFlashAttribute("message", "Khóa tài khoản thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {

@@ -156,12 +156,10 @@
                 </div>
                 <div class="card-body">
                     <th:block th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).ACTIVE and user.role.roleName != 'ADMIN'}">
-                        <form th:action="@{/admin/users/{id}/lock(id=${user.userId})}" method="post" class="mb-3">
-                            <button type="submit" class="btn btn-danger w-100"
-                                    onclick="return confirm('Bạn chắc chắn muốn khóa tài khoản này?')">
-                                <i class="bi bi-lock"></i> Khóa tài khoản
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-danger w-100 mb-3"
+                                th:attr="onclick=|showLockModal('${user.userId}', '${user.fullName}', '${user.role.roleName}')|">
+                            <i class="bi bi-lock"></i> Khóa tài khoản
+                        </button>
                     </th:block>
                     <th:block th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).LOCKED}">
                         <form th:action="@{/admin/users/{id}/unlock(id=${user.userId})}" method="post" class="mb-3">
@@ -190,7 +188,10 @@
                         <i class="bi bi-check-circle"></i> Tài khoản đang hoạt động bình thường
                     </div>
                     <div th:if="${user.status == T(com.swp391.techforge.entity.UserStatus).LOCKED}" class="alert alert-danger mb-0">
-                        <i class="bi bi-lock-fill"></i> Tài khoản đã bị khóa. Người dùng không thể đăng nhập
+                        <div><i class="bi bi-lock-fill"></i> Tài khoản đã bị khóa. Người dùng không thể đăng nhập</div>
+                        <div th:if="${user.lockReason != null}" class="mt-2">
+                            <strong>Lý do:</strong> <span th:text="${user.lockReason}"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,6 +202,110 @@
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 
+<!-- Lock Confirm Modal -->
+<div class="modal fade" id="lockConfirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Xác nhận khóa tài khoản</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="lockUserForm" method="post" action="">
+      <div class="modal-body">
+        <p>Bạn đang thực hiện khóa tài khoản: <strong id="lockUserName"></strong></p>
+        <div id="lockOrderStats" class="alert alert-info" style="display: none;">
+            <!-- Stats will be injected here -->
+        </div>
+        <div id="lockLoading" class="text-center my-3">
+            <div class="spinner-border text-danger" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Đang kiểm tra thông tin...</p>
+        </div>
+        <p class="mb-0 mt-3 text-danger"><i class="bi bi-exclamation-triangle"></i> Bạn chắc chắn muốn tiếp tục khóa tài khoản này?</p>
+        
+        <div class="mt-3">
+            <label for="lockReason" class="form-label fw-bold">Lý do khóa <span class="text-danger">*</span></label>
+            <select name="lockReason" id="lockReason" class="form-select" required>
+                <option value="">-- Chọn lý do --</option>
+                <option value="Bom hàng/Từ chối nhận hàng nhiều lần.">Bom hàng/Từ chối nhận hàng nhiều lần.</option>
+                <option value="Spam/Đánh giá ảo/Dùng từ ngữ thô tục.">Spam/Đánh giá ảo/Dùng từ ngữ thô tục.</option>
+                <option value="Nghi ngờ gian lận thanh toán (Dùng thẻ tín dụng lạ).">Nghi ngờ gian lận thanh toán (Dùng thẻ tín dụng lạ).</option>
+                <option value="Lý do khác.">Lý do khác.</option>
+            </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="submit" class="btn btn-danger" id="confirmLockBtn" disabled>Đồng ý Khóa</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function showLockModal(userId, userName, roleName) {
+        document.getElementById('lockUserName').innerText = userName;
+        document.getElementById('lockUserForm').action = '/admin/users/' + userId + '/lock';
+        
+        const statsDiv = document.getElementById('lockOrderStats');
+        const loadingDiv = document.getElementById('lockLoading');
+        const confirmBtn = document.getElementById('confirmLockBtn');
+        
+        statsDiv.style.display = 'none';
+        loadingDiv.style.display = 'block';
+        confirmBtn.disabled = true;
+        
+        const modal = new bootstrap.Modal(document.getElementById('lockConfirmModal'));
+        modal.show();
+
+        if (roleName === 'CUSTOMER') {
+            fetch('/admin/users/' + userId + '/orders-summary')
+                .then(response => response.json())
+                .then(data => {
+                    loadingDiv.style.display = 'none';
+                    statsDiv.style.display = 'block';
+                    
+                    if (data.success) {
+                        if (data.total === 0) {
+                            statsDiv.innerHTML = '<strong>Người dùng này hiện tại không có đơn hàng nào.</strong>';
+                        } else {
+                            let html = '<strong>Thông tin đơn hàng hiện tại:</strong><ul>';
+                            html += '<li>Đang chờ xử lý (PENDING): ' + data.pending + '</li>';
+                            html += '<li>Đã xác nhận (CONFIRMED): ' + data.confirmed + '</li>';
+                            html += '<li>Đang giao (SHIPPING): ' + data.shipping + '</li>';
+                            html += '</ul>';
+                            if (data.pending > 0 || data.confirmed > 0) {
+                                html += '<div class="text-danger mt-2"><small>* Các đơn hàng đang chờ xử lý và đã xác nhận sẽ bị HỦY tự động.</small></div>';
+                            }
+                            statsDiv.innerHTML = html;
+                        }
+                    } else {
+                        statsDiv.innerHTML = '<span class="text-danger">Không thể tải thông tin đơn hàng.</span>';
+                    }
+                    confirmBtn.disabled = false;
+                })
+                .catch(err => {
+                    loadingDiv.style.display = 'none';
+                    statsDiv.style.display = 'block';
+                    statsDiv.innerHTML = '<span class="text-danger">Lỗi khi tải thông tin đơn hàng.</span>';
+                    confirmBtn.disabled = false;
+                });
+        } else if (roleName === 'STAFF_WARRANTY') {
+            loadingDiv.style.display = 'none';
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = '<strong>Lưu ý:</strong> Các phiếu bảo hành đang giao cho nhân viên này sẽ bị gỡ phân công tự động.';
+            confirmBtn.disabled = false;
+        } else {
+            // VD: STAFF_SALES không cần thông báo đặc biệt
+            loadingDiv.style.display = 'none';
+            statsDiv.style.display = 'none';
+            confirmBtn.disabled = false;
+        }
+    }
+</script>
 </body>
 </html>

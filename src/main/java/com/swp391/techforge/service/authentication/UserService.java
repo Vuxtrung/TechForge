@@ -103,12 +103,13 @@ public class UserService {
      * @return User sau khi khóa
      */
     @Transactional
-    public User lockUser(Long userId) {
+    public User lockUser(Long userId, String lockReason) {
         User user = getById(userId);
         if (user.getRole() != null && "ADMIN".equalsIgnoreCase(user.getRole().getRoleName())) {
             throw new IllegalStateException("Không thể khóa tài khoản quản trị viên (ADMIN)!");
         }
         user.setStatus(UserStatus.LOCKED);
+        user.setLockReason(lockReason);
         User savedUser = userRepository.save(user);
 
         // Xử lý logic nghiệp vụ khi khóa
@@ -134,6 +135,7 @@ public class UserService {
     public User unlockUser(Long userId) {
         User user = getById(userId);
         user.setStatus(UserStatus.ACTIVE);
+        user.setLockReason(null);
         return userRepository.save(user);
     }
 
