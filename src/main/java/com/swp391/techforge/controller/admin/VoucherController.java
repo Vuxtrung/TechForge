@@ -59,6 +59,7 @@ public class VoucherController {
         model.addAttribute("voucher", voucher);
         model.addAttribute("usedCount", voucherService.countUsed(id));
         return "admin/voucher-form";
+        
     }
 
     @PostMapping

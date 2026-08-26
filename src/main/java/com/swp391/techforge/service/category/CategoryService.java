@@ -23,7 +23,7 @@ public class CategoryService {
     public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
-    
+
     // Lấy N danh mục nổi bật (nhiều sản phẩm nhất), dùng cho trang chủ
     @Transactional(readOnly = true)
     public List<Category> findTopCategoriesByProductCount(int limit) {
@@ -53,6 +53,11 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<Category> findAllActive() {
         return categoryRepository.findAllByActiveTrueOrderByNameAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Category> findAllChild() {
+        return categoryRepository.findAllByParentIsNotNullAndActiveTrueOrderByNameAsc();
     }
 
     // Chỉ lấy danh mục GỐC (không có cha) đang active - dùng cho dropdown "Danh Mục Cha"
@@ -167,24 +172,19 @@ public class CategoryService {
         if (parentId == null) {
             return null;
         }
+
         if (currentId != null && parentId.equals(currentId)) {
-            throw new IllegalArgumentException("Danh mục không thể là cha của chính nó.");
+            throw new IllegalArgumentException(
+                    "Danh mục không thể là cha của chính nó.");
         }
 
         Category parent = categoryRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Danh mục cha không tồn tại."));
+                .orElseThrow(() -> new IllegalArgumentException(
+                "Danh mục cha không tồn tại."));
 
-        // Chống vòng lặp cha-con đa cấp: duyệt ngược lên tổ tiên của parent,
-        // nếu gặp lại currentId thì tức là đang tạo vòng lặp (A -> B -> A...)
-        if (currentId != null) {
-            Category ancestor = parent;
-            while (ancestor != null) {
-                if (ancestor.getCategoryId().equals(currentId)) {
-                    throw new IllegalArgumentException(
-                            "Không thể chọn danh mục con của chính nó làm danh mục cha.");
-                }
-                ancestor = ancestor.getParent();
-            }
+        if (parent.getParent() != null) {
+            throw new IllegalArgumentException(
+                    "Chỉ được phép tạo danh mục tối đa 2 tầng.");
         }
 
         return parent;
