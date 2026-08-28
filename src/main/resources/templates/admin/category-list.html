@@ -342,7 +342,7 @@
       document.querySelectorAll('.js-delete-category').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           var name = btn.getAttribute('data-name');
-          if (!confirm('Xác nhận XÓA VĨNH VIỄN danh mục "' + name + '"? Hành động này không thể hoàn tác.')) {
+          if (!confirm('Xác nhận XÓA danh mục "' + name + '"? Hành động này không thể hoàn tác.')) {
             e.preventDefault();
           }
         });

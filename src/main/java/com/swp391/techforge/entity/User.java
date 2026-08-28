@@ -45,6 +45,9 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus status = UserStatus.ACTIVE;
 
+    @Column(name = "lock_reason", columnDefinition = "NVARCHAR(255)")
+    private String lockReason;
+
     @Column(name = "loyalty_points", nullable = false)
     private Integer loyaltyPoints = 0;
 

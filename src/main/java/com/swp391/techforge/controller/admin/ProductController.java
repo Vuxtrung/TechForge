@@ -61,7 +61,7 @@ public class ProductController {
     public String newForm(Model model) {
         model.addAttribute("product", new Product());
         model.addAttribute("spec", new ComponentSpecRequest());
-        model.addAttribute("categories", categoryService.findAllActive());
+        model.addAttribute("categories", categoryService.findAllChild());
         return "admin/product-form";
     }
 
