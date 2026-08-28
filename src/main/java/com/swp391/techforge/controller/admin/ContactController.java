@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,7 +36,6 @@ public class ContactController {
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("createdAt", "fullName", "email", "subject",
             "status");
     private final ContactRepository contactRepository;
-    private final JavaMailSender mailSender;
     private final ContactRateLimiterService rateLimiterService;
     private final CaptchaService captchaService;
     private final EmailService emailService;
@@ -48,7 +46,6 @@ public class ContactController {
             CaptchaService captchaService,
             EmailService emailService) {
         this.contactRepository = contactRepository;
-        this.mailSender = mailSender;
         this.rateLimiterService = rateLimiterService;
         this.captchaService = captchaService;
         this.emailService = emailService;
