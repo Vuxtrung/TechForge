@@ -2,6 +2,7 @@ package com.swp391.techforge.dto.authentication;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,7 @@ public class RegisterRequest implements Serializable {
     private String fullName;
 
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Size(min = 10, max = 10, message = "Số điện thoại phải là 10 ký tự")
+    @Pattern(regexp = "^\\d{10}$", message = "Số điện thoại phải là 10 ký tự số")
     private String phone;
 
     @NotBlank(message = "Mật khẩu không được để trống")
