@@ -40,6 +40,28 @@ public class StaffWarrantyController {
         return "staff/warranty-list";
     }
 
+    @GetMapping("/new")
+    public String createForm(Model model) {
+        List<User> customers = userRepository.findAll().stream()
+                .filter(user -> user.getRole() != null && user.getRole().getRoleId() == 2)
+                .toList();
+        model.addAttribute("customers", customers);
+        return "staff/warranty-create";
+    }
+
+    @PostMapping("/receive")
+    public String receive(@RequestParam Long userId, @RequestParam String imeiSerial,
+            @RequestParam(required = false) String phoneLookup, @RequestParam(required = false) String issueDesc,
+            @RequestParam(required = false) Long orderItemId, RedirectAttributes redirectAttributes) {
+        try {
+            warrantyTicketService.receiveProduct(userId, imeiSerial, phoneLookup, issueDesc, orderItemId);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã tiếp nhận sản phẩm và tạo phiếu bảo hành.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/staff/warranty";
+    }
+
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         model.addAttribute("ticket", warrantyTicketService.getById(id));

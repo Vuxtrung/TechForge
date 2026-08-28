@@ -36,6 +36,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                      @Param("endDate") LocalDateTime endDate,
                                      @Param("search") String search);
 
+    @Query("SELECT o FROM Order o WHERE o.user = :user " +
+           "AND (:status IS NULL OR o.status = :status) " +
+           "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +
+           "AND (:endDate IS NULL OR o.orderDate <= :endDate) " +
+           "AND (:search IS NULL OR CAST(o.orderId AS string) LIKE %:search% OR LOWER(o.recipientName) LIKE LOWER(CONCAT('%', :search, '%'))) ")
+    Page<Order> searchForCustomer(@Param("user") User user,
+                                  @Param("status") OrderStatus status,
+                                  @Param("startDate") LocalDateTime startDate,
+                                  @Param("endDate") LocalDateTime endDate,
+                                  @Param("search") String search,
+                                  Pageable pageable);
+
     @Query("SELECT o FROM Order o WHERE " +
            "(:status IS NULL OR o.status = :status) " +
            "AND (:startDate IS NULL OR o.orderDate >= :startDate) " +

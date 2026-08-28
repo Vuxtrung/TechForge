@@ -124,26 +124,15 @@
 
             <nav th:if="${orderPage.totalPages > 1}" class="mt-4" aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
-                    <li class="page-item" th:classappend="${!orderPage.hasPrevious()} ? 'disabled'">
-                        <a class="page-link" th:if="${orderPage.hasPrevious()}"
-                           th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${orderPage.number - 1}, size=${orderPage.size})}">&laquo;</a>
-                        <span class="page-link" th:unless="${orderPage.hasPrevious()}">&laquo;</span>
-                    </li>
-
-                    <th:block th:each="i : ${#numbers.sequence(0, orderPage.totalPages - 1)}">
-                        <li class="page-item" th:classappend="${i == orderPage.number} ? 'active'">
-                            <a class="page-link" th:if="${i != orderPage.number}"
-                               th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${i}, size=${orderPage.size})}"
-                               th:text="${i + 1}"></a>
-                            <span class="page-link" th:if="${i == orderPage.number}" th:text="${i + 1}"></span>
-                        </li>
-                    </th:block>
-
-                    <li class="page-item" th:classappend="${!orderPage.hasNext()} ? 'disabled'">
-                        <a class="page-link" th:if="${orderPage.hasNext()}"
-                           th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${orderPage.number + 1}, size=${orderPage.size})}">&raquo;</a>
-                        <span class="page-link" th:unless="${orderPage.hasNext()}">&raquo;</span>
-                    </li>
+                    <li class="page-item" th:classappend="${!orderPage.hasPrevious()} ? 'disabled'"><a class="page-link" th:if="${orderPage.hasPrevious()}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=0, size=${orderPage.size})}"><i class="bi bi-chevron-double-left"></i></a><span class="page-link" th:unless="${orderPage.hasPrevious()}"><i class="bi bi-chevron-double-left"></i></span></li>
+                    <li class="page-item" th:classappend="${!orderPage.hasPrevious()} ? 'disabled'"><a class="page-link" th:if="${orderPage.hasPrevious()}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${orderPage.number - 1}, size=${orderPage.size})}"><i class="bi bi-chevron-left"></i></a><span class="page-link" th:unless="${orderPage.hasPrevious()}"><i class="bi bi-chevron-left"></i></span></li>
+                    <li class="page-item" th:classappend="${orderPage.number == 0} ? 'active'"><a class="page-link" th:if="${orderPage.number != 0}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=0, size=${orderPage.size})}">1</a><span class="page-link" th:if="${orderPage.number == 0}">1</span></li>
+                    <li class="page-item disabled" th:if="${orderPage.number > 2}"><span class="page-link">...</span></li>
+                    <th:block th:with="start=${T(java.lang.Math).max(1, orderPage.number - 1)}, end=${T(java.lang.Math).min(orderPage.totalPages - 2, orderPage.number + 1)}"><th:block th:if="${start <= end}" th:each="i : ${#numbers.sequence(start, end)}"><li class="page-item" th:classappend="${i == orderPage.number} ? 'active'"><a class="page-link" th:if="${i != orderPage.number}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${i}, size=${orderPage.size})}" th:text="${i + 1}"></a><span class="page-link" th:if="${i == orderPage.number}" th:text="${i + 1}"></span></li></th:block></th:block>
+                    <li class="page-item disabled" th:if="${orderPage.number < orderPage.totalPages - 3}"><span class="page-link">...</span></li>
+                    <li class="page-item" th:classappend="${orderPage.last} ? 'active'"><a class="page-link" th:if="${!orderPage.last}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${orderPage.totalPages - 1}, size=${orderPage.size})}" th:text="${orderPage.totalPages}"></a><span class="page-link" th:if="${orderPage.last}" th:text="${orderPage.totalPages}"></span></li>
+                    <li class="page-item" th:classappend="${!orderPage.hasNext()} ? 'disabled'"><a class="page-link" th:if="${orderPage.hasNext()}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${orderPage.number + 1}, size=${orderPage.size})}"><i class="bi bi-chevron-right"></i></a><span class="page-link" th:unless="${orderPage.hasNext()}"><i class="bi bi-chevron-right"></i></span></li>
+                    <li class="page-item" th:classappend="${!orderPage.hasNext()} ? 'disabled'"><a class="page-link" th:if="${orderPage.hasNext()}" th:href="@{/staff/orders(search=${search}, status=${status}, startDate=${startDate}, endDate=${endDate}, sort=${sort}, page=${orderPage.totalPages - 1}, size=${orderPage.size})}"><i class="bi bi-chevron-double-right"></i></a><span class="page-link" th:unless="${orderPage.hasNext()}"><i class="bi bi-chevron-double-right"></i></span></li>
                 </ul>
             </nav>
         </div>
