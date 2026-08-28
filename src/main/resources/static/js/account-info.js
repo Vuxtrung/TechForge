@@ -1,12 +1,11 @@
-(function () {
-    const form = document.getElementById('accountInfoForm');
-    if (!form) return;
-
+document.addEventListener('DOMContentLoaded', function () {
     const avatarInput = document.getElementById('avatarInput');
     const avatarError = document.getElementById('avatarError');
-    const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
+    const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 
     avatarInput.addEventListener('change', function () {
+        console.log("Đã chọn file!");
+
         avatarError.classList.add('d-none');
         const file = this.files[0];
         if (!file) return;
@@ -20,7 +19,7 @@
         }
 
         if (file.size > MAX_AVATAR_SIZE) {
-            avatarError.textContent = 'Kích thước ảnh vượt quá 2MB.';
+            avatarError.textContent = 'Kích thước ảnh vượt quá 5MB.';
             avatarError.classList.remove('d-none');
             this.value = '';
             return;
@@ -42,4 +41,4 @@
         };
         reader.readAsDataURL(file);
     });
-})();
+});

@@ -161,12 +161,15 @@ public class AccountController {
             return "account";
         }
 
-        user.setFullName(request.getFullName());
-        user.setPhone(request.getPhone());
-        user.setAddress(request.getAddress());
-
         MultipartFile avatarFile = request.getAvatarFile();
         if (avatarFile != null && !avatarFile.isEmpty()) {
+            if (avatarFile.getSize() > 2 * 1024 * 1024) {
+                bindingResult.rejectValue("avatarFile", "error.avatarFile");
+                model.addAttribute("user", user);
+                model.addAttribute("view", "info");
+                return "account";
+            }
+
             try {
                 user.setAvatarUrl(cloudinaryService.uploadImage(avatarFile, "techforge/avatars"));
             } catch (IOException e) {
@@ -176,6 +179,9 @@ public class AccountController {
                 return "account";
             }
         }
+        user.setFullName(request.getFullName());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
 
         userRepository.save(user);
 
