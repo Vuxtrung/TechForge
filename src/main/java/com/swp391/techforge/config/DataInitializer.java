@@ -9,12 +9,14 @@ import com.swp391.techforge.repository.product.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 @Component
-public class DataInitializer {
+@ConditionalOnProperty(name = "app.seed-data.enabled", havingValue = "true")
+public class DataInitializer implements CommandLineRunner {
 
         private final UserRepository userRepository;
         private final RoleRepository roleRepository;
@@ -37,6 +39,12 @@ public class DataInitializer {
                 this.productRepository = productRepository;
                 this.passwordEncoder = passwordEncoder;
                 this.blogRepository = blogRepository;
+        }
+
+        @Override
+        public void run(String... args) {
+                // Seed logic is kept disabled by default unless app.seed-data.enabled=true.
+                // The project can enable it explicitly when needed.
         }
 
         // @Override

@@ -28,8 +28,6 @@ import java.util.*;
 @RequestMapping("/checkout")
 public class CheckoutController {
 
-    private static final String CART_SESSION_KEY = "MY_CART_ITEMS";
-
     private final OrderService orderService;
     private final VNPayService vnPayService;
     private final PaymentRepository paymentRepository;

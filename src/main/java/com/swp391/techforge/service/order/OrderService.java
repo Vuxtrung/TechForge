@@ -26,7 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final PaymentRepository paymentRepository;
-    private final VoucherService voucherService;
+    private final VoucherRepository voucherRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -35,7 +35,7 @@ public class OrderService {
     public OrderService(OrderRepository orderRepository,
                         OrderItemRepository orderItemRepository,
                         PaymentRepository paymentRepository,
-                        VoucherService voucherService,
+                        VoucherRepository voucherRepository,
                         ProductRepository productRepository,
                         UserRepository userRepository,
                         RoleRepository roleRepository,
@@ -43,11 +43,44 @@ public class OrderService {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.paymentRepository = paymentRepository;
-        this.voucherService = voucherService;
+        this.voucherRepository = voucherRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public Voucher validateVoucher(String code, BigDecimal subtotal) {
+        if (code == null || code.trim().isEmpty()) return null;
+
+        Optional<Voucher> voucherOpt = voucherRepository.findByCodeIgnoreCaseAndIsActiveTrue(code.trim());
+        if (voucherOpt.isEmpty()) return null;
+
+        Voucher voucher = voucherOpt.get();
+        LocalDateTime now = LocalDateTime.now();
+
+        if (voucher.getStartDate() != null && now.isBefore(voucher.getStartDate())) return null;
+        if (voucher.getEndDate() != null && now.isAfter(voucher.getEndDate())) return null;
+        if (voucher.getUsageLimit() != null && voucher.getUsageLimit() <= 0) return null;
+        if (voucher.getMinOrderValue() != null && subtotal.compareTo(voucher.getMinOrderValue()) < 0) return null;
+
+        return voucher;
+    }
+
+    public BigDecimal calculateVoucherDiscount(Voucher voucher, BigDecimal subtotal) {
+        if (voucher == null || subtotal == null) return BigDecimal.ZERO;
+
+        BigDecimal discount = BigDecimal.ZERO;
+        if (voucher.getDiscountType() == DiscountType.PERCENT) {
+            discount = subtotal.multiply(voucher.getDiscountValue()).divide(BigDecimal.valueOf(100));
+        } else if (voucher.getDiscountType() == DiscountType.FIXED_AMOUNT) {
+            discount = voucher.getDiscountValue();
+        }
+
+        if (discount.compareTo(subtotal) > 0) {
+            discount = subtotal;
+        }
+        return discount;
     }
 
     @Transactional
@@ -75,20 +108,8 @@ public class OrderService {
             }
         }
 
-        User orderUser = user;
-        if (orderUser == null && request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
-            orderUser = userRepository.findByEmail(request.getEmail().trim()).orElse(null);
-        }
-
-        if (orderUser == null) {
-            throw new IllegalStateException("Vui lòng đăng nhập tài khoản trước khi thực hiện đặt hàng!");
-        }
-
-        // BR-V08: voucher phải được kiểm tra lại đầy đủ (BR-V02..BR-V06, BR-V10)
-        // ngay tại thời điểm tạo đơn, không tin kết quả đã check ở bước preview giỏ hàng.
-        // Dùng orderUser (đã resolve) để BR-V06 (giới hạn theo khách hàng) chính xác.
-        Voucher voucher = voucherService.validateForCheckout(request.getVoucherCode(), subtotal, orderUser);
-        BigDecimal voucherDiscount = voucherService.calculateDiscount(voucher, subtotal);
+        Voucher voucher = validateVoucher(request.getVoucherCode(), subtotal);
+        BigDecimal voucherDiscount = calculateVoucherDiscount(voucher, subtotal);
 
         BigDecimal shippingFee = BigDecimal.valueOf(30000);
         if ("EXPRESS".equalsIgnoreCase(request.getShippingMethod())) {
@@ -98,6 +119,15 @@ public class OrderService {
         BigDecimal grandTotal = subtotal.subtract(voucherDiscount).add(shippingFee);
         if (grandTotal.compareTo(BigDecimal.ZERO) < 0) {
             grandTotal = BigDecimal.ZERO;
+        }
+
+        User orderUser = user;
+        if (orderUser == null && request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
+            orderUser = userRepository.findByEmail(request.getEmail().trim()).orElse(null);
+        }
+
+        if (orderUser == null) {
+            throw new IllegalStateException("Vui lòng đăng nhập tài khoản trước khi thực hiện đặt hàng!");
         }
 
         Order order = new Order();
@@ -113,18 +143,13 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(grandTotal);
         order.setVoucher(voucher);
-        order.setDiscountAmount(voucherDiscount);
+
+        if (voucher != null && voucher.getUsageLimit() != null) {
+            voucher.setUsageLimit(voucher.getUsageLimit() - 1);
+            voucherRepository.save(voucher);
+        }
 
         Order savedOrder = orderRepository.save(order);
-
-        // BR-V09: chỉ ghi nhận lượt dùng voucher SAU KHI thanh toán thành công.
-        // - COD: không có bước xác nhận thanh toán online riêng trong hệ thống hiện tại,
-        //   nên coi "đặt hàng COD thành công" là mốc ghi nhận.
-        // - VNPAY: đơn đang ở trạng thái PENDING chờ thanh toán -> KHÔNG ghi nhận ở đây,
-        //   việc ghi nhận được thực hiện ở CheckoutController#vnpayReturn khi callback báo SUCCESS.
-        if (voucher != null && !"VNPAY".equalsIgnoreCase(request.getPaymentMethod())) {
-            voucherService.recordUsage(voucher, orderUser, savedOrder);
-        }
 
         for (CartItemDTO item : cartItems) {
             OrderItem orderItem = new OrderItem();
@@ -161,7 +186,7 @@ public class OrderService {
         if (user == null) {
             return Page.empty();
         }
-        return orderRepository.filterCustomerOrders(user, status, startDate, endDate, search,
+        return orderRepository.searchForCustomer(user, status, startDate, endDate, search,
                 PageRequest.of(normalizePage(page), normalizeSize(size), Sort.by(Sort.Direction.DESC, "orderDate")));
     }
 
@@ -264,7 +289,7 @@ public class OrderService {
         return switch (current) {
             case PENDING -> next == OrderStatus.CONFIRMED || next == OrderStatus.CANCELLED;
             case CONFIRMED -> next == OrderStatus.SHIPPING || next == OrderStatus.CANCEL_REQUESTED || next == OrderStatus.CANCELLED;
-            case SHIPPING -> next == OrderStatus.DELIVERED || next == OrderStatus.CANCEL_REQUESTED;
+            case SHIPPING -> next == OrderStatus.DELIVERED;
             case CANCEL_REQUESTED -> next == OrderStatus.CANCELLED || next == OrderStatus.CONFIRMED;
             case DELIVERED, CANCELLED -> false;
         };
@@ -284,8 +309,14 @@ public class OrderService {
             order.setStatus(OrderStatus.CANCELLED);
             order.setCancelReason(reason);
             orderRepository.save(order);
-            restoreStock(order.getOrderId());
-            voucherService.releaseUsageForCancelledOrder(order);
+
+            for (OrderItem item : order.getOrderItems()) {
+                if (item.getProduct() != null) {
+                    Product product = item.getProduct();
+                    product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                    productRepository.save(product);
+                }
+            }
             return true;
         }
         return false;
@@ -362,9 +393,9 @@ public class OrderService {
     public void autoCompleteDeliveredOrders() {
         List<Order> deliveredOrders = orderRepository.findByStatus(OrderStatus.DELIVERED);
         LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
-        
+
         for (Order order : deliveredOrders) {
-            // Assuming orderDate is close enough to when it was actually delivered, 
+            // Assuming orderDate is close enough to when it was actually delivered,
             // or we just use orderDate + 3 days as the auto-complete limit.
             if (order.getOrderDate().isBefore(threeDaysAgo)) {
                 order.setStatus(OrderStatus.COMPLETED);
