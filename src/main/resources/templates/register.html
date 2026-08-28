@@ -22,7 +22,7 @@
                     <!-- Email -->
                     <div class="form-group">
                         <label for="email">Email đăng ký<span class="required">*</span></label>
-                        <input type="email" id="email" th:field="*{email}"
+                        <input type="text" id="email" th:field="*{email}"
                                th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
                                placeholder="Nhập email của bạn">
                         <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
@@ -67,7 +67,7 @@
                     <!-- Province -->
                     <div class="form-group">
                         <label for="province">Tỉnh/Thành phố<span class="required">*</span></label>
-                        <select id="province" th:field="*{province}"
+                        <select id="province" th:field="*{province}" class="form-select"
                                 th:classappend="${#fields.hasErrors('province')} ? 'is-invalid'">
                             <option value="">-- Chọn Tỉnh/Thành phố --</option>
                         </select>
@@ -77,7 +77,7 @@
                     <!-- Ward -->
                     <div class="form-group">
                         <label for="ward">Phường/Xã<span class="required">*</span></label>
-                        <select id="ward" th:field="*{ward}"
+                        <select id="ward" th:field="*{ward}" class="form-select"
                                 th:classappend="${#fields.hasErrors('ward')} ? 'is-invalid'"
                                 disabled>
                             <option value="">-- Chọn Phường/Xã --</option>

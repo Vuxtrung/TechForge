@@ -64,9 +64,7 @@
                     <div class="text-danger fs-8 mt-1" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
                 </div>
 
-
-
-                <div class="col-12">
+                <div class="col-12" hidden>
                     <label class="form-label fs-7 fw-semibold">Địa chỉ <span class="text-danger">*</span></label>
                     <textarea th:field="*{address}" class="form-control" rows="2"
                         th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'"

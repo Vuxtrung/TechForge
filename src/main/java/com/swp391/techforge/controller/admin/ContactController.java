@@ -6,6 +6,7 @@ import com.swp391.techforge.entity.ContactStatus;
 import com.swp391.techforge.repository.contact.ContactRepository;
 import com.swp391.techforge.service.contact.CaptchaService;
 import com.swp391.techforge.service.contact.ContactRateLimiterService;
+import com.swp391.techforge.service.email.EmailService;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
@@ -39,15 +40,18 @@ public class ContactController {
     private final JavaMailSender mailSender;
     private final ContactRateLimiterService rateLimiterService;
     private final CaptchaService captchaService;
+    private final EmailService emailService;
 
     public ContactController(ContactRepository contactRepository,
             JavaMailSender mailSender,
             ContactRateLimiterService rateLimiterService,
-            CaptchaService captchaService) {
+            CaptchaService captchaService,
+            EmailService emailService) {
         this.contactRepository = contactRepository;
         this.mailSender = mailSender;
         this.rateLimiterService = rateLimiterService;
         this.captchaService = captchaService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/contact")
@@ -181,17 +185,7 @@ public class ContactController {
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy thông tin liên hệ với ID: " + id));
 
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(contact.getEmail());
-            message.setSubject("Phản hồi từ TechForge về yêu cầu: " + contact.getSubject());
-            message.setText("Xin chào " + contact.getFullName() + ",\n\n" +
-                    "Cảm ơn bạn đã liên hệ với TechForge. Phản hồi từ nhân viên:\n\n" +
-                    replyMessage + "\n\n" +
-                    "Trân trọng,\n" +
-                    "Đội ngũ hỗ trợ TechForge");
-
-            mailSender.send(message);
-
+            emailService.sendContactResponse(contact.getEmail(), contact.getSubject(), contact.getFullName(), replyMessage);
             contact.setRepliedAt(LocalDateTime.now());
             if (contact.getStatus() != ContactStatus.HIDDEN) {
                 contact.setStatus(ContactStatus.REPLIED);

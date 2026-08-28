@@ -22,12 +22,23 @@ public class EmailService {
         message.setFrom(fromEmail);
         message.setTo(toEmail);
         message.setSubject("[TechForge] Mã xác thực OTP");
-        message.setText(
-                "Mã OTP của bạn là: " + otpCode + "\n\n" +
+        message.setText("Mã OTP của bạn là: " + otpCode + "\n\n" +
                 "Mã có hiệu lực trong 5 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai.\n\n" +
                 "Nếu bạn không yêu cầu, vui lòng bỏ qua email này.\n\n" +
-                "— TechForge System"
-        );
+                "— TechForge System");
+        mailSender.send(message);
+    }
+
+    public void sendContactResponse(String toEmail, String subject, String name, String replyMessage) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("[TechForge] Phản hồi về yêu cầu: " + subject);
+        message.setText("Xin chào " + name + ",\n\n" +
+                "Cảm ơn bạn đã liên hệ với TechForge. Phản hồi từ nhân viên:\n\n" +
+                replyMessage + "\n\n" +
+                "Trân trọng,\n" +
+                "Đội ngũ hỗ trợ TechForge");
         mailSender.send(message);
     }
 }
