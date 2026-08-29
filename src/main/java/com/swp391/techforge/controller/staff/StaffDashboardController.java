@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.Authentication;
 
 @Controller
 @RequestMapping("/staff")
@@ -21,13 +22,23 @@ public class StaffDashboardController {
     }
 
     @GetMapping({"", "/dashboard"})
-    public String dashboard(Model model) {
-        Page<?> orders = orderService.searchForStaff(null, null, null, null, 0, 1,
+        public String dashboard(Model model, Authentication authentication) {
+        boolean salesStaff = authentication.getAuthorities().stream()
+            .anyMatch(authority -> authority.getAuthority().equals("ROLE_STAFF_SALES"));
+        boolean warrantyStaff = authentication.getAuthorities().stream()
+            .anyMatch(authority -> authority.getAuthority().equals("ROLE_STAFF_WARRANTY"));
+        if (salesStaff) {
+            Page<?> orders = orderService.searchForStaff(null, null, null, null, 0, 1,
                 Sort.by(Sort.Direction.DESC, "orderDate"));
-        Page<?> tickets = warrantyTicketService.search(null, null, 0, 1,
+            model.addAttribute("orderCount", orders.getTotalElements());
+        }
+        if (warrantyStaff) {
+            Page<?> tickets = warrantyTicketService.search(null, null, 0, 1,
                 Sort.by(Sort.Direction.DESC, "createdAt"));
-        model.addAttribute("orderCount", orders.getTotalElements());
-        model.addAttribute("warrantyCount", tickets.getTotalElements());
+            model.addAttribute("warrantyCount", tickets.getTotalElements());
+        }
+        model.addAttribute("salesStaff", salesStaff);
+        model.addAttribute("warrantyStaff", warrantyStaff);
         return "staff/dashboard";
     }
 }

@@ -107,16 +107,15 @@
 
             <nav th:if="${ticketPage.totalPages > 1}" aria-label="Pagination">
                 <ul class="pagination justify-content-center mt-3">
-                    <li class="page-item" th:classappend="${ticketPage.first} ? 'disabled' : ''">
-                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number - 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}">Trước</a>
-                    </li>
-                    <li class="page-item" th:each="i : ${#numbers.sequence(0, ticketPage.totalPages - 1)}"
-                        th:classappend="${ticketPage.number == i} ? 'active' : ''">
-                        <a class="page-link" th:href="@{/admin/warranty(page=${i}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}" th:text="${i + 1}"></a>
-                    </li>
-                    <li class="page-item" th:classappend="${ticketPage.last} ? 'disabled' : ''">
-                        <a class="page-link" th:href="@{/admin/warranty(page=${ticketPage.number + 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}">Sau</a>
-                    </li>
+                    <li class="page-item" th:classappend="${ticketPage.first} ? 'disabled' : ''"><a class="page-link" th:if="${!ticketPage.first}" th:href="@{/admin/warranty(page=0, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}"><i class="bi bi-chevron-double-left"></i></a><span class="page-link" th:if="${ticketPage.first}"><i class="bi bi-chevron-double-left"></i></span></li>
+                    <li class="page-item" th:classappend="${ticketPage.first} ? 'disabled' : ''"><a class="page-link" th:if="${!ticketPage.first}" th:href="@{/admin/warranty(page=${ticketPage.number - 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}"><i class="bi bi-chevron-left"></i></a><span class="page-link" th:if="${ticketPage.first}"><i class="bi bi-chevron-left"></i></span></li>
+                    <li class="page-item" th:classappend="${ticketPage.number == 0} ? 'active'"><a class="page-link" th:if="${ticketPage.number != 0}" th:href="@{/admin/warranty(page=0, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}">1</a><span class="page-link" th:if="${ticketPage.number == 0}">1</span></li>
+                    <li class="page-item disabled" th:if="${ticketPage.number > 2}"><span class="page-link">...</span></li>
+                    <th:block th:with="start=${T(java.lang.Math).max(1, ticketPage.number - 1)}, end=${T(java.lang.Math).min(ticketPage.totalPages - 2, ticketPage.number + 1)}"><th:block th:if="${start <= end}" th:each="i : ${#numbers.sequence(start, end)}"><li class="page-item" th:classappend="${i == ticketPage.number} ? 'active'"><a class="page-link" th:if="${i != ticketPage.number}" th:href="@{/admin/warranty(page=${i}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}" th:text="${i + 1}"></a><span class="page-link" th:if="${i == ticketPage.number}" th:text="${i + 1}"></span></li></th:block></th:block>
+                    <li class="page-item disabled" th:if="${ticketPage.number < ticketPage.totalPages - 3}"><span class="page-link">...</span></li>
+                    <li class="page-item" th:classappend="${ticketPage.last} ? 'active'"><a class="page-link" th:if="${!ticketPage.last}" th:href="@{/admin/warranty(page=${ticketPage.totalPages - 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}" th:text="${ticketPage.totalPages}"></a><span class="page-link" th:if="${ticketPage.last}" th:text="${ticketPage.totalPages}"></span></li>
+                    <li class="page-item" th:classappend="${ticketPage.last} ? 'disabled' : ''"><a class="page-link" th:if="${!ticketPage.last}" th:href="@{/admin/warranty(page=${ticketPage.number + 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}"><i class="bi bi-chevron-right"></i></a><span class="page-link" th:if="${ticketPage.last}"><i class="bi bi-chevron-right"></i></span></li>
+                    <li class="page-item" th:classappend="${ticketPage.last} ? 'disabled' : ''"><a class="page-link" th:if="${!ticketPage.last}" th:href="@{/admin/warranty(page=${ticketPage.totalPages - 1}, size=${size}, keyword=${keyword}, status=${status}, sort=${sort})}"><i class="bi bi-chevron-double-right"></i></a><span class="page-link" th:if="${ticketPage.last}"><i class="bi bi-chevron-double-right"></i></span></li>
                 </ul>
             </nav>
         </div>

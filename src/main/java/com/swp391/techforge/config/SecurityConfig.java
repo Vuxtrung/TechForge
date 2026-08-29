@@ -37,9 +37,10 @@ public class SecurityConfig {
 						.requestMatchers("/account/**", "/checkout/**", "/orders/**", "/customer/warranty/**")
 						.authenticated()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.requestMatchers("/staff/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
-						.anyRequest().permitAll())
-
+					.requestMatchers("/staff/orders/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
+					.requestMatchers("/staff/warranty/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
+					.requestMatchers("/staff", "/staff/dashboard").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
+					.anyRequest().permitAll())
 				.formLogin(form -> form
 						.loginPage("/login")
 						.successHandler(authenticationSuccessHandler())
