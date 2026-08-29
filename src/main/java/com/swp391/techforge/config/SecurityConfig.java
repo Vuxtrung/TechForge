@@ -41,6 +41,8 @@ public class SecurityConfig {
 					.requestMatchers("/staff/warranty/**").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
 					.requestMatchers("/staff", "/staff/dashboard").hasAnyRole("STAFF_SALES", "STAFF_WARRANTY")
 					.anyRequest().permitAll())
+				.formLogin(form -> form
+						.loginPage("/login")
 						.successHandler(authenticationSuccessHandler())
 						.failureHandler(authenticationFailureHandler())
 						.permitAll())

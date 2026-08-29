@@ -291,7 +291,7 @@ public class OrderService {
             case CONFIRMED -> next == OrderStatus.SHIPPING || next == OrderStatus.CANCEL_REQUESTED || next == OrderStatus.CANCELLED;
             case SHIPPING -> next == OrderStatus.DELIVERED;
             case CANCEL_REQUESTED -> next == OrderStatus.CANCELLED || next == OrderStatus.CONFIRMED;
-            case DELIVERED, CANCELLED -> false;
+            default -> false;
         };
     }
 
